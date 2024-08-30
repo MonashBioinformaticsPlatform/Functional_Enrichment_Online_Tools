@@ -17,7 +17,8 @@ github-repo: https://github.com/MonashBioinformaticsPlatform/Functional_Enrichme
 # Getting started
 
 Instructors: 
-
+- Hossein V Kahrood
+- Cali Willet
 
 ## Summary
 
