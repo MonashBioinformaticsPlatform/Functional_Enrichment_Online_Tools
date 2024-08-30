@@ -17,8 +17,15 @@ github-repo: https://github.com/MonashBioinformaticsPlatform/Functional_Enrichme
 # Getting started
 
 Instructors: 
-- Hossein V Kahrood
-- Cali Willet
+- **Hossein V Kahrood**
+  - *Affiliation:* Monash Genomics and Bioinformatics Platform (MGBP)
+  - *Role:* Lead Instructor
+  - *Contact:* hossein.valipourkahrood@monash.edu
+
+- **Cali Willet**
+  - *Affiliation:* Sydney Informatics Hub
+  - *Role:* Lead Instructor
+  - *Contact:* cali.willet@sydney.edu.au
 
 ## Summary
 
