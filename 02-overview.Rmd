@@ -35,13 +35,69 @@ Links and material will be provided on the day. BYO coffee.
 
 ### Schedule
 
-Time	|	Programme
------------	| ------------------:
-10:30	|	Welcome & Session 1
-12:00	|	Break
-12:20	|	Session 2
-13:30	|	Wrap-up
+| Day  | Time  | Item | Activity | Time (mins) |
+|------|-------|------|----------|-------------|
+| **Day 1** | 3 hrs |      | **Welcome and housekeeping** | 10          |
+|        |       | HK   | Introduction | 10          |
+|        |       | HK   | Data acquisition | 5           |
+|        |       | HK   | Filtering gene list | 15          |
+|        |       | HK   | Hands-on with Interactive Calculator (breakout rooms) | 15          |
+|        |       |      | [Interactive Calculator](https://bioinformatics3.erc.monash.edu/rsconnect/content/241/) |             |
+|        |       | HK   | gProfiler [GO + pathways] | 20          |
+|        |       |      | [gProfiler](https://biit.cs.ut.ee/gprofiler/gost) |             |
+|        |       | HK   | Hands-on with gProfiler (breakout rooms) | 20          |
+|        |       | HK   | Break | 15          |
+|        |       | HK   | STRING | 20          |
+|        |       |      | [STRING](https://string-db.org/) |             |
+|        |       | HK   | Reactome | 20          |
+|        |       |      | [Reactome](https://reactome.org/) |             |
+|        |       | HK   | GSEA (GenePattern) | 30          |
+|        |       |      | [GSEA (GenePattern)](https://cloud.genepattern.org/gp/pages/index.jsf) |             |
+| **Day 2** | 3 hrs |      | **Welcome and housekeeping** | 5           |
+|        |       | HK   | Day-1 recap | 15          |
+|        |       | CW   | Using R for functional enrichment analysis | 30          |
+|        |       |      | **Applications and advantages** |             |
+|        |       |      | Working with confidential data |             |
+|        |       |      | Customisation, flexibility, reproducibility |             |
+|        |       |      | Automation and batch processing |             |
+|        |       | CW   | Available packages in R | 5           |
+|        |       |      | Clusterprofiler |             |
+|        |       |      | Gprofiler |             |
+|        |       |      | Any other? |             |
+|        |       | CW   | Introducing R, R Markdown, Rstudio | 30          |
+|        |       |      | Getting logged on RStudio environment |             |
+|        |       |      | Discuss R Markdown |             |
+|        |       |      | Discuss basic features of Rstudio |             |
+|        |       | CW   | Clusterprofiler - Hands-on | 30          |
+|        |       |      | Breakout rooms |             |
+|        |       | CW   | Work on and discuss results based on following criterion | 30          |
+|        |       |      | **Analysis** |             |
+|        |       |      | ORA |             |
+|        |       |      | GSEA |             |
+|        |       |      | Ontologies (GO) |             |
+|        |       |      | Pathway (KEGG, Reactome) |             |
+|        |       |      | Visualisations |             |
+|        |       | CW   | gprofiler - Hands-on | 30          |
+|        |       |      | Breakout rooms |             |
+|        |       | CW   | Work on and discuss specific features | 30          |
+|        |       |      | gost function with standard analysis and plots - Discuss how the plots from gprofiler are different (than clusterprofiler) and also useful |             |
+|        |       |      | Send analysis from R to g:Profiler web interface |             |
+|        |       |      | Sharing the results easily with colleagues |             |
+|        |       |      | To accompany a publication without the peers having to run the full analysis code in R |             |
+|        |       |      | Integrating results with external tools for visualisations |             |
+|        |       |      | Alter results using ggplot2, enrichplot, clusterProfiler |             |
+|        |       |      | Using custom annotations |             |
+|        |       |      | Non-model organisms, that are not annotated in the Ensembl database |             |
+|        |       |      | Enable users to upload custom annotation files |             |
+|        |       | CW   | Experiment wrap up | 30          |
+|        |       |      | Discuss results |             |
+|        |       |      | Enrichments look different from different tools - Why |             |
+|        |       |      | Wrap up and feedback | 5           |
 
+<!-- ### Abbreviations -->
+
+- **HK**: Hossein V Kahrood
+- **CW**: Cali Willet
 
 ### Post-workshop survey
 
