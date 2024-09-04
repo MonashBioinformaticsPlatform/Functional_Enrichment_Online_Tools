@@ -3,6 +3,7 @@ title: "Functional Enrichment Workshop"
 author: "Monash Genomics and Bioinformatics Platform (MGBP)"
 date: "Compiled: `r format(Sys.Date(), '%B %d, %Y')`"
 site: bookdown::bookdown_site
+output: bookdown::bs4_book
 documentclass: book
 bibliography: [book.bib, packages.bib]
 description: |
