@@ -4,11 +4,40 @@
 
 Enrichment statistics are based on a contingency table like so:
 
-|        Gene        | ..in term | ..not in term | Total |
-|:------------------:|----------:|--------------:|------:|
-|     ..in gene list |        50 |           100 |   150 |
-| ..not in gene list (but in background) |       200 |         15900 | 16100 |
-|              Total |       250 |         16000 | 16250 |
+<!-- |        Gene        | ..in term | ..not in term | Total | -->
+<!-- |:------------------:|----------:|--------------:|------:| -->
+<!-- |     ..in gene list |        50 |           100 |   150 | -->
+<!-- | ..not in gene list (but in background) |       200 |         15900 | 16100 | -->
+<!-- |              Total |       250 |         16000 | 16250 | -->
+
+
+<table border="1" style="border-collapse: collapse; width: 100%;">
+  <tr>
+    <th></th>
+    <th>..in term</th>
+    <th>..not in term</th>
+    <td>Total</td>
+  </tr>
+  <tr>
+    <th>..in gene list</th>
+    <td style="background-color: #ffcccb;">50</td>
+    <td style="background-color: #90ee90;">100</td>
+    <td>150</td>
+  </tr>
+  <tr>
+    <th>..not in gene list (but in background)</th>
+    <td style="background-color: #add8e6;">200</td>
+    <td style="background-color: #ffffe0;">15900</td>
+    <td>16100</td>
+  </tr>
+  <tr>
+    <td>Total</td>
+    <td>250</td>
+    <td>16000</td>
+    <!-- <td>16250</td> -->
+    <td style="color: orange;">16250</td> <!-- Colored text for 16250 -->
+  </tr>
+</table>
 
 
 This is based on the 16250 genes that were measured in your experiment. 
@@ -21,15 +50,63 @@ Note that there might be extra genes that weren't measured these are excluded fr
 
 ## Interactive Calculator
 
+### Fisher's Exact Test
+
 [*Link to open toy enrichment calculator*](https://bioinformatics3.erc.monash.edu/rsconnect/content/241/). 
 
 This calculates enrichment for a single hypothetical genelist (e.g. your RNAseq differentially expressed genelist) against a single hypothetical 'term' (some set of interesting genes, e.g. synaptic signaling genes). It makes a Venn diagram and a wordy description of what is being tested.
 
 You can adjust various factors and see their effect on the enrichment p-values. 
 
+> _Note:_ This is just a toy calculator for this training, it is quite limited. You can also use [online tools](https://www.socscistatistics.com/tests/fisher/default2.aspx) to play with.
 
-> _Note:_ This is just a toy calculator for this training, it quite limited. Bonus points if you break it. There are online hypergeometric test or fishers exact test calculators available if you ever need to calculate this directly e.g. : https://keisan.casio.com/exec/system/1180573201  
+In R, this can be achieved by:
+```{r, eval=FALSE}
+data <- matrix(c('a', 'b', 'c', 'd'), nrow = 2, byrow = TRUE)
+# One-tailed test
+fisher.test(data)
+# Two-tailed test
+fisher.test(data, alternative = "greater") # or "less"
+```
 
+Given this contingency table:
+
+|            | Category 1 | Category 2 | Total |
+|------------|------------|------------|-------|
+| **Group 1**   | \(a\)        | \(b\)        | \(a + b\) |
+| **Group 2**   | \(c\)        | \(d\)        | \(c + d\) |
+| **Total**     | \(a + c\)    | \(b + d\)    | \(a + b + c + d\) |
+
+
+### Hypergeometric Test
+
+Hypergeometric Test: This test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance. It models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).
+
+### Formulas
+
+$$P(X = k) = \frac{\binom{K}{k} \binom{N - K}{n - k}}{\binom{N}{n}}$$
+Where:
+
+  - \(N\) = Total number of items in the population.
+  
+  - \(K\) = Number of success items in the population.
+  
+  - \(n\) = Number of items in the sample.
+  
+  - \(k\) = Number of success items in the sample.
+  
+The parameters in our example:
+N=16250; K=250; n=150; k=50
+
+In R, this can be can be achieved by:
+```{r, eval=FALSE}
+phyper(k-1, K, N-K, n, lower.tail = FALSE)
+```
+
+Where:
+
+k−1 is the number of observed successes minus 1 (for the "at least" scenario).
+lower.tail = FALSE gives the probability of getting at least k successes (right-tail).
 
 ---
 

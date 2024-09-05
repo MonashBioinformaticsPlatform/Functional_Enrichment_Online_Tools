@@ -38,7 +38,6 @@ Links and material will be provided on the day. BYO coffee.
 ```{r, echo=FALSE, message=FALSE}
 library(knitr)
 suppressWarnings(library(kableExtra))
-library(downlit)
 
 # Create the table data
 schedule <- data.frame(
