@@ -51,6 +51,9 @@ Note that there might be extra genes that weren't measured these are excluded fr
 
 ### <span style="color:orange;">Fisher's Exact Test</span>
 
+Fisher's Exact Test is a statistical test used to determine if there are nonrandom associations between the proportions of two categorical variables. It calculates the exact probability of observing the given distribution of counts in a 2x2 contingency table, under the null hypothesis of no association between the variables.
+
+
 [*Link to open toy enrichment calculator*](https://bioinformatics3.erc.monash.edu/rsconnect/content/241/). 
 
 This calculates enrichment for a single hypothetical genelist (e.g. your RNAseq differentially expressed genelist) against a single hypothetical 'term' (some set of interesting genes, e.g. synaptic signaling genes). It makes a Venn diagram and a wordy description of what is being tested.
@@ -90,7 +93,7 @@ fisher.test(data, alternative = "greater") # or "less"
 ### <span style="color:orange;">Hypergeometric Test</span>
 
 
-This test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance. It models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).
+Hypergeometric test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance. It models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).
 
 
 > _Note:_ Here is a tool by [Stat Trek](https://stattrek.com/online-calculator/hypergeometric) to play around with the hypergeometric test.
