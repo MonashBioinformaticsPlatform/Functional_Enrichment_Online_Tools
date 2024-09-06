@@ -49,7 +49,7 @@ Note that there might be extra genes that weren't measured these are excluded fr
 
 ## Interactive Calculator
 
-### Fisher's Exact Test
+### <span style="color:orange;">Fisher's Exact Test</span>
 
 [*Link to open toy enrichment calculator*](https://bioinformatics3.erc.monash.edu/rsconnect/content/241/). 
 
@@ -87,7 +87,8 @@ fisher.test(data, alternative = "greater") # or "less"
 ```
 
 
-### Hypergeometric Test
+### <span style="color:orange;">Hypergeometric Test</span>
+
 
 This test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance. It models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).
 
