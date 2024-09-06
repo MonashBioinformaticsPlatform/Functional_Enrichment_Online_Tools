@@ -45,7 +45,6 @@ This is based on the 16250 genes that were measured in your experiment.
 Note that there might be extra genes that weren't measured these are excluded from the calculations entirely. E.g. There might have been an extra 5000 terms (some of which might have been annotated with the term of interest), making for 21250 _annotated_ genes.
 
 
-
 ---
 
 ## Interactive Calculator
@@ -58,16 +57,16 @@ This calculates enrichment for a single hypothetical genelist (e.g. your RNAseq 
 
 You can adjust various factors and see their effect on the enrichment p-values. 
 
-> _Note:_ This is just a toy calculator for this training, it is quite limited. You can also use [online tools](https://www.socscistatistics.com/tests/fisher/default2.aspx) to play with.
+> _Note:_ This is just a toy calculator for this training, it is quite limited. You can also use some online tools like [Social Science Statistics](https://www.socscistatistics.com/tests/fisher/default2.aspx) to play with.
 
-In R, this can be achieved by:
-```{r, eval=FALSE}
-data <- matrix(c('a', 'b', 'c', 'd'), nrow = 2, byrow = TRUE)
-# One-tailed test
-fisher.test(data)
-# Two-tailed test
-fisher.test(data, alternative = "greater") # or "less"
-```
+*Formula*:
+$$P = \frac{(a + b)!(c + d)!(a + c)!(b + d)!}{a!b!c!d!N!}$$
+
+Where:
+
+- \(a\), \(b\), \(c\), and \(d\) are the observed counts in the 2x2 contingency table.
+
+- \(N\) is the total number of observations, \(N = a + b + c + d\).
 
 Given this contingency table:
 
@@ -78,12 +77,24 @@ Given this contingency table:
 | **Total**     | \(a + c\)    | \(b + d\)    | \(a + b + c + d\) |
 
 
+*R syntax*
+```{r, eval=FALSE}
+data <- matrix(c(a, b, c, d), nrow = 2, byrow = TRUE)
+# Two-tailed test
+fisher.test(data, alternative = "two.sided")
+# One-tailed test
+fisher.test(data, alternative = "greater") # or "less"
+```
+
+
 ### Hypergeometric Test
 
-Hypergeometric Test: This test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance. It models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).
+This test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance. It models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).
 
-### Formulas
 
+> _Note:_ Here is a tool by [Stat Trek](https://stattrek.com/online-calculator/hypergeometric) to play around with the hypergeometric test.
+
+*Formula:*
 $$P(X = k) = \frac{\binom{K}{k} \binom{N - K}{n - k}}{\binom{N}{n}}$$
 Where:
 
@@ -98,7 +109,7 @@ Where:
 The parameters in our example:
 N=16250; K=250; n=150; k=50
 
-In R, this can be can be achieved by:
+*R syntax*
 ```{r, eval=FALSE}
 phyper(k-1, K, N-K, n, lower.tail = FALSE)
 ```
