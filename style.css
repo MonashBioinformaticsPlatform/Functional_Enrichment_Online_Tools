@@ -1,3 +1,17 @@
+/* Target links inside paragraphs and lists (i.e., typical body text links) */
+p a, li a {
+  color: green;
+}
+
+/* Optional: Style hovered and visited links differently if desired */
+p a:visited, li a:visited {
+  color: darkgreen;
+}
+
+p a:hover, li a:hover {
+  color: limegreen;
+}
+
 p.caption {
   color: #777;
   margin-top: 10px;

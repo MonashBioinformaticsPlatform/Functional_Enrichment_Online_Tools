@@ -8,7 +8,8 @@ language:
     chapter_name: "Chapter "
 rmd_files:
   - index.Rmd
-  - 02-overview.Rmd
+  - 01-overview.Rmd
+  - 02-recap.Rmd
   - 03-stats.Rmd
   - 04-example-dataset.Rmd
   - 05-genelists.Rmd
