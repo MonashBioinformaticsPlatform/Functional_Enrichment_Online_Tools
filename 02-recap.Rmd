@@ -42,6 +42,8 @@ It's important to note that the term "functional enrichment analysis" is often u
 - ...
 
 ## Concepts
+He we will explore key concepts that are essential to perform and interpret enrichment analysis, including gene lists, background sets, p-values, false discovery rates, and the role of annotation databases. These concepts form the foundation for making sense of the biological significance of experimental findings.
+
 - <span style="color: orange;">Gene List:</span>
 A gene list is the collection of genes (or proteins) that are of particular interest in a biological experiment. This list typically arises from high-throughput experiments such as transcriptomics, proteomics, or genomics, where genes are differentially expressed, mutated, or otherwise identified as significant. In functional enrichment analysis, the gene list is used to assess whether certain biological pathways, gene ontologies, or functions are statistically overrepresented compared to a reference or background set.
 
