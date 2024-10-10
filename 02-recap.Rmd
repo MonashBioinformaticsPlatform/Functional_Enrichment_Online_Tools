@@ -1,7 +1,7 @@
 # Recap
 
 ## Functional enrichment analysis
-Functional enrichment analysis refers to a set of computational approaches designed to derive biological meaning from lists of biomolecules, such as genes, proteins, or metabolites.
+Functional enrichment analysis (FEA) refers to a set of computational approaches designed to derive biological meaning from lists of biomolecules, such as genes, proteins, or metabolites.
 
 By focusing on the biological significance of biomolecular changes, functional enrichment analysis enables researchers to make sense of complex high-throughput data from large-scale studies, revealing the key cellular processes and signaling pathways involved in health and disease states.
 
@@ -14,20 +14,15 @@ Functional enrichment analysis provides a solution by organising these biomolecu
 ### When to Use Functional Enrichment Analysis?
 Functional enrichment analysis is typically applied after conducting a differential expression analysis or other comparative analyses in omics studies. This step is essential when attempting to derive biological insights from large lists of biomolecules that exhibit significant changes in expression, modification, or abundance between experimental groups. Below are common scenarios where functional enrichment analysis is particularly valuable:
 
-- Transcriptomics (high-fat diet vs. low-fat diet)
-- Proteomics (tumor tissue vs. healthy tissue)
-- Lipidomics (disease vs. healthy state)
-- Epigenomics (DNA methylation)
+- Transcriptomics (eg high-fat diet vs. low-fat diet)
+- Proteomics (eg tumor tissue vs. healthy tissue)
+- Lipidomics (eg disease vs. healthy state)
+- Metabolomics (eg diabetic vs. non-diabetic patients)
+- Epigenomics (eg smokers vs. non-smokers)
 - ...
 
 ### What Are the Input Data?
 Functional enrichment analysis relies on carefully prepared input data derived from an -omics study. The data inputs typically consist of the following components depending on the type of the enrichment analysis:
-
-- <span style="color: orange;">List of Features:</span> This refers to the subset of biomolecules identified as significantly regulated or altered in the study. Features might include genes, proteins, lipids, or other biomolecules, depending on the type of -omics data.
-
-- <span style="color: orange;">Background Set:</span> The background set, or universe, consists of all the features that were measured in the study or a defined subset of the total genome, proteome, or metabolome being studied. The background is critical for enrichment analysis because it provides the context against which the significance of feature enrichment is assessed.
-
-- <span style="color: orange;">Ranked List:</span> In some enrichment methods, such as Gene Set Enrichment Analysis (GSEA), a ranked list is used instead of a simple feature list. The ranking is typically based on a continuous metric such as the magnitude of gene expression changes or some sort of statistical test output. This ranked list helps prioritise features that exhibit the strongest biological relevance and facilitates more nuanced enrichment analyses that consider the direction and strength of biomolecular changes.
 
 ### Synonyms
 It's important to note that the term "functional enrichment analysis" is often used in different ways across the field. The diversity in terminology can sometimes cause confusion, as the same concept is referred to by various synonymous terms. These include:
@@ -42,7 +37,7 @@ It's important to note that the term "functional enrichment analysis" is often u
 - ...
 
 ## Concepts
-He we will explore key concepts that are essential to perform and interpret enrichment analysis, including gene lists, background sets, p-values, false discovery rates, and the role of annotation databases. These concepts form the foundation for making sense of the biological significance of experimental findings.
+Here we will explore key concepts that are essential to perform and interpret enrichment analysis, including gene lists, background sets, p-values, false discovery rates, and the role of annotation databases. These concepts form the foundation for making sense of the biological significance of experimental findings.
 
 - <span style="color: orange;">Gene List:</span>
 A gene list is the collection of genes (or proteins) that are of particular interest in a biological experiment. This list typically arises from high-throughput experiments such as transcriptomics, proteomics, or genomics, where genes are differentially expressed, mutated, or otherwise identified as significant. In functional enrichment analysis, the gene list is used to assess whether certain biological pathways, gene ontologies, or functions are statistically overrepresented compared to a reference or background set.
@@ -79,6 +74,12 @@ knitr::include_graphics("images/fea_types.jpg")
 ### Over Representation Analysis (ORA)
 Over Representation Analysis (ORA) is one of the simplest and most widely used methods for functional enrichment analysis. ORA aims to determine whether specific biological categories (e.g., pathways, Gene Ontology terms) are statistically overrepresented in a given list of features (like genes or proteins) compared to a background or reference set. This method focuses on counting the number of features from the list that are associated with a specific category and comparing this count to what would be expected by chance.
 
+#### Input Data
+- <span style="color: orange;">List of Features:</span> This refers to the subset of biomolecules identified as significantly regulated or altered in the study. Features might include genes, proteins, lipids, or other biomolecules, depending on the type of -omics data.
+
+- <span style="color: orange;">Background Set:</span> The background set, or universe, consists of all the features that were measured in the study or a defined subset of the total genome, proteome, or metabolome being studied. The background is critical for enrichment analysis because it provides the context against which the significance of feature enrichment is assessed.
+
+#### Workflow
 <span style="color: orange;"><em>How it works</em></span>: ORA uses a predefined feature list (e.g., from differentially expressed genes), calculates the number of features in the list that belong to a certain category (e.g., a pathway), and tests whether this number is significantly higher than expected using statistical tests like the hypergeometric test or Fisher's exact test.
 
 <span style="color: orange;"><em>Strengths</em></span>: Simple and easy to implement. Works well with a predefined list of significant features.
@@ -88,6 +89,12 @@ Over Representation Analysis (ORA) is one of the simplest and most widely used m
 ### Gene Set Enrichment Analysis (GSEA)
 Gene Set Enrichment Analysis (GSEA) also known as Functional Class Scoring (FCS) is a more sophisticated method that avoids the need to define a strict cut-off for selecting a list of significant features. Instead of using a discrete list of differentially expressed features, GSEA analyses ranked feature expression data. It evaluates whether predefined gene sets (such as pathways or functional categories) are enriched at the top or bottom of the ranked list, capturing subtle but coordinated changes in gene expression.
 
+#### Input Data
+- <span style="color: orange;">Ranked List:</span> In some enrichment methods, such as Gene Set Enrichment Analysis (GSEA), a ranked list is used instead of a simple feature list. The ranking is typically based on a continuous metric such as the magnitude of gene expression changes or some sort of statistical test output. This ranked list helps prioritise features that exhibit the strongest biological relevance and facilitates more nuanced enrichment analyses that consider the direction and strength of biomolecular changes.
+
+- <span style="color: orange;">Gene Sets:</span> This refers to predefined groups of genes that share a common biological property, such as involvement in a specific biological pathway, functional category, or regulatory process. The most commonly used format for gene sets in MSigDB is the GMT format.  This format is simple, human-readable, and widely supported by various GSEA tools.
+
+#### Workflow
 <span style="color: orange;"><em>How it works</em></span>: GSEA first ranks all genes in the dataset according to their differential expression levels (e.g., from a control to a condition). Then, for each predefined gene set, it calculates an enrichment score (ES) that reflects the concentration of the gene set members at the extremes of the ranked list. Statistical significance is assessed through permutation testing, and the False Discovery Rate (FDR) is used to correct for multiple comparisons.
 
 <span style="color: orange;"><em>Strengths</em></span>: GSEA avoids arbitrary thresholds for feature selection and can detect coordinated changes across sets of genes, even if individual genes within the set do not show significant differential expression.
@@ -97,6 +104,11 @@ Gene Set Enrichment Analysis (GSEA) also known as Functional Class Scoring (FCS)
 ### Pathway Topology (PT)-Based Enrichment
 Pathway Topology (PT)-based enrichment analysis extends beyond merely counting features and instead incorporates the topological structure of biological pathways. This method evaluates not only which features are part of a pathway but also their position and interactions within the pathway. By considering the connectivity and interaction strength between features, PT-based approaches provide a more biologically meaningful interpretation of pathway activation or suppression.
 
+#### Input Data
+- <span style="color: orange;">List of Features or Ranked List:</span> Already explained.
+- <span style="color: orange;">Pathway Topology:</span> This refers to the structure of a biological pathway, which includes detailed information about the interactions and relationships between gene products (such as proteins or RNAs) within a pathway.
+
+#### Workflow
 <span style="color: orange;"><em>How it works</em></span>: PT-based methods take into account the direction and magnitude of feature expression changes, as well as the structure of pathways (e.g., signaling cascades, metabolic pathways). They consider how biomolecule products interact with one another and the specific roles of each gene within the pathway. Topological factors like the number of connections a gene has or its centrality in the pathway are considered when assessing the enrichment.
 
 <span style="color: orange;"><em>Strengths</em></span>: Provides more biologically relevant insights by considering gene-gene interactions and the position of each gene within a pathway. It is particularly useful for complex pathways where the roles of genes differ based on their interactions with others.
@@ -150,4 +162,4 @@ knitr::include_graphics("images/GSEA-homegraphic.gif")
 ```
 
 
-## Functional Enrichment Analysis in R
+## Common Tools for Doing FEA
