@@ -141,7 +141,7 @@ This will be our input file for the first activity.
 
 To open an existing notebook in RStudio, select `File` &rarr; `Open file` or use the keyboard shortcut `ctrl + o`. 
 
-The first code chunk defines the working directory. Setting the working directory is important, as we can then point to the input files we need, and specify output file save locations, relative to this directory. 
+The code chunk labelled `working directory` defines the working directory. Setting the working directory is important, as we can then point to the input files we need, and specify output file save locations, relative to this directory. 
 
 &#x27A4; Run the working directory code chunk, and confirm that it prints the `day_2` path.
 

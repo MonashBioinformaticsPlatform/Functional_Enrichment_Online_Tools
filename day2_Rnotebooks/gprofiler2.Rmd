@@ -1,0 +1,249 @@
+---
+title: "ORA with gprofiler2"
+output: html_notebook
+---
+
+
+```{r Load R packages, include=FALSE}
+library(readr)
+library(dplyr)
+library(gprofiler2)
+library(ggplot2)
+
+```
+
+
+[`gprofiler2`](https://cran.r-project.org/web/packages/gprofiler2/index.html) is the R interface to the [`g:Profiler`](https://biit.cs.ut.ee/gprofiler/gost) toolset. 
+
+Like the web interface, gprofiler2 performs ORA with `g:GOSt` against multiple databases simultaneously. It supports multiple namespaces and numerous species. 
+
+# 1. Load input data
+
+The dataset comprises 2 experimental groups (differentiated and undifferentiated cells in response to  treatment) with 3 replicates in each group. The raw data from [Pezzini et al 2016](https://link.springer.com/article/10.1007/s10571-016-0403-y) was subjected to differential gene expression analysis with [Degust](https://degust.erc.monash.edu/) and the results file saved. 
+
+You will find a copy of the DE results `Pezzini_DE.txt` within the `Functional_enrichment_workshop_2024/day_2` folder. 
+
+First, ensure that your working directory reflects this day_2 folder:
+
+```{r working directory}
+#### UPDATE FOR VMS 
+setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+####
+
+getwd()
+```
+Please ask for assistance if this step does not show the day_2 folder path! 
+
+Once your working directory is set, load the DE input file, and inspect the first few lines: 
+
+
+```{r load input data}
+data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
+head(data)
+```
+
+The dataframe shows genes with fold change and FDR values, along with some normalised counts values for the 6 samples. 
+
+Look on the environment pane of RStudio, and you can see a description '14420 obs. of 10 variables' - this shows your dataframe consists of 10 columns and 14,420 genes. 
+
+# 2. Get ORA gene list
+
+Now we need to filter for DEGs, and we will apply the same thresholds as applied in day 1: adjusted P values/FDR < 0.01, and log2fold change of 2. 
+
+```{r get ORA gene list}
+degs <- data %>%
+  filter(FDR < 0.01 & abs(Log2FC) > 2) %>%
+  pull(Gene.ID)
+cat("Number of genes passing FDR and fold change filter:", length(degs), "\n")
+```
+We have 792 genes passing our filters. 
+
+# 3. Get background gene list
+
+Recall from the webinar and day 1 of the workshop that an experimental background gene list is crucial to avoiding false positives and minimising tissue bias. 
+
+The analysis in Degust has already removed lowly expressed genes, so we can simply extract all genes from this data matrix as our background gene list and save it as our 'background' object. 
+
+```{r get background }
+background <- data$Gene.ID
+cat("Number of background genes:", length(background), "\n")
+
+#background_gene_list_names <- data$Gene.Name
+
+```
+
+# 4. Run ORA with `gost` function
+
+Before running the below code chunk, review the parameters. Observe the similarities to what was available on the g:Profiler web interface, for example organism, the correction method (g:Profiler's custom `g_scs` method), and domain scope. 
+
+Every R package has a user guide that outlines available parameters. Open the [gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/gprofiler2.pdf) user guide and navigate to page detailing the `gost` function (currently page 6). 
+
+Under the `Usage` subheading, all available  parameters are listed, along with their default settings.  You can over-ride these parameters by specifying your custom values in your R command. 
+
+The below full code shows all parameters: 
+
+```{r run gost}
+ora <- gost( 
+    degs, 
+    organism = "hsapiens", 
+    ordered_query = FALSE, 
+    multi_query = FALSE, 
+    significant = TRUE, 
+    exclude_iea = FALSE, 
+    measure_underrepresentation = FALSE, 
+    evcodes = FALSE, 
+    user_threshold = 0.05, 
+    correction_method = "g_SCS", 
+    domain_scope = "custom_annotated", 
+    custom_bg = background, 
+    numeric_ns = "", 
+    sources = NULL, 
+    as_short_link = FALSE, 
+    highlight = FALSE 
+)
+```
+
+Since we are using many of the default parameters, we could shorten this code to what is shown below. The results would be identical. 
+
+```{r run gost short code }
+ora <- gost( 
+    degs, 
+    correction_method = "g_SCS", 
+    domain_scope = "custom_annotated",
+    custom_bg = background,
+)
+```
+
+
+We have now run ORA with gprofiler2! View the topmost significant enrichments with the R `head` command. Only significant enrichments passing your specified threshold are included in the results object. 
+
+
+```{r head ora}
+head(ora$result)
+```
+
+
+These are all biological process. What databases did this run ORA against?
+
+
+```{r gost dbs}
+unique(ora$result$source)
+```
+Same as the web tool, we have enrichment results for GP (BP, CC, MF), HP (human phenotype), HPA (human protein atlas), KEGG, MiRNA, Reactome, Transcription Factors and WikiPathways. 
+
+One of the strenghts of gprofiler is the ability to quickly and easily perform enichment against many databses with one simple run. 
+
+# 5. Save the results to a file
+
+The results can be saved as a TSV or CSV to simplify sharing or local viewing outside the R environment. The output can be re-ordered to more closely match what is produced in the web tool: 
+
+
+```{r write ora table}
+
+ora_reordered <- ora$result[, c("source", "term_name", "term_id", "p_value", "term_size", "query_size", "intersection_size", "effective_domain_size")]
+
+head(ora_reordered)
+
+write.csv(ora_reordered, "gprofiler_ORA_results.csv", row.names = FALSE)
+
+
+```
+
+
+# 6. Visualise the results 
+
+If we obtain a list of databases that gost has enriched against, we can use a loop to create dotplots of enriched terms for each database separately. 
+
+
+```{r dotplot ora}
+
+dbs <- unique(ora$result$source)
+
+# Loop through each database and create plots
+for (db in dbs) {
+  #db_results <- ora$result 
+  db_results <- ora$result %>% filter(source == db)
+  
+  # Create a dot plot for the current database
+  p <- ggplot(db_results, aes(x = reorder(term_name, -p_value), y = -log10(p_value))) +
+    geom_point(aes(size = term_size, color = significant)) +
+    labs(title = paste("Database: ", db), 
+         x = "Term", 
+         y = "-log10(p-value)") +
+    theme_minimal() +
+    coord_flip()  # Flips the coordinates for better visibility
+  
+  # Print the plot
+  print(p)
+}
+```
+
+Notice the glut of terms with large sizes. Let's re-run, but restrict maximum term size to 500, in order to minimise the higher-order processes from obscuring more specific results. 
+
+```{r dotplot ora restrict term size }
+
+dbs <- unique(ora$result$source)
+
+# Loop through each database and create plots
+for (db in dbs) {
+  #db_results <- ora$result 
+  db_results <- ora$result %>% filter(source == db, term_size <= 500)
+  
+  # Create a dot plot for the current database
+  p <- ggplot(db_results, aes(x = reorder(term_name, -p_value), y = -log10(p_value))) +
+    geom_point(aes(size = term_size, color = significant)) +
+    labs(title = paste("Database: ", db), 
+         x = "Term", 
+         y = "-log10(p-value)") +
+    theme_minimal() +
+    coord_flip()  # Flips the coordinates for better visibility
+  
+  # Print the plot
+  print(p)
+}
+
+```
+
+
+Note that for plots with a lot of enriched terms, the display within the notebook is less than ideal. Saving the plot to an image file enables better resolution: 
+
+
+```{r save go bp plot}
+
+# Filter for the GO:BP database
+go_bp_results <- ora$result %>% filter(source == "GO:BP", term_size <= 500)
+
+# Create the plot for GO:BP
+p_go_bp <- ggplot(go_bp_results, aes(x = reorder(term_name, -p_value), y = -log10(p_value))) +
+  geom_point(aes(size = term_size, color = significant)) +
+  labs(title = "GO:BP Database", 
+       x = "Term", 
+       y = "-log10(p-value)") +
+  theme_minimal() +
+  coord_flip()  # Flips the coordinates for better visibility
+
+# Save the plot as a PDF in full page size:
+
+# Open a PDF device to save the plot
+pdf("go_bp_plot.pdf", width = 8.27, height = 11.69)  # A4 portrait size in inches
+
+# Print the plot to the device
+print(p_go_bp)
+
+# Close the device (this saves the plot)
+dev.off()
+
+```
+
+# 7. Compare gprofiler2 R results to the g:Profiler web results
+
+
+
+
+# 8. Run a gost multi-query for up-regulated and down-regulated genes, and compare the results to those generated from the full DEG gene list
+
+
+https://rdrr.io/cran/gprofiler2/f/vignettes/gprofiler2.Rmd
+
+
+
