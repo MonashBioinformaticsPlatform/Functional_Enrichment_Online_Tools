@@ -1,0 +1,30 @@
+# ORA with gprofiler2
+
+[gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) is the R interface to the 'g:Profiler' toolset that you used in day 1 of the workshop.
+
+Like the web interface, gprofiler2 performs ORA with `g:GOSt` against multiple databases simultaneously. 
+
+It supports all the same organisms, namespaces and data sources as the web tool. The list of organisms and corresponding data sources is available [here](https://biit.cs.ut.ee/gprofiler/page/organism-list) (n = 984). 
+The full list of namespaces that g:Profiler recognizes is available [here](https://biit.cs.ut.ee/gprofiler/page/namespaces-list). 
+
+## Input data 
+
+Since we are doing ORA, we will need a filtered gene list, and a background gene list. We will continue with the RNAseq dataset from [Pezzini et al 2016](https://link.springer.com/article/10.1007/s10571-016-0403-y) introduced yesterday. 
+
+## Activity overview
+
+1. Load input dataset (a gene matrix with adjusted P values and log2 fold change values) 
+2. Filter for differentially expressed genes (DEGs) and create a gene list R object
+3. Extract background genes and create a background gene list R object
+4. Run ORA with `gost` function
+5. Save the tabular results to a file
+6. Visualise the results 
+7. Compare gprofiler2 R results to the g:Profiler web results
+8. Run a gost multi-query for up-regulated and down-regulated genes, and compare the results to those generated from the full DEG gene list
+
+&#x27A4; Go back to your RStudio interface, where we have opened the `gprofiler2.Rmd` notebook and loaded the required R packages. 
+
+Instructions and information for the rest of this activity will continue from the notebook. 
+
+
+
