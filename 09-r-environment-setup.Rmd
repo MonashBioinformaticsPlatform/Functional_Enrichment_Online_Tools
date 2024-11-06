@@ -1,0 +1,161 @@
+# R environment set up 
+
+For today's session, we will be using the [R](https://www.r-project.org/) statistical programming language to perform functional enrichmemt analysis using a range of dedicated R packages. To simplify our work, we will be using the [RStudio](https://posit.co/download/rstudio-desktop/) integrated development environment. 
+
+This will create a central place to write code, comments, run code, view and save graphics.
+
+## RStudio basics
+
+RStudio has been installed on your VM. 
+
+&#x27A4; Open RStudio by clicking on the taskbar shortcut.
+
+![RStudio logo](images/rstudio_logo.png)
+
+
+When RStudio opens, you will see empty 'Console', 'History' and 'Plots' panes. 
+
+![RStudio logo](images/rstudio-default-open.png)
+
+The 'Console' contains the command prompt (>) which is where R commands are entered. Test this out by issuing the command to show your current working directory:
+
+```{r getwd}
+getwd()
+```
+
+If you are unfamiliar with R, don't worry because we will provide all the R code that you need to complete today's workshop. 
+
+&#x27A4; Click on 'Environment' to change the pane to list all active objects in your R session. 
+
+An object refers to things like imported datasets, R dataframes, variables, etc. For a new session, the environment is empty. 
+
+Let's put something in there:
+
+&#x27A4; Create an R variable called 'name' and fill it with your name, then print it with the 'cat' command:
+
+```{r my name}
+name <- 'Cali'
+cat(name)
+```
+
+Note that the object 'name' is now listed in the environment. 
+
+Now let's see the plots pane in action by creating a simple dummy barplot. 
+
+&#x27A4; Copy paste the below code into your console and press enter:
+
+```{r plot}
+values <- c(5, 10, 15)
+labels <- c("A", "B", "C")
+barplot(values, names.arg = labels)
+```
+
+You will now see a barplot in the plots pane, as well as 2 new objects in the environment. Note that the environment list also tells you what type of objects it is: for our 'name' object, the double quotes indicate it's a single string, where 'chr [1:3]' for 'labels' shows that it is a 'character vector' with 3 text elements and 'num [1:3]' indicates that 'values' is a numeric vector with 3 values. The only message to takeaway here is that the environment shows your active R objects, and that these are of different types. 
+
+## R notebooks 
+
+Today we will not be entering R commands directly into the console like this. We will instead be using an R notebook. 
+
+Using notebooks in RStudio is a great way to save your code and comments, as well as have the code output display inside the notebook. Notebooks can be easily shared with others so they can run your analysis, and also rendered to HTML which is a neat way of saving and presenting results to others. 
+
+&#x27A4; Open a new R notebook from the RStudio toolbar by selecting `File` &rarr; `New file` &rarr; `R Notebook`:   
+
+![RStudio logo](images/rstudio-new-notebook.png)
+
+
+The new notebook opens in the 'Editor pane'. It has a placeholder title and basic starting instructions. 
+
+### Code chunks
+
+A code chunk is placed within triple backticks, and the language of the code is included on the first line, in this case `'r'`. Having code in chunks is a way of grouping and running related lines of code together. 
+
+Code chunks can be run by using the green arrow to the right of the chunk or by clicking inside the chunk and entering `ctrl + shift + enter`. There are additional run options under the `Run` menu from the top bar - for example `Run current chunk`, `Run next chunk`, or `Run all chunks below` etc. 
+
+&#x27A4; Run the demo code chunk to plot 'cars'
+
+Note that the plot dispalys *inside* the notebook, rather than within the plot pane as we saw earlier. 
+
+Code chunks can also be given labels, by placing these inside the curly brackets, leaving a space after the `'r'`. 
+
+Code chunks can be added with the shortcut `ctrl + alt + i` or via the toolbar `Code` &rarr; `Insert chunk`
+
+&#x27A4; Add a code chunk and label it 'barplot'. Then copy the dummy barplot code from earlier into the code chunk and run it
+
+
+```{r barplot}
+values <- c(5, 10, 15)
+labels <- c("A", "B", "C")
+barplot(values, names.arg = labels)
+```
+### Rendered HTML notebooks
+
+Next we will look at what a HTML version of the notebook looks like. In order to preview the HTML, we first need to save the notebook. 
+
+&#x27A4;  Change the title to something of your choice and make any other edits you want to, such as deleting some of the default content 
+
+**Note:** don't delete the `output: html_notebook` content from under the title! This will prevent the option to preview the html. 
+
+&#x27A4; Save the notebook (either `ctrl + s` or `File` &rarr; `Save as`)
+
+&#x27A4; Preview the HTML by selecting 'Preview' from the editor pane toolbar 
+
+`Preview` is for a quick check of how your notebook renders while working on it. For a fullly rendered, static document, use the `knit` function. 
+
+&#x27A4; Knit the notebook to HTML by selecting  `Knit` &rarr; `Knit to HTML` from the editor pane toolbar 
+
+For today's activities, we will provide you with R notebooks containing the code required to run the analysis. After each activity, you may choose to knit the notebook to HTML to have a static record of your work. 
+
+### A fresh workspace
+
+Next we will open the R notebook for the first analysis activity.  It's ideal to start a new analysis with a clear environment, to avoid unintended object name clashes. To clear the environment, you can either close and re-open RStudio, or manually clear the environment and command history. 
+
+&#x27A4; Clear your environment using either option 1 or option 2
+
+***Option 1: close and re-open RStudio***
+
+When you close RStudio, you will likely be asked `Save workspace image to ~/R.Data?`. It is typically advisable to select `Don't Save`. Not saving the workspace image can help avoid workspace clashes that are hard to resolve. You don't need to worry about losing data - after all, your input data is saved elsewhere, and your R code that produces all required outputs is safely saved within the notebook.
+
+Saving the workspace image saves all objects from the session such as your variables and dataframes. This can save time if you need to close an analysis part way through and continue later. However, this can have drawbacks such as the clashes as mentioned, as well as large file size, relic objects cluttering thr workspace, old objects conflicting with new ones, etc. 
+
+***Option 2: manualy clear environment and history***
+
+Close the Rmd file, clear the command history by selecting the broom icon in the history pane, then clear all objects from the environment by entering the following R command in the console:
+
+```{r}
+rm(list = ls())
+```
+
+
+
+### Working directory
+
+Now that we have a clear workspace, we will prepare for the first analysis activity by opening the notebook and checking our working directory. 
+
+On your VMs you will find a folder under `My Documents` named `Functional_enrichment_workshop_2024`. This has folders for `day_1` and `day_2`. 
+
+&#x27A4; Open the `day_2` folder and confirm that it contains the input data file `Pezzini_DE.txt`
+
+This will be our input file for the first activity. 
+
+&#x27A4; Open RStduio and load the notebook `My Documents/Functional_enrichment_workshop_2024/day_2/gprofiler2.Rmd`
+
+To open an existing notebook in RStudio, select `File` &rarr; `Open file` or use the keyboard shortcut `ctrl + o`. 
+
+The first code chunk defines the working directory. Setting the working directory is important, as we can then point to the input files we need, and specify output file save locations, relative to this directory. 
+
+&#x27A4; Run the working directory code chunk, and confirm that it prints the `day_2` path.
+
+Scroll down to the code chunk labelled `Load input data`. Note that the filepath is simply `Pezzini_DE.txt`. We don't need to specify the full path to our working directory, only the relative path. Since the notebook working directory and input data are both within the same directory, we can simply load the input file by providing the fle name. 
+
+
+### R packages
+
+Immediately above the `Load input data` is a code chunk labelled `Load R packages`. This contains all of the R packages required to run the analysis contained within the workbook. Loading all required packages within the notebook, rather than directly via the console, ensures that anyone running your notebook does not encounter errors if they forget to load a required package. 
+
+Note that the packages that are loaded to the session with the R `library` command must first be installed; this has already been been done for you on these VMs. Attempts to load a package that is not installed will meet a fatal error, and installation can then be peformed (not difficult in R) before resuming.
+
+Note that the code chunk label also contaisn the text `include=FALSE`. This prevents the loading of libraries, which can at times have verbose output, from cluttering up your rendered notebook when it is previewed or knit. 
+
+&#x27A4; Run the `Load R packages` code chunk. 
+
+Please let us know if you have any errors loading the packages. Don't be alarmed that the output is red! :relaxed:
