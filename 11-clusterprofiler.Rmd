@@ -1,0 +1,52 @@
+# GSEA with clusterProfiler
+
+
+[clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has inbuilt functions to run ORA (`enrich<DB>`) or GSEA (`gse<DB>`) over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as functions to perform ORA (`enricher`) or GSEA (`gsea`) with custom gene sets.
+
+It supports all organisms available in KEGG. It has a companion plotting package `enrichPlot` dedicated to plotting `clusterProfiler` results. 
+
+The `clusterProfiler` user guide can be found [here](https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf). 
+
+The `enrichplot` user guide can be found [here](https://www.bioconductor.org/packages/devel/bioc/manuals/enrichplot/man/enrichplot.pdf). 
+
+
+## Input data 
+
+We will use the same RNAseq dataset from the previous activity ([Pezzini et al 2016](https://link.springer.com/article/10.1007/s10571-016-0403-y)).
+
+
+## Activity overview
+
+1. Load input dataset (a gene matrix with adjusted P values and log2 fold change values) 
+2. Extract the gene IDs and sort by log2 fold change to create the GSEA gene list
+3. Use the `gse<DB>` function to run GSEA over supported databases
+4. Visualise GSEA results with `enrichplot`
+5. Use the `enrich<DB>` function to run ORA over supported databases
+6. Visualise ORA results with `enrichplot`
+7. Import a database that is not directly supported by the `enrich` or `gse` functions and use the `enricher` and `gsea` generic functions to perform ORA and GSEA
+
+
+&#x27A4; Refresh your Rstudio workspace with option 1 or option 2
+
+***Option 1: close and re-open RStudio***
+
+Close RStudio, and if asked `Save workspace image to ~/R.Data?` select `Don't Save`. Then, re-open RStudio. 
+
+***Option 2: manualy clear environment and history***
+
+Close the Rmd file, clear the command history by selecting the broom icon in the history pane, then clear all objects from the environment by entering the following R command in the console:
+
+```{r}
+rm(list = ls())
+```
+
+&#x27A4; Open the `clusterProfiler.Rmd` notebook in RStudio
+
+**Instructions and information for the rest of this activity will continue from the notebook.**
+
+
+## End of activity summary
+
+
+
+

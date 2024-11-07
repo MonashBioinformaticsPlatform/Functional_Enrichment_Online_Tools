@@ -26,13 +26,21 @@ You will find a copy of the DE results `Pezzini_DE.txt` within the `Functional_e
 
 First, ensure that your working directory reflects this day_2 folder:
 
-```{r working directory}
-#### UPDATE FOR VMS 
+
+```{r setup, include=FALSE}
+# Set the root directory for all notebook chunks
+knitr::opts_knit$set(root.dir = "C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+
+# and set the working directory for the console:
 setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
-####
+
 
 getwd()
+
 ```
+
+
+
 Please ask for assistance if this step does not show the day_2 folder path! 
 
 Once your working directory is set, load the DE input file, and inspect the first few lines: 
