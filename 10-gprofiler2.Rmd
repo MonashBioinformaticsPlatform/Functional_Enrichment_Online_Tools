@@ -24,7 +24,21 @@ Since we are doing ORA, we will need a filtered gene list, and a background gene
 
 &#x27A4; Go back to your RStudio interface, where we have opened the `gprofiler2.Rmd` notebook and loaded the required R packages. 
 
-Instructions and information for the rest of this activity will continue from the notebook. 
+**Instructions and information for the rest of this activity will continue from the notebook.**
 
+
+## End of activity summary
+
+- We have extracted a gene list and background gene list from a DE dataset and run ORA with `gprofiler2` `gost` function
+- We have plotted the data with `gostplot` Manhattan plots and `ggplot2` dotplots
+- We have run a `gost` multi-query separating up and down regulated genes
+- We have verified that `gprofiler2` results match the results from `g:Profiler` web
+- We have captured all version details relevant to the session within the R notebook
+
+The last task is to `knit` the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work. 
+
+&#x27A4; Knit the notebook to HTML
+
+Note that the notebook will only knit if there are no errors in the code. If your knit fails, please ask for assistance resolving the errors. 
 
 
