@@ -1,0 +1,108 @@
+---
+title: "Enrichment with clusterProfiler"
+output: html_notebook
+---
+
+```{r Load R packages, include=FALSE}
+library(clusterProfiler)
+library(enrichplot)
+library(readr)
+
+```
+
+[clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has inbuilt functions to run ORA (`enrich<DB>`) or GSEA (`gse<DB>`) over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as functions to perform ORA (`enricher`) or GSEA (`gsea`) with custom gene sets.
+
+It supports all organisms available in KEGG. It has a companion plotting package `enrichPlot` dedicated to plotting `clusterProfiler` results. 
+
+
+# 1. Load input data
+
+We will use the same dataset as per day 1 and the `gprofiler`` activity. First, confirm your working directory is the `Functional_enrichment_workshop_2024/day_2` folder. 
+
+```{r setup, include=FALSE}
+# Set the root directory for all notebook chunks
+knitr::opts_knit$set(root.dir = "C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+
+# and set the working directory for the console:
+setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+
+
+getwd()
+
+```
+
+
+Please ask for assistance if this step does not show the day_2 folder path! 
+
+Once your working directory is set, load the DEGs and background gene list extracted from the previous activity. We will also need to obtain all genes and sort by log2 fold change for GSEA, so load the full matrix as well: 
+
+
+```{r load input data}
+degs <- read_tsv("degs.txt", col_names = FALSE, show_col_types = FALSE)
+nrow(degs)
+
+background <- read_tsv("background_genes.txt", col_names = FALSE, show_col_types = FALSE)
+nrow(background)
+
+data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
+head(data)
+
+```
+
+# 2. Extract GSEA ranked gene list
+
+```{r get ranked gene list}
+ranked <- data[order(-data$Log2FC), c("Gene.ID", "Log2FC")]
+
+head(ranked)
+tail(ranked)
+```
+
+# 3. Use the `gse<DB>` function to run GSEA over supported databases
+
+Review the contents page of the [clusterProfiler user guide](https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf). 
+
+We can use the `gse<DB>` function to perform GSEA on any of the following databases without having to manually load these datbases:
+
+- GO
+- KEGG
+- KEGG Modules (MKEGG)
+- DAVID
+- Pathway Commons (PC)
+- WikiPathways (WP)
+
+Let's run `gseKEGG`!
+
+Navigate to the page of the user guide where the `gseKEGG` function is described. Note that the default organism is human (`hsa`). 
+
+**Note:**  If you were working with a species other than human, you first need to undertsand your organism code. You can derive this from [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html) or using the `clsuterProfiler` function `search_kegg_organism`, for example `search_kegg_organism("horse", by = "common_name")`. 
+
+```{r gseKEGG}
+
+```
+
+
+
+
+
+# 4. Visualise GSEA results with `enrichplot`
+
+
+
+
+# 5. Use the `enrich<DB>` function to run ORA over supported databases
+
+
+
+
+
+# 6. Visualise ORA results with `enrichplot`
+
+
+
+
+# 7. Import a database that is not directly supported by the `enrich` or `gse` functions and use the `enricher` and `gsea` generic functions to perform ORA and GSEA
+
+
+
+

@@ -19,8 +19,8 @@ Since we are doing ORA, we will need a filtered gene list, and a background gene
 4. Run ORA with `gost` function
 5. Save the tabular results to a file
 6. Visualise the results 
-7. Compare gprofiler2 R results to the g:Profiler web results
-8. Run a gost multi-query for up-regulated and down-regulated genes, and compare the results to those generated from the full DEG gene list
+7. Run a gost multi-query for up-regulated and down-regulated genes
+8. Compare gprofiler2 R results to the g:Profiler web results
 
 &#x27A4; Go back to your RStudio interface, where we have opened the `gprofiler2.Rmd` notebook and loaded the required R packages. 
 
