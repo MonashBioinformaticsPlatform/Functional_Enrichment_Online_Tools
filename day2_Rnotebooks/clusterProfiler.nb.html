@@ -1764,131 +1764,300 @@ custom gene sets.</p>
 <p>It supports all organisms available in KEGG. It has a companion
 plotting package <code>enrichPlot</code> dedicated to plotting
 <code>clusterProfiler</code> results.</p>
-<div id="load-input-data" class="section level1">
-<h1>1. Load input data</h1>
-<p>We will use the same dataset as per day 1 and the
-<code>gprofiler`` activity. First, confirm your working directory is the</code>Functional_enrichment_workshop_2024/day_2`
-folder.</p>
+<div id="load-input-data-and-extract-ranked-gene-list" class="section level1">
+<h1>1. Load input data and extract ranked gene list</h1>
+<p>We will use the same Pezzini RNAseq dataset as earlier. First,
+confirm your working directory is the
+<code>Functional_enrichment_workshop_2024/day_2</code> folder.</p>
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
 <p>Please ask for assistance if this step does not show the day_2 folder
 path!</p>
-<p>Once your working directory is set, load the DEGs and background gene
-list extracted from the previous activity. We will also need to obtain
-all genes and sort by log2 fold change for GSEA, so load the full matrix
-as well:</p>
+<p>Once your working directory is set, load the dataset and extract the
+gene lists.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGVncyA8LSByZWFkX3RzdihcImRlZ3MudHh0XCIsIGNvbF9uYW1lcyA9IEZBTFNFLCBzaG93X2NvbF90eXBlcyA9IEZBTFNFKVxubnJvdyhkZWdzKVxuYGBgIn0= -->
-<pre class="r"><code>degs &lt;- read_tsv(&quot;degs.txt&quot;, col_names = FALSE, show_col_types = FALSE)
-nrow(degs)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDc5MlxuIn0= -->
-<pre><code>[1] 792</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYmFja2dyb3VuZCA8LSByZWFkX3RzdihcImJhY2tncm91bmRfZ2VuZXMudHh0XCIsIGNvbF9uYW1lcyA9IEZBTFNFLCBzaG93X2NvbF90eXBlcyA9IEZBTFNFKVxubnJvdyhiYWNrZ3JvdW5kKVxuYGBgIn0= -->
-<pre class="r"><code>background &lt;- read_tsv(&quot;background_genes.txt&quot;, col_names = FALSE, show_col_types = FALSE)
-nrow(background)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE0NDIwXG4ifQ== -->
-<pre><code>[1] 14420</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YSA8LSByZWFkX3RzdihcIlBlenppbmlfREUudHh0XCIsIGNvbF9uYW1lcyA9IFRSVUUsIHNob3dfY29sX3R5cGVzID0gRkFMU0UpXG5oZWFkKGRhdGEpXG5gYGAifQ== -->
-<pre class="r"><code>data &lt;- read_tsv(&quot;Pezzini_DE.txt&quot;, col_names = TRUE, show_col_types = FALSE)
-head(data)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6MTAsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyAxMCJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUJndHlpVERtaXVCaVlHQmdabUJoWVdKZ1pnVXlHVmhEUTl4MExSZ1lnQUlNREl3TUxBeWNJTG9DcUVnWXlBQ3BGZ0JpTnFnRXY2dGZzTHNCSEJoakV6WXh0TVFxYkdxT1Zkak1BSnV3cGJraEZtRkRBMk16TkJleGhRUUhPUHFaUVhrc0xnRytNSTJzd2M2UlBqQVhjamdiNWhlbEdSb2FRZm5Nem00ZU1IVnVvYzZPUmtBR0g4ZzQrN2M3ak5vWDNmVzIzL3FOMDk5bTQ0SDlNMzY1Rjh0L1o5My8yZmZwaTlzYVR4d2tPRUptTkhDWDJqK1BFT2RsY2J3QTErZGI4NCtwOHZwZCt6dC93azJ1eGF5eWY4V29lVGZwd1ZQN3ZQZGZwYjRzWnJEUC9oalplMldkb2YwbTlrVm5aUDBMWWZvY3loVkEwY0RnME84Qm9Xc0NJSFNyQUFNeWNLZzNnREVoK2tvTElPSTlEUkM2Q3FxdktRTlZYMjBBcXI2eUQxRDdJT1k1VkU2QTZydUJxcStLQVZWZkcxUmRmd0tFcm9EU3lROGdkQ0RVSFpOYVVQVjFRTzJaZUFEcVA2ajk1VkMrRGRTKzFnbW8rbHBlUVBYNVFQMEJWVjhtQUtGTm9mcGFJcURhVUZJd2ExNWlibW94QXlTdGNFRUYyZDFUODFMMVBGMmdYRTR3MXcrb0VKYVdmUExUamR5Y1lVbkV6U1VJbG5wSzgxSXkwM1NMRE5INFJtaDhXR3BqUTFITmhxS1dEYW9TMWIyY1JmbmxlakEzOHdJeEV5ZzQvLy8vL3d2ZFk4azVpY1V3ajhFRXVWSVNTeEwxMG9wQVhtRmcrSWVtaFQyL29DUXpQdytvaVFtVXA5blFORE1Xb1FudzUrUW5waWhrNWhXVWxpaUFERWFUWmk3SVMyZUFGQTJNMEtEbmhiTFprTmhjRUZjdy9XZEF5N0NwZWVtWmViQWdaODFKVEVyTmdabWNrbG9HWmZJQnd3TWNISG9GUlpsNUpUQi9Ba1dMOVVyeVN4SmhXcmlTODNOZ0ltQ2ZNL3dEQVBGVkUxWG9CQUFBIn0= -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Gene.ID"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Gene.Name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Log2FC"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["FDR"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["undif-r1"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["undif-r2"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["undif-r3"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["dif-r1"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["dif-r2"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["dif-r3"],"name":[10],"type":["dbl"],"align":["right"]}],"data":[{"1":"ENSG00000000003","2":"TSPAN6","3":"0.92873503","4":"0.000899910","5":"370","6":"343","7":"367","8":"722","9":"774","10":"669"},{"1":"ENSG00000000419","2":"DPM1","3":"0.08578547","4":"0.452901651","5":"1001","6":"912","7":"998","8":"1004","9":"1136","10":"1107"},{"1":"ENSG00000000457","2":"SCYL3","3":"-0.02439224","4":"0.812642033","5":"453","6":"421","7":"409","8":"390","9":"463","10":"476"},{"1":"ENSG00000000460","2":"C1orf112","3":"-1.20651809","4":"0.003776530","5":"674","6":"589","7":"603","8":"159","9":"380","10":"353"},{"1":"ENSG00000000971","2":"CFH","3":"6.00813521","4":"0.003410983","5":"0","6":"0","7":"0","8":"70","9":"28","10":"21"},{"1":"ENSG00000001036","2":"FUCA2","3":"0.72950318","4":"0.070429015","5":"499","6":"469","7":"416","8":"1185","9":"690","10":"651"}],"options":{"columns":{"min":{},"max":[10],"total":[10]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTkFcbmBgYCJ9 -->
-<pre class="r"><code>NA</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="extract-gsea-ranked-gene-list" class="section level1">
-<h1>2. Extract GSEA ranked gene list</h1>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucmFua2VkIDwtIGRhdGFbb3JkZXIoLWRhdGEkTG9nMkZDKSwgYyhcIkdlbmUuSURcIiwgXCJMb2cyRkNcIildXG5cbmhlYWQocmFua2VkKVxuYGBgIn0= -->
-<pre class="r"><code>ranked &lt;- data[order(-data$Log2FC), c(&quot;Gene.ID&quot;, &quot;Log2FC&quot;)]
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIEZ1bGwgZGF0YXNldFxuZGF0YSA8LSByZWFkX3RzdihcIlBlenppbmlfREUudHh0XCIsIGNvbF9uYW1lcyA9IFRSVUUsIHNob3dfY29sX3R5cGVzID0gRkFMU0UpXG5cbiMgREVHcyBmb3IgT1JBXG5kZWdzIDwtIGRhdGEgJT4lXG4gIGZpbHRlcihGRFIgPCAwLjAxICYgYWJzKExvZzJGQykgPiAyKSAlPiVcbiAgcHVsbChHZW5lLklEKVxuXG4jIEJhY2tncm91bmQgZm9yIE9SQVxuYmFja2dyb3VuZCA8LSBkYXRhJEdlbmUuSURcblxuIyBSYW5rZWQgZ2VuZSBsaXN0IHZlY3RvciBmb3IgR1NFQVxucmFua2VkIDwtIHNldE5hbWVzKGRhdGEkTG9nMkZDW29yZGVyKC1kYXRhJExvZzJGQyldLCBkYXRhJEdlbmUuSURbb3JkZXIoLWRhdGEkTG9nMkZDKV0pXG5cbmhlYWQocmFua2VkKVxuYGBgIn0= -->
+<pre class="r"><code>
+# Full dataset
+data &lt;- read_tsv(&quot;Pezzini_DE.txt&quot;, col_names = TRUE, show_col_types = FALSE)
+
+# DEGs for ORA
+degs &lt;- data %&gt;%
+  filter(FDR &lt; 0.01 &amp; abs(Log2FC) &gt; 2) %&gt;%
+  pull(Gene.ID)
+
+# Background for ORA
+background &lt;- data$Gene.ID
+
+# Ranked gene list vector for GSEA
+ranked &lt;- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.ID[order(-data$Log2FC)])
 
 head(ranked)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6Miwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDIiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFCZ3R5aVREbWl1QmlZR0JnWm1CaFlXSmdaZ1V5R1ZoRFE5eDBMUmdZZ0FJTURJd01MQXljSUxvQ3FFZ1l5QUFKQ2dBeEcxU0MzOVV2Mk4wQURNd3RMWTBOTVlTTkRFeE5ESXd4aEEzTkxDMnhDcHRhbW1NVE5qYkNLZ3cwQk9oVUJqNlFpeHhVMm5ZZjNzM2c3cUQwOGU4UEZaVXREa3FudG4wTXFUbmdvTVI1SVc3NWFpMEh4ZSt4Q3hrMTlCMFVweW1rL0FxZGcrWkYxcnpFM05SaXFQZVlvSUxzN3FsNXFYcWVMbEF1bTA5K3VwR2JNNXBPenFMOGNqMllibDZRN2dZZzhmLy8vMS9vVmlUbkpCYkRySUFKY3FVa2xpVHFwUlVCOVFONS85QzBzT2NYbEdUbTV3RTFNUW1EZ3gxVk0yTVJtb0JJZW1xSlFsRmlYblpxaWtJNjBPMEtPWm5GSldocW1Bdnkwa0VXZzRVZ2dCZktaa05pTTBHY3d2UWZMY3JaVXZQU00vTlNZWDdLU1V4S3pZR1puSkphQm1YeUFRTUZIQ1o2QlVXWmVTVXd6d0pGaS9WSzhrc1NZVnE0a3ZOellDSmc3elA4QXdCZmpKekltQUlBQUE9PSJ9 -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Gene.ID"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Log2FC"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"ENSG00000079931","2":"10.263151"},{"1":"ENSG00000205403","2":"9.472641"},{"1":"ENSG00000169903","2":"9.395927"},{"1":"ENSG00000165973","2":"9.019168"},{"1":"ENSG00000163273","2":"8.983136"},{"1":"ENSG00000169908","2":"8.793216"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRU5TRzAwMDAwMDc5OTMxIEVOU0cwMDAwMDIwNTQwMyBFTlNHMDAwMDAxNjk5MDMgRU5TRzAwMDAwMTY1OTczIEVOU0cwMDAwMDE2MzI3MyBFTlNHMDAwMDAxNjk5MDggXG4gICAgICAxMC4yNjMxNTEgICAgICAgIDkuNDcyNjQxICAgICAgICA5LjM5NTkyNyAgICAgICAgOS4wMTkxNjggICAgICAgIDguOTgzMTM2ICAgICAgICA4Ljc5MzIxNiBcbiJ9 -->
+<pre><code>ENSG00000079931 ENSG00000205403 ENSG00000169903 ENSG00000165973 ENSG00000163273 ENSG00000169908 
+      10.263151        9.472641        9.395927        9.019168        8.983136        8.793216 </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFpbChyYW5rZWQpXG5gYGAifQ== -->
 <pre class="r"><code>tail(ranked)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6Miwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDIiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFCZ3R5aVREbWl1QmlZR0JnWm1CaFlXSmdaZ1V5R1ZoRFE5eDBMUmdZZ0FJTURJd01MQXljSUxvQ3FFZ1l5QUFKQ2dBeEcxU0MzOVV2Mk4wQUJBeE5EYzBNVFRHRmpVeE5qUzB3aEkxTURZek56RENFZ2NxTmpJd3hEVEd3TUxQQU5NVFF6TkxFeUJJb3hBZHkwUUhaZmRNV0x0QitmRUJ1bjZTT3dnZnJBL0pjUWdhZnIwOC9JQis0ditLQVBQTUIrWjZxbjQxejdoOVEyTnh0ZGtSTkJjMkxySG1KdWFuRlVPOHhRUVhaM1ZQelV2VThYYUJjTnAvOGRDTTNaelNkbkVYNTVYb3czYndnM1ExQTR2Ly8vNy9RclVqT1NTeUdXUUVUNUVwSkxFblVTeXNDNmdmeS9xRnBZYzh2S01uTXp3TnFZaElHQnp1cVpzWWlOQUdSOU5RU2hhTEV2T3pVRklWMG9Oc1ZjaktMUzlEVU1CZmtwWU1zQmd0QkFDK1V6WWJFWm9JNGhlay9XcFN6cGVhbForYWx3dnlVazVpVW1nTXpPU1cxRE1ya0F3WUtPRXowQ29veTgwcGduZ1dLRnV1VjVKY2t3clJ3SmVmbndFVEEzbWY0QndDSWxDUm5tQUlBQUE9PSJ9 -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["Gene.ID"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Log2FC"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"ENSG00000151615","2":"-7.436121"},{"1":"ENSG00000125538","2":"-7.685643"},{"1":"ENSG00000250366","2":"-7.759835"},{"1":"ENSG00000012223","2":"-7.829832"},{"1":"ENSG00000108688","2":"-7.887188"},{"1":"ENSG00000169429","2":"-8.350671"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRU5TRzAwMDAwMTUxNjE1IEVOU0cwMDAwMDEyNTUzOCBFTlNHMDAwMDAyNTAzNjYgRU5TRzAwMDAwMDEyMjIzIEVOU0cwMDAwMDEwODY4OCBFTlNHMDAwMDAxNjk0MjkgXG4gICAgICAtNy40MzYxMjEgICAgICAgLTcuNjg1NjQzICAgICAgIC03Ljc1OTgzNSAgICAgICAtNy44Mjk4MzIgICAgICAgLTcuODg3MTg4ICAgICAgIC04LjM1MDY3MSBcbiJ9 -->
+<pre><code>ENSG00000151615 ENSG00000125538 ENSG00000250366 ENSG00000012223 ENSG00000108688 ENSG00000169429 
+      -7.436121       -7.685643       -7.759835       -7.829832       -7.887188       -8.350671 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIEZ1bGwgZGF0YXNldFxuI2RhdGEgPC0gcmVhZF90c3YoXCJQZXp6aW5pX0RFLnR4dFwiLCBjb2xfbmFtZXMgPSBUUlVFLCBzaG93X2NvbF90eXBlcyA9IEZBTFNFKVxuXG4jIERFR3MgZm9yIE9SQVxuZGVncyA8LSBkYXRhICU+JVxuICBmaWx0ZXIoRkRSIDwgMC4wMSAmIGFicyhMb2cyRkMpID4gMikgJT4lXG4gIHB1bGwoR2VuZS5OYW1lKVxuXG4jIEJhY2tncm91bmQgZm9yIE9SQVxuYmFja2dyb3VuZCA8LSBkYXRhJEdlbmUuTmFtZVxuXG4jIFJhbmtlZCBnZW5lIGxpc3QgdmVjdG9yIGZvciBHU0VBXG5yYW5rZWRfbmFtZSA8LSBzZXROYW1lcyhkYXRhJExvZzJGQ1tvcmRlcigtZGF0YSRMb2cyRkMpXSwgZGF0YSRHZW5lLk5hbWVbb3JkZXIoLWRhdGEkTG9nMkZDKV0pXG5cbmhlYWQocmFua2VkX25hbWUpXG5gYGAifQ== -->
+<pre class="r"><code>
+# Full dataset
+#data &lt;- read_tsv(&quot;Pezzini_DE.txt&quot;, col_names = TRUE, show_col_types = FALSE)
+
+# DEGs for ORA
+degs &lt;- data %&gt;%
+  filter(FDR &lt; 0.01 &amp; abs(Log2FC) &gt; 2) %&gt;%
+  pull(Gene.Name)
+
+# Background for ORA
+background &lt;- data$Gene.Name
+
+# Ranked gene list vector for GSEA
+ranked_name &lt;- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.Name[order(-data$Log2FC)])
+
+head(ranked_name)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgIE1PWEQxICAgICAgIENGSSAgICBUTTRTRjQgICAgIE5FTEwxICAgICAgTlBQQyAgICBUTTRTRjEgXG4xMC4yNjMxNTEgIDkuNDcyNjQxICA5LjM5NTkyNyAgOS4wMTkxNjggIDguOTgzMTM2ICA4Ljc5MzIxNiBcbiJ9 -->
+<pre><code>    MOXD1       CFI    TM4SF4     NELL1      NPPC    TM4SF1 
+10.263151  9.472641  9.395927  9.019168  8.983136  8.793216 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFpbChyYW5rZWRfbmFtZSlcbmBgYCJ9 -->
+<pre class="r"><code>tail(ranked_name)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgUE9VNEYyICAgICAgSUwxQiAgICAgVFVOQVIgICAgICAgTFRGICAgICAgQ0NMNyAgICAgQ1hDTDggXG4tNy40MzYxMjEgLTcuNjg1NjQzIC03Ljc1OTgzNSAtNy44Mjk4MzIgLTcuODg3MTg4IC04LjM1MDY3MSBcbiJ9 -->
+<pre><code>   POU4F2      IL1B     TUNAR       LTF      CCL7     CXCL8 
+-7.436121 -7.685643 -7.759835 -7.829832 -7.887188 -8.350671 </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
 <div id="use-the-gsedb-function-to-run-gsea-over-supported-databases" class="section level1">
-<h1>3. Use the <code>gse&lt;DB&gt;</code> function to run GSEA over
+<h1>2. Use the <code>gse&lt;DB&gt;</code> function to run GSEA over
 supported databases</h1>
 <p>Review the contents page of the <a href="https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf">clusterProfiler
 user guide</a>.</p>
 <p>We can use the <code>gse&lt;DB&gt;</code> function to perform GSEA on
 any of the following databases without having to manually load these
-datbases:</p>
+databases:</p>
 <ul>
 <li>GO</li>
 <li>KEGG</li>
 <li>KEGG Modules (MKEGG)</li>
-<li>DAVID</li>
 <li>Pathway Commons (PC)</li>
 <li>WikiPathways (WP)</li>
 </ul>
-<p>Let’s run <code>gseKEGG</code>!</p>
-<p>Navigate to the page of the user guide where the <code>gseKEGG</code>
-function is described. Note that the default organism is human
-(<code>hsa</code>).</p>
-<p><strong>Note:</strong> If you were working with a species other than
-human, you first need to undertsand your organism code. You can derive
-this from <a href="https://www.genome.jp/kegg/tables/br08606.html">KEGG
-Organisms</a> or using the <code>clsuterProfiler</code> function
-<code>search_kegg_organism</code>, for example
-<code>search_kegg_organism(&quot;horse&quot;, by = &quot;common_name&quot;)</code>.</p>
+<div id="gsego" class="section level2">
+<h2>gseGO</h2>
+<p>Let’s run GSEA over the GO database. If we choose <code>ALL</code>
+for the <code>ont</code> (ontology) parameter, we can run over MF, BP
+and CC in one run.</p>
+</div>
+<div id="species" class="section level2">
+<h2>Species</h2>
+<p>For this function, we need an <a href="https://bioconductor.org/packages/3.20/data/annotation/">annotation
+database from Bioconductor</a>. The package <code>org.Hs.eg.db</code>
+has been installed and loaded for you.</p>
+</div>
+<div id="namespace" class="section level2">
+<h2>Namespace</h2>
+<p>We can use any gene namespace supported by the annotation
+package:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxua2V5dHlwZXMob3JnLkhzLmVnLmRiKVxuYGBgIn0= -->
+<pre class="r"><code>keytypes(org.Hs.eg.db)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcIkFDQ05VTVwiICAgICAgIFwiQUxJQVNcIiAgICAgICAgXCJFTlNFTUJMXCIgICAgICBcIkVOU0VNQkxQUk9UXCIgIFwiRU5TRU1CTFRSQU5TXCIgXCJFTlRSRVpJRFwiICAgICBcIkVOWllNRVwiICAgICAgIFwiRVZJREVOQ0VcIiAgICBcbiBbOV0gXCJFVklERU5DRUFMTFwiICBcIkdFTkVOQU1FXCIgICAgIFwiR0VORVRZUEVcIiAgICAgXCJHT1wiICAgICAgICAgICBcIkdPQUxMXCIgICAgICAgIFwiSVBJXCIgICAgICAgICAgXCJNQVBcIiAgICAgICAgICBcIk9NSU1cIiAgICAgICAgXG5bMTddIFwiT05UT0xPR1lcIiAgICAgXCJPTlRPTE9HWUFMTFwiICBcIlBBVEhcIiAgICAgICAgIFwiUEZBTVwiICAgICAgICAgXCJQTUlEXCIgICAgICAgICBcIlBST1NJVEVcIiAgICAgIFwiUkVGU0VRXCIgICAgICAgXCJTWU1CT0xcIiAgICAgIFxuWzI1XSBcIlVDU0NLR1wiICAgICAgIFwiVU5JUFJPVFwiICAgICBcbiJ9 -->
+<pre><code> [1] &quot;ACCNUM&quot;       &quot;ALIAS&quot;        &quot;ENSEMBL&quot;      &quot;ENSEMBLPROT&quot;  &quot;ENSEMBLTRANS&quot; &quot;ENTREZID&quot;     &quot;ENZYME&quot;       &quot;EVIDENCE&quot;    
+ [9] &quot;EVIDENCEALL&quot;  &quot;GENENAME&quot;     &quot;GENETYPE&quot;     &quot;GO&quot;           &quot;GOALL&quot;        &quot;IPI&quot;          &quot;MAP&quot;          &quot;OMIM&quot;        
+[17] &quot;ONTOLOGY&quot;     &quot;ONTOLOGYALL&quot;  &quot;PATH&quot;         &quot;PFAM&quot;         &quot;PMID&quot;         &quot;PROSITE&quot;      &quot;REFSEQ&quot;       &quot;SYMBOL&quot;      
+[25] &quot;UCSCKG&quot;       &quot;UNIPROT&quot;     </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We already have ENSEMBL gene IDs in our input data, so we don’t need
+to do a gene ID conversion.</p>
+<p>For the rest of the parameters, we will use the defaults, except for
+<code>seed</code> that we should set to a specific value for
+reproducibility, and add 10,000 permutations to make the analysis more
+robust and reliable by providing a better estimation of p-values for the
+enrichment scores, especially for cases with smaller gene sets or less
+significant differences.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ3NlYV9HTyA8LSBnc2VHTyggXG4gIHJhbmtlZCwgXG4gIG9udCA9IFwiQUxMXCIsIFxuICBPcmdEYiA9IFwib3JnLkhzLmVnLmRiXCIsXG4gIGtleVR5cGUgPSBcIkVOU0VNQkxcIiwgXG4gIGV4cG9uZW50ID0gMSwgXG4gIG1pbkdTU2l6ZSA9IDEwLCBcbiAgbWF4R1NTaXplID0gNTAwLCBcbiAgZXBzID0gMWUtMTAsIFxuICBwdmFsdWVDdXRvZmYgPSAwLjA1LCBcbiAgcEFkanVzdE1ldGhvZCA9IFwiQkhcIiwgXG4gIHZlcmJvc2UgPSBUUlVFLCBcbiAgc2VlZCA9IDEyMzQsIFxuICBieSA9IFwiZmdzZWFcIixcbiAgblBlcm1TaW1wbGUgPSAxMDAwMFxuKVxuXG5gYGAifQ== -->
+<pre class="r"><code>gsea_GO &lt;- gseGO( 
+  ranked, 
+  ont = &quot;ALL&quot;, 
+  OrgDb = &quot;org.Hs.eg.db&quot;,
+  keyType = &quot;ENSEMBL&quot;, 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10, 
+  pvalueCutoff = 0.05, 
+  pAdjustMethod = &quot;BH&quot;, 
+  verbose = TRUE, 
+  seed = 1234, 
+  by = &quot;fgsea&quot;,
+  nPermSimple = 10000
+)
+</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
+<div id="gsekegg" class="section level2">
+<h2>gseKEGG</h2>
+<p>Now we will run GSEA over another in-built database. avigate to the
+page of the user guide where the <code>gseKEGG</code> function is
+described.</p>
+</div>
+<div id="species-1" class="section level2">
+<h2>Species</h2>
+<p>Note that the default organism is human (<code>hsa</code>).</p>
+<p>If you were working with a species other than human, you first need
+to obtain your organism code. You can derive this from <a href="https://www.genome.jp/kegg/tables/br08606.html">KEGG Organisms</a>
+or using the <code>clusterProfiler</code> function
+<code>search_kegg_organism</code>, for example
+<code>search_kegg_organism(&quot;horse&quot;, by = &quot;common_name&quot;)</code>.</p>
+<p>Unlike <code>gseGO</code> that requires a Bioconductor annotation
+package, the <code>gseKEGG</code> function supports many more
+organisms.</p>
+</div>
+<div id="gene-namespace" class="section level2">
+<h2>Gene namespace</h2>
+<p>Required <code>key type</code> is one of <code>kegg</code>,
+<code>ncbi-geneid</code>, <code>ncib-proteinid</code> and
+<code>uniprot</code>. Our gene IDs are ENSEMBL.</p>
+<p>We can convert with <code>clusterProfiler</code> function
+<code>bitr</code>. Converting to ENTREZ will be compatible with
+<code>kegg</code>.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBDb252ZXJ0IHRoZSBFbnNlbWJsIElEcyB0byBFbnRyZXogSURzLCBkcm9wcGluZyBOQXNcbmNvbnZlcnRlZF9pZHMgPC0gYml0cihuYW1lcyhyYW5rZWQpLCBcbiAgICAgICAgICAgICAgICAgICAgICBmcm9tVHlwZSA9IFwiRU5TRU1CTFwiLCBcbiAgICAgICAgICAgICAgICAgICAgICB0b1R5cGUgPSBcIkVOVFJFWklEXCIsIFxuICAgICAgICAgICAgICAgICAgICAgIE9yZ0RiID0gb3JnLkhzLmVnLmRiLCBcbiAgICAgICAgICAgICAgICAgICAgICBkcm9wID0gVFJVRSlcbmBgYCJ9 -->
+<pre class="r"><code># Convert the Ensembl IDs to Entrez IDs, dropping NAs
+converted_ids &lt;- bitr(names(ranked), 
+                      fromType = &quot;ENSEMBL&quot;, 
+                      toType = &quot;ENTREZID&quot;, 
+                      OrgDb = org.Hs.eg.db, 
+                      drop = TRUE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJ3NlbGVjdCgpJyByZXR1cm5lZCAxOm1hbnkgbWFwcGluZyBiZXR3ZWVuIGtleXMgYW5kIGNvbHVtbnNcbldhcm5pbmc6IDAuNzglIG9mIGlucHV0IGdlbmUgSURzIGFyZSBmYWlsIHRvIG1hcC4uLlxuIn0= -->
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns
+Warning: 0.78% of input gene IDs are fail to map...</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBIYW5kbGUgYW55IGAxOm1hbnkgbWFwcGluZ2AgKEVOU0VNQkwgSUQgbWF0Y2hlcyA+MSBFTlRSRVpJRCkgYnkga2VlcGluZyBvbmx5IHRoZSBmaXJzdCBFbnRyZXogSUQgZm9yIGVhY2ggRW5zZW1ibCBJRFxuY29udmVydGVkX2lkcyA8LSBjb252ZXJ0ZWRfaWRzWyFkdXBsaWNhdGVkKGNvbnZlcnRlZF9pZHMkRU5TRU1CTCksIF1cblxuIyBLZWVwIG9ubHkgdGhlIHJvd3Mgd2l0aCB2YWxpZCBFbnRyZXogSURzXG5jb252ZXJ0ZWRfaWRzIDwtIGNvbnZlcnRlZF9pZHNbIWlzLm5hKGNvbnZlcnRlZF9pZHMkRU5UUkVaSUQpLCBdXG5cbiMgRmlsdGVyIHRoZSByYW5rZWQgZ2VuZSBsaXN0IHRvIGluY2x1ZGUgb25seSB0aGUgc3VjY2Vzc2Z1bGx5IG1hcHBlZCBFbnNlbWJsIElEc1xucmFua2VkX2VudHJleiA8LSByYW5rZWRbbmFtZXMocmFua2VkKSAlaW4lIGNvbnZlcnRlZF9pZHMkRU5TRU1CTF1cblxuIyBSZXBsYWNlIHRoZSBFbnNlbWJsIElEcyB3aXRoIHRoZSBjb3JyZXNwb25kaW5nIEVudHJleiBJRHMgaW4gdGhlIHJhbmtlZCB2ZWN0b3Jcbm5hbWVzKHJhbmtlZF9lbnRyZXopIDwtIGNvbnZlcnRlZF9pZHMkRU5UUkVaSURbbWF0Y2gobmFtZXMocmFua2VkX2VudHJleiksIGNvbnZlcnRlZF9pZHMkRU5TRU1CTCldXG5cbiMgUmVtb3ZlIGR1cGxpY2F0ZXMgKGtlZXAgb25seSBmaXJzdCBvY2N1cnJlbmNlIG9mIEVudHJleiBJRHMpXG4jIyBOb3RlOiB0aGlzIGlzIG5vdCBpZGVhbCBhbmQgZm9yIGEgcmVhbCBleHBlcmltZW50IHlvdSBzaG91bGQgY2FyZWZ1bGx5IHJldmlldyBkdXBsaWNhdGVzIGFuZCBjaG9vc2Ugd2hpY2ggYW5kIGhvdyB0byByZXRhaW4gYmFzZWQgb24geW91ciBiaW9sb2dpY2FsIGNvbnRleHQgXG5yYW5rZWRfZW50cmV6IDwtIHJhbmtlZF9lbnRyZXpbIWR1cGxpY2F0ZWQobmFtZXMocmFua2VkX2VudHJleikpXVxuXG5jYXQoXCJcXG5cIilcbmBgYCJ9 -->
+<pre class="r"><code># Handle any `1:many mapping` (ENSEMBL ID matches &gt;1 ENTREZID) by keeping only the first Entrez ID for each Ensembl ID
+converted_ids &lt;- converted_ids[!duplicated(converted_ids$ENSEMBL), ]
+
+# Keep only the rows with valid Entrez IDs
+converted_ids &lt;- converted_ids[!is.na(converted_ids$ENTREZID), ]
+
+# Filter the ranked gene list to include only the successfully mapped Ensembl IDs
+ranked_entrez &lt;- ranked[names(ranked) %in% converted_ids$ENSEMBL]
+
+# Replace the Ensembl IDs with the corresponding Entrez IDs in the ranked vector
+names(ranked_entrez) &lt;- converted_ids$ENTREZID[match(names(ranked_entrez), converted_ids$ENSEMBL)]
+
+# Remove duplicates (keep only first occurrence of Entrez IDs)
+## Note: this is not ideal and for a real experiment you should carefully review duplicates and choose which and how to retain based on your biological context 
+ranked_entrez &lt;- ranked_entrez[!duplicated(names(ranked_entrez))]
+
+cat(&quot;\n&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBDaGVjazogXG5oZWFkKHJhbmtlZF9lbnRyZXopXG5gYGAifQ== -->
+<pre class="r"><code># Check: 
+head(ranked_entrez)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgIDI2MDAyICAgICAgMzQyNiAgICAgIDcxMDQgICAgICA0NzQ1ICAgICAgNDg4MCAgICAgIDQwNzEgXG4xMC4yNjMxNTEgIDkuNDcyNjQxICA5LjM5NTkyNyAgOS4wMTkxNjggIDguOTgzMTM2ICA4Ljc5MzIxNiBcbiJ9 -->
+<pre><code>    26002      3426      7104      4745      4880      4071 
+10.263151  9.472641  9.395927  9.019168  8.983136  8.793216 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGFpbChyYW5rZWRfZW50cmV6KVxuYGBgIn0= -->
+<pre class="r"><code>tail(ranked_entrez)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICA1NDU4ICAgICAgMzU1MyAxMDA1MDcwNDMgICAgICA0MDU3ICAgICAgNjM1NCAgICAgIDM1NzYgXG4tNy40MzYxMjEgLTcuNjg1NjQzIC03Ljc1OTgzNSAtNy44Mjk4MzIgLTcuODg3MTg4IC04LjM1MDY3MSBcbiJ9 -->
+<pre><code>     5458      3553 100507043      4057      6354      3576 
+-7.436121 -7.685643 -7.759835 -7.829832 -7.887188 -8.350671 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Now run GSEA over the KEGG database with <code>gseKEGG</code>
+function:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ3NlYV9rZWdnIDwtIGdzZUtFR0coIFxuICByYW5rZWRfZW50cmV6LCBcbiAgb3JnYW5pc20gPSBcImhzYVwiLCBcbiAga2V5VHlwZSA9IFwia2VnZ1wiLCBcbiAgZXhwb25lbnQgPSAxLCBcbiAgbWluR1NTaXplID0gMTAsIFxuICBtYXhHU1NpemUgPSA1MDAsIFxuICBlcHMgPSAxZS0xMCwgXG4gIHB2YWx1ZUN1dG9mZiA9IDAuMDUsIFxuICBwQWRqdXN0TWV0aG9kID0gXCJCSFwiLFxuICB2ZXJib3NlID0gVFJVRSwgXG4gIHVzZV9pbnRlcm5hbF9kYXRhID0gRkFMU0UsIFxuICBzZWVkID0gRkFMU0UsIFxuICBieSA9IFwiZmdzZWFcIlxuKVxuYGBgIn0= -->
+<pre class="r"><code>gsea_kegg &lt;- gseKEGG( 
+  ranked_entrez, 
+  organism = &quot;hsa&quot;, 
+  keyType = &quot;kegg&quot;, 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10, 
+  pvalueCutoff = 0.05, 
+  pAdjustMethod = &quot;BH&quot;,
+  verbose = TRUE, 
+  use_internal_data = FALSE, 
+  seed = FALSE, 
+  by = &quot;fgsea&quot;
+)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoidXNpbmcgJ2Znc2VhJyBmb3IgR1NFQSBhbmFseXNpcywgcGxlYXNlIGNpdGUgS29yb3RrZXZpY2ggZXQgYWwgKDIwMTkpLlxuXG5wcmVwYXJpbmcgZ2VuZVNldCBjb2xsZWN0aW9ucy4uLlxuR1NFQSBhbmFseXNpcy4uLlxuV2FybmluZzogVGhlcmUgYXJlIHRpZXMgaW4gdGhlIHByZXJhbmtlZCBzdGF0cyAoMC4wMSUgb2YgdGhlIGxpc3QpLlxuVGhlIG9yZGVyIG9mIHRob3NlIHRpZWQgZ2VuZXMgd2lsbCBiZSBhcmJpdHJhcnksIHdoaWNoIG1heSBwcm9kdWNlIHVuZXhwZWN0ZWQgcmVzdWx0cy5XYXJuaW5nOiBUaGVyZSB3ZXJlIDEgcGF0aHdheXMgZm9yIHdoaWNoIFAtdmFsdWVzIHdlcmUgbm90IGNhbGN1bGF0ZWQgcHJvcGVybHkgZHVlIHRvIHVuYmFsYW5jZWQgKHBvc2l0aXZlIGFuZCBuZWdhdGl2ZSkgZ2VuZS1sZXZlbCBzdGF0aXN0aWMgdmFsdWVzLiBGb3Igc3VjaCBwYXRod2F5cyBwdmFsLCBwYWRqLCBORVMsIGxvZzJlcnIgYXJlIHNldCB0byBOQS4gWW91IGNhbiB0cnkgdG8gaW5jcmVhc2UgdGhlIHZhbHVlIG9mIHRoZSBhcmd1bWVudCBuUGVybVNpbXBsZSAoZm9yIGV4YW1wbGUgc2V0IGl0IG5QZXJtU2ltcGxlID0gMTAwMDApV2FybmluZzogJ3BhY2thZ2U6c3RhdHMnIG1heSBub3QgYmUgYXZhaWxhYmxlIHdoZW4gbG9hZGluZ1dhcm5pbmc6ICdwYWNrYWdlOnN0YXRzJyBtYXkgbm90IGJlIGF2YWlsYWJsZSB3aGVuIGxvYWRpbmdXYXJuaW5nOiAncGFja2FnZTpzdGF0cycgbWF5IG5vdCBiZSBhdmFpbGFibGUgd2hlbiBsb2FkaW5nV2FybmluZzogJ3BhY2thZ2U6c3RhdHMnIG1heSBub3QgYmUgYXZhaWxhYmxlIHdoZW4gbG9hZGluZ1dhcm5pbmc6ICdwYWNrYWdlOnN0YXRzJyBtYXkgbm90IGJlIGF2YWlsYWJsZSB3aGVuIGxvYWRpbmdXYXJuaW5nOiAncGFja2FnZTpzdGF0cycgbWF5IG5vdCBiZSBhdmFpbGFibGUgd2hlbiBsb2FkaW5nV2FybmluZzogJ3BhY2thZ2U6c3RhdHMnIG1heSBub3QgYmUgYXZhaWxhYmxlIHdoZW4gbG9hZGluZ1dhcm5pbmc6ICdwYWNrYWdlOnN0YXRzJyBtYXkgbm90IGJlIGF2YWlsYWJsZSB3aGVuIGxvYWRpbmdXYXJuaW5nOiAncGFja2FnZTpzdGF0cycgbWF5IG5vdCBiZSBhdmFpbGFibGUgd2hlbiBsb2FkaW5nV2FybmluZzogJ3BhY2thZ2U6c3RhdHMnIG1heSBub3QgYmUgYXZhaWxhYmxlIHdoZW4gbG9hZGluZ1dhcm5pbmc6ICdwYWNrYWdlOnN0YXRzJyBtYXkgbm90IGJlIGF2YWlsYWJsZSB3aGVuIGxvYWRpbmdXYXJuaW5nOiAncGFja2FnZTpzdGF0cycgbWF5IG5vdCBiZSBhdmFpbGFibGUgd2hlbiBsb2FkaW5nV2FybmluZzogJ3BhY2thZ2U6c3RhdHMnIG1heSBub3QgYmUgYXZhaWxhYmxlIHdoZW4gbG9hZGluZ1dhcm5pbmc6ICdwYWNrYWdlOnN0YXRzJyBtYXkgbm90IGJlIGF2YWlsYWJsZSB3aGVuIGxvYWRpbmdXYXJuaW5nOiAncGFja2FnZTpzdGF0cycgbWF5IG5vdCBiZSBhdmFpbGFibGUgd2hlbiBsb2FkaW5nV2FybmluZzogJ3BhY2thZ2U6c3RhdHMnIG1heSBub3QgYmUgYXZhaWxhYmxlIHdoZW4gbG9hZGluZ1dhcm5pbmc6ICdwYWNrYWdlOnN0YXRzJyBtYXkgbm90IGJlIGF2YWlsYWJsZSB3aGVuIGxvYWRpbmdXYXJuaW5nOiAncGFja2FnZTpzdGF0cycgbWF5IG5vdCBiZSBhdmFpbGFibGUgd2hlbiBsb2FkaW5nV2FybmluZzogJ3BhY2thZ2U6c3RhdHMnIG1heSBub3QgYmUgYXZhaWxhYmxlIHdoZW4gbG9hZGluZ1dhcm5pbmc6ICdwYWNrYWdlOnN0YXRzJyBtYXkgbm90IGJlIGF2YWlsYWJsZSB3aGVuIGxvYWRpbmdXYXJuaW5nOiAncGFja2FnZTpzdGF0cycgbWF5IG5vdCBiZSBhdmFpbGFibGUgd2hlbiBsb2FkaW5nV2FybmluZzogJ3BhY2thZ2U6c3RhdHMnIG1heSBub3QgYmUgYXZhaWxhYmxlIHdoZW4gbG9hZGluZ1dhcm5pbmc6ICdwYWNrYWdlOnN0YXRzJyBtYXkgbm90IGJlIGF2YWlsYWJsZSB3aGVuIGxvYWRpbmdXYXJuaW5nOiAncGFja2FnZTpzdGF0cycgbWF5IG5vdCBiZSBhdmFpbGFibGUgd2hlbiBsb2FkaW5nV2FybmluZzogRm9yIHNvbWUgb2YgdGhlIHBhdGh3YXlzIHRoZSBQLXZhbHVlcyB3ZXJlIGxpa2VseSBvdmVyZXN0aW1hdGVkLiBGb3Igc3VjaCBwYXRod2F5cyBsb2cyZXJyIGlzIHNldCB0byBOQS5XYXJuaW5nOiBGb3Igc29tZSBwYXRod2F5cywgaW4gcmVhbGl0eSBQLXZhbHVlcyBhcmUgbGVzcyB0aGFuIDFlLTEwLiBZb3UgY2FuIHNldCB0aGUgYGVwc2AgYXJndW1lbnQgdG8gemVybyBmb3IgYmV0dGVyIGVzdGltYXRpb24ubGVhZGluZyBlZGdlIGFuYWx5c2lzLi4uXG5kb25lLi4uXG4ifQ== -->
+<pre><code>using &#39;fgsea&#39; for GSEA analysis, please cite Korotkevich et al (2019).
+
+preparing geneSet collections...
+GSEA analysis...
+Warning: There are ties in the preranked stats (0.01% of the list).
+The order of those tied genes will be arbitrary, which may produce unexpected results.Warning: There were 1 pathways for which P-values were not calculated properly due to unbalanced (positive and negative) gene-level statistic values. For such pathways pval, padj, NES, log2err are set to NA. You can try to increase the value of the argument nPermSimple (for example set it nPermSimple = 10000)Warning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: &#39;package:stats&#39; may not be available when loadingWarning: For some of the pathways the P-values were likely overestimated. For such pathways log2err is set to NA.Warning: For some pathways, in reality P-values are less than 1e-10. You can set the `eps` argument to zero for better estimation.leading edge analysis...
+done...</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
 <div id="visualise-gsea-results-with-enrichplot" class="section level1">
 <h1>4. Visualise GSEA results with <code>enrichplot</code></h1>
-</div>
-<div id="use-the-enrichdb-function-to-run-ora-over-supported-databases" class="section level1">
-<h1>5. Use the <code>enrich&lt;DB&gt;</code> function to run ORA over
-supported databases</h1>
-</div>
-<div id="visualise-ora-results-with-enrichplot" class="section level1">
-<h1>6. Visualise ORA results with <code>enrichplot</code></h1>
 </div>
 <div id="import-a-database-that-is-not-directly-supported-by-the-enrich-or-gse-functions-and-use-the-enricher-and-gsea-generic-functions-to-perform-ora-and-gsea" class="section level1">
 <h1>7. Import a database that is not directly supported by the
 <code>enrich</code> or <code>gse</code> functions and use the
 <code>enricher</code> and <code>gsea</code> generic functions to perform
 ORA and GSEA</h1>
+<p>One of the great features of <code>clusterProfiler</code> is the
+ability to run ORA or GSEA over any gene set or database. This is
+through the use of the generic ORA and GSEA fnctions
+<code>enricher</code> and <code>GSEA</code>. The database and annotation
+details are provided to the functions through the <code>TERM2GENE</code>
+and <code>TERM2NAME</code> arguments. These are custom files that map
+your gene IDs to database terms.</p>
+<p>This enables extensive database support, as well as the option to
+analyse novel genomes.</p>
+<p>The <code>TERM2GENE</code> file is a 2-column list of gene IDs
+against database/gene set term IDs. There is one gene per line, and a
+gene can be on many lines ie be mapped to more than one term.</p>
+<p>The <code>TERM2NAME</code> file will contain the ID of the term from
+the database, alongside its description, eg
+<code>GO:0003676  nucleic acid binding</code>.</p>
+<p>So the <code>TERM2GENE</code> file is species-specific, while the
+<code>TERM2NAME</code> is generic, but subset to only include the terms
+that are present in the <code>TERM2GENE</code> file.</p>
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkVucmljaG1lbnQgd2l0aCBjbHVzdGVyUHJvZmlsZXIiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7ciBMb2FkIFIgcGFja2FnZXMsIGluY2x1ZGU9RkFMU0V9DQpsaWJyYXJ5KGNsdXN0ZXJQcm9maWxlcikNCmxpYnJhcnkoZW5yaWNocGxvdCkNCmxpYnJhcnkocmVhZHIpDQoNCmBgYA0KDQpbY2x1c3RlclByb2ZpbGVyXShodHRwczovL2Jpb2NvbmR1Y3Rvci5vcmcvcGFja2FnZXMvcmVsZWFzZS9iaW9jL2h0bWwvY2x1c3RlclByb2ZpbGVyLmh0bWwpIGlzIGEgY29tcHJlaGVuc2l2ZSBzdWl0ZSBvZiBlbnJpY2htZW50IHRvb2xzLiBJdCBoYXMgaW5idWlsdCBmdW5jdGlvbnMgdG8gcnVuIE9SQSAoYGVucmljaDxEQj5gKSBvciBHU0VBIChgZ3NlPERCPmApIG92ZXIgY29tbW9ubHkgdXNlZCBkYXRhYmFzZXMgKEdPLCBLRUdHLCBLRUdHIE1vZHVsZXMsIERBVklELCBQYXRod2F5IENvbW1vbnMsIFdpa2lQYXRod2F5cykgYXMgd2VsbCBhcyBmdW5jdGlvbnMgdG8gcGVyZm9ybSBPUkEgKGBlbnJpY2hlcmApIG9yIEdTRUEgKGBnc2VhYCkgd2l0aCBjdXN0b20gZ2VuZSBzZXRzLg0KDQpJdCBzdXBwb3J0cyBhbGwgb3JnYW5pc21zIGF2YWlsYWJsZSBpbiBLRUdHLiBJdCBoYXMgYSBjb21wYW5pb24gcGxvdHRpbmcgcGFja2FnZSBgZW5yaWNoUGxvdGAgZGVkaWNhdGVkIHRvIHBsb3R0aW5nIGBjbHVzdGVyUHJvZmlsZXJgIHJlc3VsdHMuIA0KDQoNCiMgMS4gTG9hZCBpbnB1dCBkYXRhDQoNCldlIHdpbGwgdXNlIHRoZSBzYW1lIGRhdGFzZXQgYXMgcGVyIGRheSAxIGFuZCB0aGUgYGdwcm9maWxlcmBgIGFjdGl2aXR5LiBGaXJzdCwgY29uZmlybSB5b3VyIHdvcmtpbmcgZGlyZWN0b3J5IGlzIHRoZSBgRnVuY3Rpb25hbF9lbnJpY2htZW50X3dvcmtzaG9wXzIwMjQvZGF5XzJgIGZvbGRlci4gDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KIyBTZXQgdGhlIHJvb3QgZGlyZWN0b3J5IGZvciBhbGwgbm90ZWJvb2sgY2h1bmtzDQprbml0cjo6b3B0c19rbml0JHNldChyb290LmRpciA9ICJDOi9Vc2Vycy9jd2lsMjI4MS9PbmVEcml2ZSAtIFRoZSBVbml2ZXJzaXR5IG9mIFN5ZG5leSAoU3RhZmYpL0RvY3VtZW50cy9QSVBFLTUxMTktZW5yaWNobWVudC13b3Jrc2hvcC9kYXlfMiIpDQoNCiMgYW5kIHNldCB0aGUgd29ya2luZyBkaXJlY3RvcnkgZm9yIHRoZSBjb25zb2xlOg0Kc2V0d2QoIkM6L1VzZXJzL2N3aWwyMjgxL09uZURyaXZlIC0gVGhlIFVuaXZlcnNpdHkgb2YgU3lkbmV5IChTdGFmZikvRG9jdW1lbnRzL1BJUEUtNTExOS1lbnJpY2htZW50LXdvcmtzaG9wL2RheV8yIikNCg0KDQpnZXR3ZCgpDQoNCmBgYA0KDQoNClBsZWFzZSBhc2sgZm9yIGFzc2lzdGFuY2UgaWYgdGhpcyBzdGVwIGRvZXMgbm90IHNob3cgdGhlIGRheV8yIGZvbGRlciBwYXRoISANCg0KT25jZSB5b3VyIHdvcmtpbmcgZGlyZWN0b3J5IGlzIHNldCwgbG9hZCB0aGUgREVHcyBhbmQgYmFja2dyb3VuZCBnZW5lIGxpc3QgZXh0cmFjdGVkIGZyb20gdGhlIHByZXZpb3VzIGFjdGl2aXR5LiBXZSB3aWxsIGFsc28gbmVlZCB0byBvYnRhaW4gYWxsIGdlbmVzIGFuZCBzb3J0IGJ5IGxvZzIgZm9sZCBjaGFuZ2UgZm9yIEdTRUEsIHNvIGxvYWQgdGhlIGZ1bGwgbWF0cml4IGFzIHdlbGw6IA0KDQoNCmBgYHtyIGxvYWQgaW5wdXQgZGF0YX0NCmRlZ3MgPC0gcmVhZF90c3YoImRlZ3MudHh0IiwgY29sX25hbWVzID0gRkFMU0UsIHNob3dfY29sX3R5cGVzID0gRkFMU0UpDQpucm93KGRlZ3MpDQoNCmJhY2tncm91bmQgPC0gcmVhZF90c3YoImJhY2tncm91bmRfZ2VuZXMudHh0IiwgY29sX25hbWVzID0gRkFMU0UsIHNob3dfY29sX3R5cGVzID0gRkFMU0UpDQpucm93KGJhY2tncm91bmQpDQoNCmRhdGEgPC0gcmVhZF90c3YoIlBlenppbmlfREUudHh0IiwgY29sX25hbWVzID0gVFJVRSwgc2hvd19jb2xfdHlwZXMgPSBGQUxTRSkNCmhlYWQoZGF0YSkNCg0KYGBgDQoNCiMgMi4gRXh0cmFjdCBHU0VBIHJhbmtlZCBnZW5lIGxpc3QNCg0KYGBge3IgZ2V0IHJhbmtlZCBnZW5lIGxpc3R9DQpyYW5rZWQgPC0gZGF0YVtvcmRlcigtZGF0YSRMb2cyRkMpLCBjKCJHZW5lLklEIiwgIkxvZzJGQyIpXQ0KDQpoZWFkKHJhbmtlZCkNCnRhaWwocmFua2VkKQ0KYGBgDQoNCiMgMy4gVXNlIHRoZSBgZ3NlPERCPmAgZnVuY3Rpb24gdG8gcnVuIEdTRUEgb3ZlciBzdXBwb3J0ZWQgZGF0YWJhc2VzDQoNClJldmlldyB0aGUgY29udGVudHMgcGFnZSBvZiB0aGUgW2NsdXN0ZXJQcm9maWxlciB1c2VyIGd1aWRlXShodHRwczovL2Jpb2NvbmR1Y3Rvci5vcmcvcGFja2FnZXMvZGV2ZWwvYmlvYy9tYW51YWxzL2NsdXN0ZXJQcm9maWxlci9tYW4vY2x1c3RlclByb2ZpbGVyLnBkZikuIA0KDQpXZSBjYW4gdXNlIHRoZSBgZ3NlPERCPmAgZnVuY3Rpb24gdG8gcGVyZm9ybSBHU0VBIG9uIGFueSBvZiB0aGUgZm9sbG93aW5nIGRhdGFiYXNlcyB3aXRob3V0IGhhdmluZyB0byBtYW51YWxseSBsb2FkIHRoZXNlIGRhdGJhc2VzOg0KDQotIEdPDQotIEtFR0cNCi0gS0VHRyBNb2R1bGVzIChNS0VHRykNCi0gREFWSUQNCi0gUGF0aHdheSBDb21tb25zIChQQykNCi0gV2lraVBhdGh3YXlzIChXUCkNCg0KTGV0J3MgcnVuIGBnc2VLRUdHYCENCg0KTmF2aWdhdGUgdG8gdGhlIHBhZ2Ugb2YgdGhlIHVzZXIgZ3VpZGUgd2hlcmUgdGhlIGBnc2VLRUdHYCBmdW5jdGlvbiBpcyBkZXNjcmliZWQuIE5vdGUgdGhhdCB0aGUgZGVmYXVsdCBvcmdhbmlzbSBpcyBodW1hbiAoYGhzYWApLiANCg0KKipOb3RlOioqICBJZiB5b3Ugd2VyZSB3b3JraW5nIHdpdGggYSBzcGVjaWVzIG90aGVyIHRoYW4gaHVtYW4sIHlvdSBmaXJzdCBuZWVkIHRvIHVuZGVydHNhbmQgeW91ciBvcmdhbmlzbSBjb2RlLiBZb3UgY2FuIGRlcml2ZSB0aGlzIGZyb20gW0tFR0cgT3JnYW5pc21zXShodHRwczovL3d3dy5nZW5vbWUuanAva2VnZy90YWJsZXMvYnIwODYwNi5odG1sKSBvciB1c2luZyB0aGUgYGNsc3V0ZXJQcm9maWxlcmAgZnVuY3Rpb24gYHNlYXJjaF9rZWdnX29yZ2FuaXNtYCwgZm9yIGV4YW1wbGUgYHNlYXJjaF9rZWdnX29yZ2FuaXNtKCJob3JzZSIsIGJ5ID0gImNvbW1vbl9uYW1lIilgLiANCg0KYGBge3IgZ3NlS0VHR30NCg0KYGBgDQoNCg0KDQoNCg0KIyA0LiBWaXN1YWxpc2UgR1NFQSByZXN1bHRzIHdpdGggYGVucmljaHBsb3RgDQoNCg0KDQoNCiMgNS4gVXNlIHRoZSBgZW5yaWNoPERCPmAgZnVuY3Rpb24gdG8gcnVuIE9SQSBvdmVyIHN1cHBvcnRlZCBkYXRhYmFzZXMNCg0KDQoNCg0KDQojIDYuIFZpc3VhbGlzZSBPUkEgcmVzdWx0cyB3aXRoIGBlbnJpY2hwbG90YA0KDQoNCg0KDQojIDcuIEltcG9ydCBhIGRhdGFiYXNlIHRoYXQgaXMgbm90IGRpcmVjdGx5IHN1cHBvcnRlZCBieSB0aGUgYGVucmljaGAgb3IgYGdzZWAgZnVuY3Rpb25zIGFuZCB1c2UgdGhlIGBlbnJpY2hlcmAgYW5kIGBnc2VhYCBnZW5lcmljIGZ1bmN0aW9ucyB0byBwZXJmb3JtIE9SQSBhbmQgR1NFQQ0KDQoNCg0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkVucmljaG1lbnQgd2l0aCBjbHVzdGVyUHJvZmlsZXIiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7ciBMb2FkIFIgcGFja2FnZXMsIGluY2x1ZGU9RkFMU0V9DQpsaWJyYXJ5KGNsdXN0ZXJQcm9maWxlcikNCmxpYnJhcnkoZW5yaWNocGxvdCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGJpb21hUnQpDQpsaWJyYXJ5KG9yZy5Icy5lZy5kYikNCmxpYnJhcnkoZHBseXIpDQpgYGANCg0KW2NsdXN0ZXJQcm9maWxlcl0oaHR0cHM6Ly9iaW9jb25kdWN0b3Iub3JnL3BhY2thZ2VzL3JlbGVhc2UvYmlvYy9odG1sL2NsdXN0ZXJQcm9maWxlci5odG1sKSBpcyBhIGNvbXByZWhlbnNpdmUgc3VpdGUgb2YgZW5yaWNobWVudCB0b29scy4gSXQgaGFzIGluYnVpbHQgZnVuY3Rpb25zIHRvIHJ1biBPUkEgKGBlbnJpY2g8REI+YCkgb3IgR1NFQSAoYGdzZTxEQj5gKSBvdmVyIGNvbW1vbmx5IHVzZWQgZGF0YWJhc2VzIChHTywgS0VHRywgS0VHRyBNb2R1bGVzLCBEQVZJRCwgUGF0aHdheSBDb21tb25zLCBXaWtpUGF0aHdheXMpIGFzIHdlbGwgYXMgZnVuY3Rpb25zIHRvIHBlcmZvcm0gT1JBIChgZW5yaWNoZXJgKSBvciBHU0VBIChgZ3NlYWApIHdpdGggY3VzdG9tIGdlbmUgc2V0cy4NCg0KSXQgc3VwcG9ydHMgYWxsIG9yZ2FuaXNtcyBhdmFpbGFibGUgaW4gS0VHRy4gSXQgaGFzIGEgY29tcGFuaW9uIHBsb3R0aW5nIHBhY2thZ2UgYGVucmljaFBsb3RgIGRlZGljYXRlZCB0byBwbG90dGluZyBgY2x1c3RlclByb2ZpbGVyYCByZXN1bHRzLiANCg0KDQojIDEuIExvYWQgaW5wdXQgZGF0YSBhbmQgZXh0cmFjdCByYW5rZWQgZ2VuZSBsaXN0DQoNCldlIHdpbGwgdXNlIHRoZSBzYW1lIFBlenppbmkgUk5Bc2VxIGRhdGFzZXQgYXMgZWFybGllci4gRmlyc3QsIGNvbmZpcm0geW91ciB3b3JraW5nIGRpcmVjdG9yeSBpcyB0aGUgYEZ1bmN0aW9uYWxfZW5yaWNobWVudF93b3Jrc2hvcF8yMDI0L2RheV8yYCBmb2xkZXIuIA0KDQpgYGB7ciBzZXR1cCwgaW5jbHVkZT1GQUxTRX0NCiMgU2V0IHRoZSByb290IGRpcmVjdG9yeSBmb3IgYWxsIG5vdGVib29rIGNodW5rcw0Ka25pdHI6Om9wdHNfa25pdCRzZXQocm9vdC5kaXIgPSAiQzovVXNlcnMvY3dpbDIyODEvT25lRHJpdmUgLSBUaGUgVW5pdmVyc2l0eSBvZiBTeWRuZXkgKFN0YWZmKS9Eb2N1bWVudHMvUElQRS01MTE5LWVucmljaG1lbnQtd29ya3Nob3AvZGF5XzIiKQ0KDQojIFRvIHNldCB0aGUgd29ya2luZyBkaXJlY3RvcnkgZm9yIHRoZSBjb25zb2xlLCBydW4gdGhpcyBpbiB0aGUgY29uc29sZSBpdHNlbGY6DQpzZXR3ZCgiQzovVXNlcnMvY3dpbDIyODEvT25lRHJpdmUgLSBUaGUgVW5pdmVyc2l0eSBvZiBTeWRuZXkgKFN0YWZmKS9Eb2N1bWVudHMvUElQRS01MTE5LWVucmljaG1lbnQtd29ya3Nob3AvZGF5XzIiKQ0KDQoNCmdldHdkKCkNCg0KYGBgDQoNCg0KUGxlYXNlIGFzayBmb3IgYXNzaXN0YW5jZSBpZiB0aGlzIHN0ZXAgZG9lcyBub3Qgc2hvdyB0aGUgZGF5XzIgZm9sZGVyIHBhdGghIA0KDQpPbmNlIHlvdXIgd29ya2luZyBkaXJlY3RvcnkgaXMgc2V0LCBsb2FkIHRoZSBkYXRhc2V0IGFuZCBleHRyYWN0IHRoZSBnZW5lIGxpc3RzLg0KDQpgYGB7ciBsb2FkIGlucHV0IGRhdGF9DQoNCiMgRnVsbCBkYXRhc2V0DQpkYXRhIDwtIHJlYWRfdHN2KCJQZXp6aW5pX0RFLnR4dCIsIGNvbF9uYW1lcyA9IFRSVUUsIHNob3dfY29sX3R5cGVzID0gRkFMU0UpDQoNCiMgREVHcyBmb3IgT1JBIC0gRU5TRU1CTCBnZW5lIElEcw0KZGVncyA8LSBkYXRhICU+JQ0KICBmaWx0ZXIoRkRSIDwgMC4wMSAmIGFicyhMb2cyRkMpID4gMikgJT4lDQogIHB1bGwoR2VuZS5JRCkNCg0KIyBERUdzIGZvciBPUkEgLSBnZW5lIG5hbWVzDQpkZWdzX25hbWUgPC0gZGF0YSAlPiUNCiAgZmlsdGVyKEZEUiA8IDAuMDEgJiBhYnMoTG9nMkZDKSA+IDIpICU+JQ0KICBwdWxsKEdlbmUuTmFtZSkNCg0KIyBCYWNrZ3JvdW5kIGZvciBPUkEgLSBFTlNFTUJMIGdlbmUgSURzDQpiYWNrZ3JvdW5kIDwtIGRhdGEkR2VuZS5JRA0KDQojIFJhbmtlZCBnZW5lIGxpc3QgdmVjdG9yIGZvciBHU0VBDQpyYW5rZWQgPC0gc2V0TmFtZXMoZGF0YSRMb2cyRkNbb3JkZXIoLWRhdGEkTG9nMkZDKV0sIGRhdGEkR2VuZS5JRFtvcmRlcigtZGF0YSRMb2cyRkMpXSkNCg0KIyBOb3cgd2l0aCBnZW5lIG5hbWVzOg0KcmFua2VkX25hbWUgPC0gc2V0TmFtZXMoZGF0YSRMb2cyRkNbb3JkZXIoLWRhdGEkTG9nMkZDKV0sIGRhdGEkR2VuZS5OYW1lW29yZGVyKC1kYXRhJExvZzJGQyldKQ0KcmFua2VkX25hbWUgPC0gcmFua2VkX25hbWVbIWR1cGxpY2F0ZWQobmFtZXMocmFua2VkX25hbWUpKV0gIyB0aGVyZSBhcmUgOCBkdXBsaWNhdGUgZ2VuZSBuYW1lcyEgdGhpcyB3aWxsIHRocm93IGVycm9ycyB3aGVuIHJ1bm5pbmcgZ3NlYQ0KDQpoZWFkKHJhbmtlZCkNCnRhaWwocmFua2VkKQ0KDQpgYGANCg0KYGBge3IgbG9hZCBpbnB1dCBkYXRhIFNZTUJPTCB9DQoNCiMgRnVsbCBkYXRhc2V0DQojZGF0YSA8LSByZWFkX3RzdigiUGV6emluaV9ERS50eHQiLCBjb2xfbmFtZXMgPSBUUlVFLCBzaG93X2NvbF90eXBlcyA9IEZBTFNFKQ0KDQojIERFR3MgZm9yIE9SQQ0KZGVncyA8LSBkYXRhICU+JQ0KICBmaWx0ZXIoRkRSIDwgMC4wMSAmIGFicyhMb2cyRkMpID4gMikgJT4lDQogIHB1bGwoR2VuZS5OYW1lKQ0KDQojIEJhY2tncm91bmQgZm9yIE9SQQ0KYmFja2dyb3VuZCA8LSBkYXRhJEdlbmUuTmFtZQ0KDQojIFJhbmtlZCBnZW5lIGxpc3QgdmVjdG9yIGZvciBHU0VBDQpyYW5rZWRfbmFtZSA8LSBzZXROYW1lcyhkYXRhJExvZzJGQ1tvcmRlcigtZGF0YSRMb2cyRkMpXSwgZGF0YSRHZW5lLk5hbWVbb3JkZXIoLWRhdGEkTG9nMkZDKV0pDQoNCmhlYWQocmFua2VkX25hbWUpDQp0YWlsKHJhbmtlZF9uYW1lKQ0KDQpgYGANCg0KIyAyLiBVc2UgdGhlIGBnc2U8REI+YCBmdW5jdGlvbiB0byBydW4gR1NFQSBvdmVyIHN1cHBvcnRlZCBkYXRhYmFzZXMNCg0KUmV2aWV3IHRoZSBjb250ZW50cyBwYWdlIG9mIHRoZSBbY2x1c3RlclByb2ZpbGVyIHVzZXIgZ3VpZGVdKGh0dHBzOi8vYmlvY29uZHVjdG9yLm9yZy9wYWNrYWdlcy9kZXZlbC9iaW9jL21hbnVhbHMvY2x1c3RlclByb2ZpbGVyL21hbi9jbHVzdGVyUHJvZmlsZXIucGRmKS4gDQoNCldlIGNhbiB1c2UgdGhlIGBnc2U8REI+YCBmdW5jdGlvbiB0byBwZXJmb3JtIEdTRUEgb24gYW55IG9mIHRoZSBmb2xsb3dpbmcgZGF0YWJhc2VzIHdpdGhvdXQgaGF2aW5nIHRvIG1hbnVhbGx5IGxvYWQgdGhlc2UgZGF0YWJhc2VzOg0KDQotIEdPDQotIEtFR0cNCi0gS0VHRyBNb2R1bGVzIChNS0VHRykNCi0gUGF0aHdheSBDb21tb25zIChQQykNCi0gV2lraVBhdGh3YXlzIChXUCkNCg0KDQojIyBnc2VHTw0KDQpMZXQncyBydW4gR1NFQSBvdmVyIHRoZSBHTyBkYXRhYmFzZS4gSWYgd2UgY2hvb3NlIGBBTExgIGZvciB0aGUgYG9udGAgKG9udG9sb2d5KSBwYXJhbWV0ZXIsICB3ZSBjYW4gcnVuIG92ZXIgTUYsIEJQIGFuZCBDQyBpbiBvbmUgcnVuLiANCg0KIyMgU3BlY2llcw0KDQpGb3IgdGhpcyBmdW5jdGlvbiwgd2UgbmVlZCBhbiBbYW5ub3RhdGlvbiBkYXRhYmFzZSBmcm9tIEJpb2NvbmR1Y3Rvcl0oaHR0cHM6Ly9iaW9jb25kdWN0b3Iub3JnL3BhY2thZ2VzLzMuMjAvZGF0YS9hbm5vdGF0aW9uLykuIFRoZSBwYWNrYWdlIGBvcmcuSHMuZWcuZGJgIGhhcyBiZWVuIGluc3RhbGxlZCBhbmQgbG9hZGVkIGZvciB5b3UuIA0KDQojIyBOYW1lc3BhY2UNCg0KV2UgY2FuIHVzZSBhbnkgZ2VuZSBuYW1lc3BhY2Ugc3VwcG9ydGVkIGJ5IHRoZSBhbm5vdGF0aW9uIHBhY2thZ2U6DQoNCmBgYHtyIG9yZyBocyBuYW1lc3BhY2VzfQ0Ka2V5dHlwZXMob3JnLkhzLmVnLmRiKQ0KYGBgDQpXZSBhbHJlYWR5IGhhdmUgRU5TRU1CTCBnZW5lIElEcyBpbiBvdXIgaW5wdXQgZGF0YSwgc28gd2UgZG9uJ3QgbmVlZCB0byBkbyBhIGdlbmUgSUQgY29udmVyc2lvbi4gDQoNCkZvciB0aGUgcmVzdCBvZiB0aGUgcGFyYW1ldGVycywgd2Ugd2lsbCB1c2UgdGhlIGRlZmF1bHRzLCBleGNlcHQgZm9yIGBzZWVkYCB0aGF0IHdlIHNob3VsZCBzZXQgdG8gYSBzcGVjaWZpYyB2YWx1ZSBmb3IgcmVwcm9kdWNpYmlsaXR5LCBhbmQNCmFkZCAxMCwwMDAgcGVybXV0YXRpb25zIHRvIG1ha2UgdGhlIGFuYWx5c2lzIG1vcmUgcm9idXN0IGFuZCByZWxpYWJsZSBieSBwcm92aWRpbmcgYSBiZXR0ZXIgZXN0aW1hdGlvbiBvZiBwLXZhbHVlcyBmb3IgdGhlIGVucmljaG1lbnQgc2NvcmVzLCBlc3BlY2lhbGx5IGZvciBjYXNlcyB3aXRoIHNtYWxsZXIgZ2VuZSBzZXRzIG9yIGxlc3Mgc2lnbmlmaWNhbnQgZGlmZmVyZW5jZXMuDQoNCmBgYHtyIGdzZUdPfQ0KZ3NlYV9HTyA8LSBnc2VHTyggDQogIHJhbmtlZCwgDQogIG9udCA9ICJBTEwiLCANCiAgT3JnRGIgPSAib3JnLkhzLmVnLmRiIiwNCiAga2V5VHlwZSA9ICJFTlNFTUJMIiwgDQogIGV4cG9uZW50ID0gMSwgDQogIG1pbkdTU2l6ZSA9IDEwLCANCiAgbWF4R1NTaXplID0gNTAwLCANCiAgZXBzID0gMWUtMTAsIA0KICBwdmFsdWVDdXRvZmYgPSAwLjA1LCANCiAgcEFkanVzdE1ldGhvZCA9ICJCSCIsIA0KICB2ZXJib3NlID0gVFJVRSwgDQogIHNlZWQgPSAxMjM0LCANCiAgYnkgPSAiZmdzZWEiLA0KICBuUGVybVNpbXBsZSA9IDEwMDAwDQopDQoNCmBgYA0KDQoNCiMjIGdzZUtFR0cNCg0KTm93IHdlIHdpbGwgcnVuIEdTRUEgb3ZlciBhbm90aGVyIGluLWJ1aWx0IGRhdGFiYXNlLiBhdmlnYXRlIHRvIHRoZSBwYWdlIG9mIHRoZSB1c2VyIGd1aWRlIHdoZXJlIHRoZSBgZ3NlS0VHR2AgZnVuY3Rpb24gaXMgZGVzY3JpYmVkLiANCg0KIyMgU3BlY2llcw0KDQpOb3RlIHRoYXQgdGhlIGRlZmF1bHQgb3JnYW5pc20gaXMgaHVtYW4gKGBoc2FgKS4gDQoNCklmIHlvdSB3ZXJlIHdvcmtpbmcgd2l0aCBhIHNwZWNpZXMgb3RoZXIgdGhhbiBodW1hbiwgeW91IGZpcnN0IG5lZWQgdG8gb2J0YWluIHlvdXIgb3JnYW5pc20gY29kZS4gWW91IGNhbiBkZXJpdmUgdGhpcyBmcm9tIFtLRUdHIE9yZ2FuaXNtc10oaHR0cHM6Ly93d3cuZ2Vub21lLmpwL2tlZ2cvdGFibGVzL2JyMDg2MDYuaHRtbCkgb3IgdXNpbmcgdGhlIGBjbHVzdGVyUHJvZmlsZXJgIGZ1bmN0aW9uIGBzZWFyY2hfa2VnZ19vcmdhbmlzbWAsIGZvciBleGFtcGxlIGBzZWFyY2hfa2VnZ19vcmdhbmlzbSgiaG9yc2UiLCBieSA9ICJjb21tb25fbmFtZSIpYC4gDQoNClVubGlrZSBgZ3NlR09gIHRoYXQgcmVxdWlyZXMgYSBCaW9jb25kdWN0b3IgYW5ub3RhdGlvbiBwYWNrYWdlLCB0aGUgYGdzZUtFR0dgIGZ1bmN0aW9uIHN1cHBvcnRzIG1hbnkgbW9yZSBvcmdhbmlzbXMuIA0KDQojIyBHZW5lIG5hbWVzcGFjZQ0KDQpSZXF1aXJlZCBga2V5IHR5cGVgIGlzIG9uZSBvZiBga2VnZ2AsIGBuY2JpLWdlbmVpZGAsIGBuY2liLXByb3RlaW5pZGAgYW5kIGB1bmlwcm90YC4gT3VyIGdlbmUgSURzIGFyZSBFTlNFTUJMLiANCg0KV2UgY2FuIGNvbnZlcnQgd2l0aCBgY2x1c3RlclByb2ZpbGVyYCBmdW5jdGlvbiBgYml0cmAuIENvbnZlcnRpbmcgdG8gRU5UUkVaIHdpbGwgYmUgY29tcGF0aWJsZSB3aXRoIGBrZWdnYC4gDQoNCg0KYGBge3IgY29udmVydCBnZW5lIElEc30NCiMgQ29udmVydCB0aGUgRW5zZW1ibCBJRHMgdG8gRW50cmV6IElEcywgZHJvcHBpbmcgTkFzDQpjb252ZXJ0ZWRfaWRzIDwtIGJpdHIobmFtZXMocmFua2VkKSwgDQogICAgICAgICAgICAgICAgICAgICAgZnJvbVR5cGUgPSAiRU5TRU1CTCIsIA0KICAgICAgICAgICAgICAgICAgICAgIHRvVHlwZSA9ICJFTlRSRVpJRCIsIA0KICAgICAgICAgICAgICAgICAgICAgIE9yZ0RiID0gb3JnLkhzLmVnLmRiLCANCiAgICAgICAgICAgICAgICAgICAgICBkcm9wID0gVFJVRSkNCg0KIyBIYW5kbGUgYW55IGAxOm1hbnkgbWFwcGluZ2AgKEVOU0VNQkwgSUQgbWF0Y2hlcyA+MSBFTlRSRVpJRCkgYnkga2VlcGluZyBvbmx5IHRoZSBmaXJzdCBFbnRyZXogSUQgZm9yIGVhY2ggRW5zZW1ibCBJRA0KY29udmVydGVkX2lkcyA8LSBjb252ZXJ0ZWRfaWRzWyFkdXBsaWNhdGVkKGNvbnZlcnRlZF9pZHMkRU5TRU1CTCksIF0NCg0KIyBLZWVwIG9ubHkgdGhlIHJvd3Mgd2l0aCB2YWxpZCBFbnRyZXogSURzDQpjb252ZXJ0ZWRfaWRzIDwtIGNvbnZlcnRlZF9pZHNbIWlzLm5hKGNvbnZlcnRlZF9pZHMkRU5UUkVaSUQpLCBdDQoNCiMgRmlsdGVyIHRoZSByYW5rZWQgZ2VuZSBsaXN0IHRvIGluY2x1ZGUgb25seSB0aGUgc3VjY2Vzc2Z1bGx5IG1hcHBlZCBFbnNlbWJsIElEcw0KcmFua2VkX2VudHJleiA8LSByYW5rZWRbbmFtZXMocmFua2VkKSAlaW4lIGNvbnZlcnRlZF9pZHMkRU5TRU1CTF0NCg0KIyBSZXBsYWNlIHRoZSBFbnNlbWJsIElEcyB3aXRoIHRoZSBjb3JyZXNwb25kaW5nIEVudHJleiBJRHMgaW4gdGhlIHJhbmtlZCB2ZWN0b3INCm5hbWVzKHJhbmtlZF9lbnRyZXopIDwtIGNvbnZlcnRlZF9pZHMkRU5UUkVaSURbbWF0Y2gobmFtZXMocmFua2VkX2VudHJleiksIGNvbnZlcnRlZF9pZHMkRU5TRU1CTCldDQoNCiMgUmVtb3ZlIGR1cGxpY2F0ZXMgKGtlZXAgb25seSBmaXJzdCBvY2N1cnJlbmNlIG9mIEVudHJleiBJRHMpDQojIyBOb3RlOiB0aGlzIGlzIG5vdCBpZGVhbCBhbmQgZm9yIGEgcmVhbCBleHBlcmltZW50IHlvdSBzaG91bGQgY2FyZWZ1bGx5IHJldmlldyBkdXBsaWNhdGVzIGFuZCBjaG9vc2Ugd2hpY2ggYW5kIGhvdyB0byByZXRhaW4gYmFzZWQgb24geW91ciBiaW9sb2dpY2FsIGNvbnRleHQgDQpyYW5rZWRfZW50cmV6IDwtIHJhbmtlZF9lbnRyZXpbIWR1cGxpY2F0ZWQobmFtZXMocmFua2VkX2VudHJleikpXQ0KDQpjYXQoIlxuIikNCg0KIyBDaGVjazogDQpoZWFkKHJhbmtlZF9lbnRyZXopDQp0YWlsKHJhbmtlZF9lbnRyZXopDQoNCmBgYA0KTm93IHJ1biBHU0VBIG92ZXIgdGhlIEtFR0cgZGF0YWJhc2Ugd2l0aCBgZ3NlS0VHR2AgZnVuY3Rpb246IA0KDQoNCmBgYHtyIGdzZUtFR0d9DQpnc2VhX2tlZ2cgPC0gZ3NlS0VHRyggDQogIHJhbmtlZF9lbnRyZXosIA0KICBvcmdhbmlzbSA9ICJoc2EiLCANCiAga2V5VHlwZSA9ICJrZWdnIiwgDQogIGV4cG9uZW50ID0gMSwgDQogIG1pbkdTU2l6ZSA9IDEwLCANCiAgbWF4R1NTaXplID0gNTAwLCANCiAgZXBzID0gMWUtMTAsIA0KICBwdmFsdWVDdXRvZmYgPSAwLjA1LCANCiAgcEFkanVzdE1ldGhvZCA9ICJCSCIsDQogIHZlcmJvc2UgPSBUUlVFLCANCiAgdXNlX2ludGVybmFsX2RhdGEgPSBGQUxTRSwgDQogIHNlZWQgPSBGQUxTRSwgDQogIGJ5ID0gImZnc2VhIiwNCiAgblBlcm1TaW1wbGUgPSAxMDAwMA0KKQ0KDQoNCmBgYA0KDQoNCg0KDQoNCiMgNC4gVmlzdWFsaXNlIEdTRUEgcmVzdWx0cyB3aXRoIGBlbnJpY2hwbG90YA0KDQoNCg0KDQoNCg0KDQoNCiMgNy4gSW1wb3J0IGEgZGF0YWJhc2UgdGhhdCBpcyBub3QgZGlyZWN0bHkgc3VwcG9ydGVkIGJ5IHRoZSBgZW5yaWNoYCBvciBgZ3NlYCBmdW5jdGlvbnMgYW5kIHVzZSB0aGUgYGVucmljaGVyYCBhbmQgYGdzZWFgIGdlbmVyaWMgZnVuY3Rpb25zIHRvIHBlcmZvcm0gT1JBIGFuZCBHU0VBDQoNCk9uZSBvZiB0aGUgZ3JlYXQgZmVhdHVyZXMgb2YgYGNsdXN0ZXJQcm9maWxlcmAgaXMgdGhlIGFiaWxpdHkgdG8gcnVuIE9SQSBvciBHU0VBIG92ZXIgYW55IGdlbmUgc2V0IG9yIGRhdGFiYXNlLiBUaGlzIGlzIHRocm91Z2ggdGhlIHVzZSBvZiB0aGUgZ2VuZXJpYyBPUkEgYW5kIEdTRUEgZm5jdGlvbnMgYGVucmljaGVyYCBhbmQgYEdTRUFgLiBUaGUgZGF0YWJhc2UgYW5kIGFubm90YXRpb24gZGV0YWlscyBhcmUgcHJvdmlkZWQgdG8gdGhlIGZ1bmN0aW9ucyB0aHJvdWdoIHRoZSBgVEVSTTJHRU5FYCBhbmQgYFRFUk0yTkFNRWAgYXJndW1lbnRzLiBUaGVzZSBhcmUgY3VzdG9tIGZpbGVzIHRoYXQgbWFwIHlvdXIgZ2VuZSBJRHMgdG8gZGF0YWJhc2UgdGVybXMuIA0KDQpUaGlzIGVuYWJsZXMgZXh0ZW5zaXZlIGRhdGFiYXNlIHN1cHBvcnQsIGFzIHdlbGwgYXMgdGhlIG9wdGlvbiB0byBhbmFseXNlIG5vdmVsIGdlbm9tZXMuIA0KDQpUaGUgYFRFUk0yR0VORWAgZmlsZSBpcyBhIDItY29sdW1uIGxpc3Qgb2YgZ2VuZSBJRHMgYWdhaW5zdCBkYXRhYmFzZS9nZW5lIHNldCB0ZXJtIElEcy4gVGhlcmUgaXMgb25lIGdlbmUgcGVyIGxpbmUsIGFuZCBhIGdlbmUgY2FuIGJlIG9uIG1hbnkgbGluZXMgaWUgYmUgbWFwcGVkIHRvIG1vcmUgdGhhbiBvbmUgdGVybS4NCg0KVGhlIGBURVJNMk5BTUVgIGZpbGUgd2lsbCBjb250YWluIHRoZSBJRCBvZiB0aGUgdGVybSBmcm9tIHRoZSBkYXRhYmFzZSwgYWxvbmdzaWRlIGl0cyBkZXNjcmlwdGlvbiwgZWcgIGBHTzowMDAzNjc2CW51Y2xlaWMgYWNpZCBiaW5kaW5nYC4gDQoNClNvIHRoZSBgVEVSTTJHRU5FYCBmaWxlIGlzIHNwZWNpZXMtc3BlY2lmaWMsIHdoaWxlIHRoZSBgVEVSTTJOQU1FYCBpcyBnZW5lcmljLCBidXQgc3Vic2V0IHRvIG9ubHkgaW5jbHVkZSB0aGUgdGVybXMgdGhhdCBhcmUgcHJlc2VudCBpbiB0aGUgYFRFUk0yR0VORWAgZmlsZS4gDQoNCg0KDQoNCg==</div>
 
 
 
