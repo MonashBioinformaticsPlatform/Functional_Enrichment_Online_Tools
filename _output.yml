@@ -1,8 +1,10 @@
 bookdown::bs4_book:
   css: style.css
+  # before_body: custom.js
   theme:
     primary: "#1D0F81"
-  repo: https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_BioCommons_2024
+  repo: https://github.com/MonashBioinformaticsPlatfor/Functional_Enrichment_BioCommons_2024
+  # toc_depth: 2  # Adjust the depth as needed (e.g., 2 for up to H2 headers)
 bookdown::pdf_book:
   includes:
     in_header: preamble.tex

@@ -8,15 +8,18 @@ language:
     chapter_name: "Chapter "
 rmd_files:
   - index.Rmd
+  - part-day1.Rmd
   - 01-overview.Rmd
   - 02-recap.Rmd
   - 03-stats.Rmd
   - 04-example-dataset.Rmd
   - 05-genelists.Rmd
-  - 06-reporting.Rmd
-  - 07-resources.Rmd
-  - 08-challenge.Rmd
-  - 09-end.Rmd
+  - 06-web-tools.Rmd
+  - 07-reporting.Rmd
+  - 08-resources.Rmd
+  - part-day2.Rmd
+  - 09-challenge.Rmd
+  - 10-end.Rmd
 
 copy_resources:
   - files/

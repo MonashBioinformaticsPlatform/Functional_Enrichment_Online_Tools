@@ -21,11 +21,19 @@ Todays exercise follows the process of getting the differentially expressed gene
 
     - For this workshop, get the genes with a FDR <1x10^-4 and 2x fold change. Note that this is a ridiculous threshold - most experiments yeild far less differential expression, but the difference between these two cell conditions is pretty extreme! Typically you would only filter at p<0.01 (and occasionally 2-fold change) - you might see 10s to 100s of results. However, this arbitrary threshold gives a more typical number of differentially expressed genes for downstream analysis. An alternative approach could be to take the top 500 genes.
 
-    {{%expand Show%}} There are 4923 differentially expressed genes, 2149 of which have a 2-fold change in expression. With the aggressive filtering - there are 198 genes left {{%/expand%}}
+<details>
+<summary>Show</summary>
+There are 4923 differentially expressed genes, 2149 of which have a 2-fold change in expression. With the aggressive filtering, there are 198 genes left.
+</details>
+
 
 
 3. How many genes are _tested_? This is your background.
-{{%expand Show%}} 14420 genes tested. {{%/expand%}}
+
+<details>
+<summary>Show</summary>
+14420 genes tested.
+</details>
 
 <!--But with ~20k human genes - why are there genes missing? **14420** --> 
 

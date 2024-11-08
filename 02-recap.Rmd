@@ -22,7 +22,7 @@ Functional enrichment analysis is typically applied after conducting a different
 - ...
 
 ### What Are the Input Data?
-Functional enrichment analysis relies on carefully prepared input data derived from an -omics study. The data inputs typically consist of the following components depending on the type of the enrichment analysis:
+Functional enrichment analysis relies on carefully prepared input data derived from an -omics study. The data inputs typically consist of various components depending on the type of the enrichment analysis. These are list of features, ranked list, background set, gene sets and pathway topology.
 
 ### Synonyms
 It's important to note that the term "functional enrichment analysis" is often used in different ways across the field. The diversity in terminology can sometimes cause confusion, as the same concept is referred to by various synonymous terms. These include:
@@ -114,6 +114,9 @@ Pathway Topology (PT)-based enrichment analysis extends beyond merely counting f
 <span style="color: orange;"><em>Strengths</em></span>: Provides more biologically relevant insights by considering gene-gene interactions and the position of each gene within a pathway. It is particularly useful for complex pathways where the roles of genes differ based on their interactions with others.
 
 <span style="color: orange;"><em>Limitations</em></span>: Requires more detailed pathway annotations and higher computational complexity. Pathway databases may not have complete or accurate topological information for all pathways, limiting the analysis for certain datasets.
+
+PT-based enrichment will be covered in this workshop:
+Given the focus of this workshop on more widely used and accessible enrichment methods, PT-based analysis will not be covered for its limited practical applications (primarily due to the insufficient availability of comprehensive and well-annotated pathway topology databases). Instead, we will focus on methods like ORA and GSEA, which are better supported by existing databases and easier to apply in typical omics studies. However, participants are encouraged to explore PT-based enrichment in the future as database resources improve.
 
 ## Annotation Databses
 Functional annotation databases are curated collections of biological data that systematically categorise and describe the functions, roles, interactions, and pathways of genes, proteins, or other biological molecules, enabling researchers to link experimental data to biological knowledge.
