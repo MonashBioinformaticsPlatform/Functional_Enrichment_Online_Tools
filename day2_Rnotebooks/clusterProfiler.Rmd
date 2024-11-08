@@ -7,7 +7,9 @@ output: html_notebook
 library(clusterProfiler)
 library(enrichplot)
 library(readr)
-
+library(biomaRt)
+library(org.Hs.eg.db)
+library(dplyr)
 ```
 
 [clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has inbuilt functions to run ORA (`enrich<DB>`) or GSEA (`gse<DB>`) over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as functions to perform ORA (`enricher`) or GSEA (`gsea`) with custom gene sets.
@@ -15,15 +17,15 @@ library(readr)
 It supports all organisms available in KEGG. It has a companion plotting package `enrichPlot` dedicated to plotting `clusterProfiler` results. 
 
 
-# 1. Load input data
+# 1. Load input data and extract ranked gene list
 
-We will use the same dataset as per day 1 and the `gprofiler`` activity. First, confirm your working directory is the `Functional_enrichment_workshop_2024/day_2` folder. 
+We will use the same Pezzini RNAseq dataset as earlier. First, confirm your working directory is the `Functional_enrichment_workshop_2024/day_2` folder. 
 
 ```{r setup, include=FALSE}
 # Set the root directory for all notebook chunks
 knitr::opts_knit$set(root.dir = "C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
 
-# and set the working directory for the console:
+# To set the working directory for the console, run this in the console itself:
 setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
 
 
@@ -34,50 +36,184 @@ getwd()
 
 Please ask for assistance if this step does not show the day_2 folder path! 
 
-Once your working directory is set, load the DEGs and background gene list extracted from the previous activity. We will also need to obtain all genes and sort by log2 fold change for GSEA, so load the full matrix as well: 
-
+Once your working directory is set, load the dataset and extract the gene lists.
 
 ```{r load input data}
-degs <- read_tsv("degs.txt", col_names = FALSE, show_col_types = FALSE)
-nrow(degs)
 
-background <- read_tsv("background_genes.txt", col_names = FALSE, show_col_types = FALSE)
-nrow(background)
-
+# Full dataset
 data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
-head(data)
 
-```
+# DEGs for ORA - ENSEMBL gene IDs
+degs <- data %>%
+  filter(FDR < 0.01 & abs(Log2FC) > 2) %>%
+  pull(Gene.ID)
 
-# 2. Extract GSEA ranked gene list
+# DEGs for ORA - gene names
+degs_name <- data %>%
+  filter(FDR < 0.01 & abs(Log2FC) > 2) %>%
+  pull(Gene.Name)
 
-```{r get ranked gene list}
-ranked <- data[order(-data$Log2FC), c("Gene.ID", "Log2FC")]
+# Background for ORA - ENSEMBL gene IDs
+background <- data$Gene.ID
+
+# Ranked gene list vector for GSEA
+ranked <- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.ID[order(-data$Log2FC)])
+
+# Now with gene names:
+ranked_name <- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.Name[order(-data$Log2FC)])
+ranked_name <- ranked_name[!duplicated(names(ranked_name))] # there are 8 duplicate gene names! this will throw errors when running gsea
 
 head(ranked)
 tail(ranked)
+
 ```
 
-# 3. Use the `gse<DB>` function to run GSEA over supported databases
+```{r load input data SYMBOL }
+
+# Full dataset
+#data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
+
+# DEGs for ORA
+degs <- data %>%
+  filter(FDR < 0.01 & abs(Log2FC) > 2) %>%
+  pull(Gene.Name)
+
+# Background for ORA
+background <- data$Gene.Name
+
+# Ranked gene list vector for GSEA
+ranked_name <- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.Name[order(-data$Log2FC)])
+
+head(ranked_name)
+tail(ranked_name)
+
+```
+
+# 2. Use the `gse<DB>` function to run GSEA over supported databases
 
 Review the contents page of the [clusterProfiler user guide](https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf). 
 
-We can use the `gse<DB>` function to perform GSEA on any of the following databases without having to manually load these datbases:
+We can use the `gse<DB>` function to perform GSEA on any of the following databases without having to manually load these databases:
 
 - GO
 - KEGG
 - KEGG Modules (MKEGG)
-- DAVID
 - Pathway Commons (PC)
 - WikiPathways (WP)
 
-Let's run `gseKEGG`!
 
-Navigate to the page of the user guide where the `gseKEGG` function is described. Note that the default organism is human (`hsa`). 
+## gseGO
 
-**Note:**  If you were working with a species other than human, you first need to undertsand your organism code. You can derive this from [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html) or using the `clsuterProfiler` function `search_kegg_organism`, for example `search_kegg_organism("horse", by = "common_name")`. 
+Let's run GSEA over the GO database. If we choose `ALL` for the `ont` (ontology) parameter,  we can run over MF, BP and CC in one run. 
+
+## Species
+
+For this function, we need an [annotation database from Bioconductor](https://bioconductor.org/packages/3.20/data/annotation/). The package `org.Hs.eg.db` has been installed and loaded for you. 
+
+## Namespace
+
+We can use any gene namespace supported by the annotation package:
+
+```{r org hs namespaces}
+keytypes(org.Hs.eg.db)
+```
+We already have ENSEMBL gene IDs in our input data, so we don't need to do a gene ID conversion. 
+
+For the rest of the parameters, we will use the defaults, except for `seed` that we should set to a specific value for reproducibility, and
+add 10,000 permutations to make the analysis more robust and reliable by providing a better estimation of p-values for the enrichment scores, especially for cases with smaller gene sets or less significant differences.
+
+```{r gseGO}
+gsea_GO <- gseGO( 
+  ranked, 
+  ont = "ALL", 
+  OrgDb = "org.Hs.eg.db",
+  keyType = "ENSEMBL", 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10, 
+  pvalueCutoff = 0.05, 
+  pAdjustMethod = "BH", 
+  verbose = TRUE, 
+  seed = 1234, 
+  by = "fgsea",
+  nPermSimple = 10000
+)
+
+```
+
+
+## gseKEGG
+
+Now we will run GSEA over another in-built database. avigate to the page of the user guide where the `gseKEGG` function is described. 
+
+## Species
+
+Note that the default organism is human (`hsa`). 
+
+If you were working with a species other than human, you first need to obtain your organism code. You can derive this from [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html) or using the `clusterProfiler` function `search_kegg_organism`, for example `search_kegg_organism("horse", by = "common_name")`. 
+
+Unlike `gseGO` that requires a Bioconductor annotation package, the `gseKEGG` function supports many more organisms. 
+
+## Gene namespace
+
+Required `key type` is one of `kegg`, `ncbi-geneid`, `ncib-proteinid` and `uniprot`. Our gene IDs are ENSEMBL. 
+
+We can convert with `clusterProfiler` function `bitr`. Converting to ENTREZ will be compatible with `kegg`. 
+
+
+```{r convert gene IDs}
+# Convert the Ensembl IDs to Entrez IDs, dropping NAs
+converted_ids <- bitr(names(ranked), 
+                      fromType = "ENSEMBL", 
+                      toType = "ENTREZID", 
+                      OrgDb = org.Hs.eg.db, 
+                      drop = TRUE)
+
+# Handle any `1:many mapping` (ENSEMBL ID matches >1 ENTREZID) by keeping only the first Entrez ID for each Ensembl ID
+converted_ids <- converted_ids[!duplicated(converted_ids$ENSEMBL), ]
+
+# Keep only the rows with valid Entrez IDs
+converted_ids <- converted_ids[!is.na(converted_ids$ENTREZID), ]
+
+# Filter the ranked gene list to include only the successfully mapped Ensembl IDs
+ranked_entrez <- ranked[names(ranked) %in% converted_ids$ENSEMBL]
+
+# Replace the Ensembl IDs with the corresponding Entrez IDs in the ranked vector
+names(ranked_entrez) <- converted_ids$ENTREZID[match(names(ranked_entrez), converted_ids$ENSEMBL)]
+
+# Remove duplicates (keep only first occurrence of Entrez IDs)
+## Note: this is not ideal and for a real experiment you should carefully review duplicates and choose which and how to retain based on your biological context 
+ranked_entrez <- ranked_entrez[!duplicated(names(ranked_entrez))]
+
+cat("\n")
+
+# Check: 
+head(ranked_entrez)
+tail(ranked_entrez)
+
+```
+Now run GSEA over the KEGG database with `gseKEGG` function: 
+
 
 ```{r gseKEGG}
+gsea_kegg <- gseKEGG( 
+  ranked_entrez, 
+  organism = "hsa", 
+  keyType = "kegg", 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10, 
+  pvalueCutoff = 0.05, 
+  pAdjustMethod = "BH",
+  verbose = TRUE, 
+  use_internal_data = FALSE, 
+  seed = FALSE, 
+  by = "fgsea",
+  nPermSimple = 10000
+)
+
 
 ```
 
@@ -90,18 +226,21 @@ Navigate to the page of the user guide where the `gseKEGG` function is described
 
 
 
-# 5. Use the `enrich<DB>` function to run ORA over supported databases
-
-
-
-
-
-# 6. Visualise ORA results with `enrichplot`
 
 
 
 
 # 7. Import a database that is not directly supported by the `enrich` or `gse` functions and use the `enricher` and `gsea` generic functions to perform ORA and GSEA
+
+One of the great features of `clusterProfiler` is the ability to run ORA or GSEA over any gene set or database. This is through the use of the generic ORA and GSEA fnctions `enricher` and `GSEA`. The database and annotation details are provided to the functions through the `TERM2GENE` and `TERM2NAME` arguments. These are custom files that map your gene IDs to database terms. 
+
+This enables extensive database support, as well as the option to analyse novel genomes. 
+
+The `TERM2GENE` file is a 2-column list of gene IDs against database/gene set term IDs. There is one gene per line, and a gene can be on many lines ie be mapped to more than one term.
+
+The `TERM2NAME` file will contain the ID of the term from the database, alongside its description, eg  `GO:0003676	nucleic acid binding`. 
+
+So the `TERM2GENE` file is species-specific, while the `TERM2NAME` is generic, but subset to only include the terms that are present in the `TERM2GENE` file. 
 
 
 
