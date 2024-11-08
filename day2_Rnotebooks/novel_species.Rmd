@@ -1,0 +1,777 @@
+---
+title: "Non-model species enrichment analysis with clusterProfiler"
+output:
+  html_document:
+    df_print: paged
+    self_contained: false
+---
+
+
+
+
+THOUGHTS - instead of doing GO and KEGG, just do GO, but do it for the manual annotation and compare to the STRING annotation. 
+
+
+
+```{r  Load libraries, include=FALSE }
+# for readTSV
+library(readr)
+
+# for %>% syntax and GSEA
+library(dplyr)
+
+# for extracting ontology from go.obo
+library(ontologyIndex)
+
+# required for drop.na()
+library(tidyverse)
+
+library(DESeq2)
+library(clusterProfiler)
+
+# upset plot
+library(enrichplot) # gsea plot
+library(ggupset)
+
+```
+
+
+# Non-model species
+
+## Options for species with the right annotation resources
+
+FEA can be easily performed for many non-model species with user friendly web tools (eg g:Profiler) or R packages. For clusterProfiler, organisms with the required annotations can be analysed using the convenient tools enrichGO, enrichKEGG, gseGO, gseKEGG etc. If a species is listed on [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html), they can be analysed online or with clusterProfiler using enrichKEGG or gseKEGG. To use enrichGO or gseGO, an [Org.db annotation package](https://bioconductor.org/packages/3.19/data/annotation/) is required. 
+
+## What options are available if your species does not have either of these two resources? 
+
+If you have performed an in-house genome assembly or are working with an understudied species, it is unlikely/impossible that your species will have the required annotations and thus your options for performing FEA become limited. How frustrating, given that you are already faced with numerous challenges working with an under-resourced species!
+
+This is where the flexibility of R can help, in particular clusterProfiler which has some generic functions for ORA (function 'enricher') and GSEA (function 'GSEA') that allow you to input your own annotation database in the form of two complimentary files, 'TERM2GENE' (maps your specific organism gene IDs to annotation IDs) and 'TERM2NAME' (maps those annotation IDs to descriptive names, eg GO term 'GO:0003676' is mapped to name 'nucleic acid binding'. These sound complicated but are simply 2-column text files. 
+
+The gene names are flexible - they do not have to conform to any specific gene ID namespace. In order to obtain the functional annotations, you may need to run the annotation yourself with tools such as eggNog emapper, which will provide annotations against GO, KEGG and a number of other databases. In order to run the annotation, you of course need a genome assembly and gene prediction GTF/GFF file. You can then filter the annotation output for the correct fields (ie organisms-specific gene ID and annotation ID) in order to create the 'TERM2GENE' file. 
+
+To create 'TERM2NAME', you then use the relevant database eg (GO, KEGG) to create a text file with the annotation IDs detected in your organism to the annotation names. 
+
+# Axolotl functional enrichment analysis
+
+## Background 
+
+The axolotl (Ambystoma mexicanum) is a salamander with some very cool abilities: it can regenerate damaged or amputated tissue, including spinal cord and some brain regions. While this species has reference genome on NCBI, it is not annotated. There is no Org.db nor does this species exist in KEGG Organisms. There is however an [axolotl genome browser](https://www.axolotl-omics.org/) where you can download a (slightly less contiguous than the NCBI version) reference genome plus a (non-curated) GTF file.
+
+Despite the lack of quality resources, there is much 'omics work conducted in axolotl due to its regenerative capabilities.
+
+Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5419050/#SD7) from axolotl, comparing gene expression in the blastema after proximal (at the shoulder) and distal (at the hand) limb amputation. The blastema is a collection of undifferentiated progenitor cells that give rise to the regenerated limb. Hopefully, our functional enrichment analysis of differentially expressed genes can help us understand what tells the blastema to grow into a full limb or just a hand! 
+
+### Raw data sources
+
+- [Reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz)
+- [GTF file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz)
+- [Raw fastq](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA300706)
+- [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obohea)
+
+**ADD GO.OBO
+
+### Data pre-processing
+
+The reference genome was annotated with emapper and GO and KEGG IDs extracted to create required database files. The raw reads were trimmed with bbduk and aligned to the reference genome with STAR. Feature counting was performed with HTSeq-counts and formatted into a matrix ready for differential gene expression analysis with DESeq2. The unfiltered dataframe contains axolotl gene IDs, adjusted P values and log2fold change values. This is the 'gene list' ready for functional enrichment analysis!
+
+
+## Load input genes
+
+Recall that there are 3 standard input requirements for FEA:
+
+1. The experimental gene list 
+2. The annotation database
+3. The background gene list (for ORA)
+
+
+For ORA, we want a gene list that is filtered (usually on adjusted P, +/- log2 fold change). For GSEA, we want an UNFILTERED gene list, that is 'ranked' (ie sorted) in this case by log2fold change. So the starting data file is the same, we just need to extract/re-format to suit the tool in use. 
+
+For now, let's load the input dataset, which is the differential expression analysis results table from DESeq2. Later on we will format the input gene list to suit the analyses at hand.  
+
+
+** UPDATE HERE LATER - NEED TO LOAD DESEQ2 DATAFRAME NOT RAW COUNTS, DONT WANT TO INCLUDE ACTUAL DE IN THIS COURSE 
+** NEED TO NOTE THAT THE REMOVAL OF LOW COUNT GENES HAS ALREADY BEEN DONE 
+
+```{r load raw dataset}
+
+# Load raw counts file
+infile <- "counts/axolotl.counts"
+raw_counts <- read.table(infile, header = TRUE, row.names = 1)
+head(raw_counts)
+```
+
+The dataset has two conditions (proximal blastema and distal blastema) with two replicates each. Not quite enough for RNAseq, but hey it was public data from a species with no NCBI refseq :-) 
+
+
+
+## Gene Ontology enrichment 
+
+### Load axolotl GO annotation file
+
+The file `Amex_term2gene_GO.tsv` was created by extracting the GO terms mapped to the axolotl genes with emapper, and printing them one term per line alongside the gene ID. A gene can map to many terms and thus be present on multiple lines. A term can be mapped to more than one gene. 
+
+
+```{r load GO annotation}
+
+# load annotation input file
+infile <- "reference/Amex_term2gene_GO.tsv"
+go_term2gene <- read_tsv(infile, show_col_types = FALSE)
+
+# assign column names
+colnames(go_term2gene) <- c("term", "gene")
+
+# print the first 6 lines
+head(go_term2gene)
+
+```
+
+Now print the number of GO terms found within the genome, and the number of genes with GO annotations
+
+```{r report GO annotation counts}
+
+total_terms<-nrow(go_term2gene)
+print(paste("Number of annotation terms:", total_terms))
+
+unique_genes <- length(unique(go_term2gene$gene))
+print(paste("Number of genes with 1 or more annotation terms:", unique_genes))
+
+```
+
+### Create TERM2NAME
+
+The 'core' gene ontology database file [`go.obo`](https://purl.obolibrary.org/obo/go.obo) has been downloaded and included in your working directory. This will enable us to assign GO names to all of the GO IDs within our axolotl 'TERM2GENE' file.  
+
+Prepare the term to name table:
+
+```{r GO term2name}
+
+# Extract ontology info from go.obo
+
+infile <- "reference/go.obo"
+
+ontology <- get_ontology(file = infile,
+                         propagate_relationships = "is_a",
+                         extract_tags = "everything",
+                         merge_equivalent_terms = TRUE)
+
+
+# Create term to name table, removing duplicates, missing values and obsolete terms 
+go_term2name <- go_term2gene %>%
+    mutate(name = ontology$name[term]) %>%
+    select(term, name) %>%
+    distinct() %>%
+    drop_na() %>%
+    filter(!grepl("obsolete", name))
+
+
+
+# Write to a file
+write_tsv(go_term2name, "Amex_term2name_GO.tsv")
+
+# Show the first few lines
+head(go_term2name)
+
+```
+
+
+### Define background genes
+
+It is critical to use only genes that are detectable in the experiment. For RNAseq experiments, we exclude those genes that aren't expressed at a meaningful level. This ensures ensure that genes that are never expressed within a particular tissue are not included in the background gene set. If they are, then enriched terms will likely include gene sets related to that specific tissue, which is information that firstly we don't need and secondly can create noise that hides truly important enrichments related to the conditions tested in the experiment. In this case, we want to find terms that are different between proximal limb regeneration and distal limb regeneration, not terms that relate to blastema tissue and regeneration in general. 
+
+Filter out genes that have zero or low expression, using an arbitrary cut off of 10 counts per gene in at least 2 samples (2 being the smallest group size within our experimental design)
+
+
+```{r filter out low count genes}
+
+# Filter for at least 10 counts per size of smallest group
+smallestGroupSize <- 2
+min_counts <- 10
+keep <- rowSums(raw_counts >= min_counts) >= smallestGroupSize
+filtered_counts <- raw_counts[keep, ]
+
+# Create a gene list of background genes
+background_genes <- rownames(filtered_counts) 
+
+# Report the numbers of genes before and after filtering 
+print(paste("Number of genes in genome:", (nrow(raw_counts))))
+print(paste("Number of genes after removing those with low or no expression (background genes):", (nrow(filtered_counts))))
+
+```
+
+We now know that we have 24,419 background genes, and 21,373 genes annotated with GO terms. How many of our background genes are annotated? 
+
+
+```{r report GO annotation percentages}
+
+# from raw counts
+percent_annotated_raw <- (unique_genes / (nrow(raw_counts))) * 100
+
+# Now filter the term2gene table to only include genes in the background gene list
+filtered_term2gene <- go_term2gene %>% filter(gene %in% background_genes)
+
+# Count the number of unique background genes with at least one GO term
+unique_genes_with_anno <- filtered_term2gene %>% distinct(gene) %>% nrow()
+
+# Calculate the percentage of background genes that have GO annotations
+percent_annotated_filtered <- (unique_genes_with_anno / nrow(filtered_counts)) * 100
+
+# Print results
+cat("Number of background genes with GO annotationss:", unique_genes_with_anno, "(",percent_annotated_filtered,"%)\n")
+cat("Percentage of genome-wide genes with GO annotations:", percent_annotated_raw, "%\n")
+
+```
+This highlights a major caveat when performing FEA on non-model species: the results are only as good as the annotations behind them. Therefore, all results must be interpreted with caution. For many non-model species, there are little opportunities (at present) to improve the annotation. Some in-silico predicted genes appear to be highly expressed and significantly regulated yet have no significant similarity to anything in the non-redundant nucleotide or protein databases. When working with datasets like this, it is critical to explore those individual genes through other methods, in addition to trying to garner some higher level overview such as we aim to obtain from FEA. Hopefully, recent advances in AI protein modelling can help provide insights into the functions of these novel genes. 
+
+For the axolotl with only 22% of predicted genes annotated, its clear that the in-silico gene predictions within the GTF file require much curation! (Side note: only 48,115 of genes in the GTF had a predicted peptide sequence).
+
+### DESeq2 DE - NOT TO BE INCLUDED IN THE COURSE BUT NEED TO BE RUN ONCE HERE TO GET THE DE DATAFRAME
+
+```{r Load sample metadata}
+
+# Read the samplesheet
+metadata <- read.table("samplesheet.txt", header = TRUE, sep = "\t")
+
+# Ensure the Sample column is treated as row names in metadata
+rownames(metadata) <- metadata$Sample
+
+# Remove the Sample column now that it's row names
+metadata <- metadata[ , -1, drop = FALSE]  # Use drop = FALSE to keep it as a data frame
+
+# Convert metadata columns to factors
+metadata$Type <- as.factor(metadata$Type)
+
+# Check the first few rows of the updated metadata
+head(metadata)
+
+# Check that the order matches in metadata and counts matrices, as this is important to DESeq which will not check sample ID against metadata but instead assumes the order is the same
+
+# Extract sample names from counts matrix
+count_samples <- colnames(raw_counts)
+
+# Extract sample names from metadata
+metadata_samples <- rownames(metadata)
+
+# Check if the order is the same - OK if no message printed out
+if (!all(count_samples == metadata_samples)) {
+     stop("Order of samples in the counts matrix and metadata do not match.")
+} else {
+  print("Samples in counts matrix and metadata match, OK to proceed.")
+}
+
+```
+
+Run deseq
+
+```{r deseq de}
+
+# Create a new DESeqDataSet
+dds <- DESeqDataSetFromMatrix(countData = filtered_counts, colData = metadata, design = ~ Type)
+dds$Type <- as.factor(dds$Type)
+  
+# Relevel reference factors
+dds$Type <- relevel(dds$Type, ref = "proximal")
+
+# Run DE
+dds <- DESeq(dds)
+
+# get results
+results_table <- results(dds)
+head(results_table)
+
+
+```
+
+```{r count signif }
+# Count the number of genes with padj < 0.05
+significant_genes <- sum(results_table$padj < 0.05, na.rm = TRUE)
+
+# Print the result
+significant_genes # 502
+
+# Count the number of genes with padj < 0.05
+higher_significant_genes <- sum(results_table$padj < 0.01, na.rm = TRUE)
+
+# Print the result
+higher_significant_genes # 284
+
+```
+```{r count signif anno}
+
+# Extract gene IDs of significant genes
+significant_genes <- rownames(results_table)[results_table$padj < 0.05 & !is.na(results_table$padj)]
+# Extract the gene IDs from the term2gene file
+annotated_genes <- go_term2gene$gene
+
+# Find significant genes that have annotations
+annotated_significant_genes <- significant_genes[significant_genes %in% annotated_genes]
+
+# Count the number of significant genes with annotations
+count_annotated_significant_genes <- length(annotated_significant_genes)
+
+# Print the result
+count_annotated_significant_genes # 182. ~ 36% of signif genes = where did htis come from? it's 312 for 0.05...
+
+```
+```{r }
+
+write.csv(as.data.frame(results_table), file = "axolotl_DE_results.csv")
+
+
+```
+
+### Load input dataframe
+
+The input data we have been provided with is the results of differential gene expression analysis performed with R package DESeq2, comparing distal vs proximal blastema gene expression. 
+
+Load the dataframe and look at the first few lines. The dataframe contains gene ID, log2 fold changes and adjusted P values, along with some other columns we won't be using for this analysis. 
+
+```{r load DE data}
+# Load the input dataframe
+input <- read.csv("axolotl_DE_results.csv", header = TRUE, row.names = 1)
+
+# View the first few rows to confirm it loaded correctly
+head(input)
+
+
+```
+
+Count the number of genes in the dataframe. The number of total genes included in the DESeq2 analysis (not shown) is 99,088. **QUESTION - SHOULD WE INCLUDE THE RAW COUNTS FOR THE PURPOSE OF DEMO THAT THE NUMBER OF GENES IN AN ANNOTATION CAN BE REALY SPURIOUS FOR NON-MODEL?) Why do you think this dataframe shows far less than that?
+
+**ANSWER: THE DESEQ ANALYSIS (NOT SHOWN) REMOVED LOW COUNT GENES. BECAUSE THIS IS NOT A WELL-RESOURCED MODEL SPECIES, THE GENOME ANNOTATION FILE CONTAINED MANY LOW QUALITY IN SILICO PREDICTED GENES THAT MAY NOT BE REAL GENES SO THE RNASEQ DATA SHOULD NOT MAP TO THEM. ALSO, WE ARE STUDYING A HIGHLY SPECIALISED TISSUE, SO MANY GENES MAY NOT BE EXPRESSED IN THE BLASTEMA. THIS FURTHER HIGHLIGHTS HOW IMPORTANT IT IS TO REMOVE THESE GENES FROM YOUR 'BACKGROUND' GENE SET! 
+
+```{r count input genes}
+nrow(input) #24419 
+```
+
+Of these 24,419 genes, some are not differentially expressed and some are not annotated. Genes that have no annotations provide no meaning to the functional enrichment analysis so must be excluded. Recall that for ORA, we need to select only the "genes of interest" ie those that are differentially expressed between proximal and distal blastema. We will do this by filtering on adjusted P value (column 7). For GSEA, we provide all the genes as a "ranked" input, ie sorted by their log2fold change values (column 3). 
+
+
+### ORA (GO)
+
+#### Create input list for ORA
+
+To select our genes of interest, what thresholds should we used? Common values are 5% (estimated that 1 in 20 is a false positive) and 1% (estimated that 1 in 100 is a false positive). Sometimes filtering on log2fold change is performed as well, say at least 1.5X dysregulation. this should only be done if the experimental question warrants it OR if the number of DEGs is very large and further filtering beyond P value is required to reduce the input to a manageable size. 
+
+Before making any decisions on the filtering stringency for the ORA input genes list, let's assess the numbers of genes passing these thresholds and what proportion of them are annotated. We will assess on the adjusted P value to avoid multiple testing bias. 
+
+
+```{r count DEGs 0.05}
+
+# Extract gene IDs of significant genes
+lenient_DEGs <- rownames(input)[input$padj < 0.05 & !is.na(input$padj)]
+
+# Extract the gene IDs from the term2gene file
+annotated_genes <- go_term2gene$gene
+
+# Find significant genes that have annotations
+lenient_annotated_DEGs <- lenient_DEGs[lenient_DEGs %in% annotated_genes]
+
+# Percentage of DEGs that are annotated
+pc <-  round((length(lenient_annotated_DEGs) / length(lenient_DEGs)) * 100, 1)
+
+# Print the result
+cat("Number of DEGs at 5% threshold:", length(lenient_DEGs), "\nNumber of DEGs annotated with GO terms:", length(lenient_annotated_DEGs), "(",pc,"%)\n")
+
+```
+This aligns with the percentage of background genes with GO annotations.
+
+Let's assess at 1% threshold. 
+
+```{r count DEGs 0.01}
+
+# Extract gene IDs of significant genes
+stricter_DEGs <- rownames(input)[input$padj < 0.01 & !is.na(input$padj)]
+
+# Find significant genes that have annotations
+stricter_annotated_DEGs <- stricter_DEGs[stricter_DEGs %in% annotated_genes]
+
+# Percentage of DEGs that are annotated
+pc <-  round((length(stricter_annotated_DEGs) / length(stricter_DEGs)) * 100, 1)
+
+# Print the result
+cat("Number of DEGs at 1% threshold:", length(stricter_DEGs), "\nNumber of DEGs annotated with GO terms:", length(stricter_annotated_DEGs), "(",pc,"%)\n")
+
+```
+
+That's only 176 genes to include. I wonder what biological processes we lose or gain in the FEA result by using either list? I wonder what happens when we apply an even stricter filter that includes log2fold change of >|1.5|? 
+
+
+```{r count DEGs 0.01 fold change 1.5}
+
+# Extract gene IDs of significant genes with padj < 0.01 and absolute log2FoldChange > 1.5
+strictest_DEGs <- rownames(input)[input$padj < 0.01 & abs(input$log2FoldChange) > 1.5 & !is.na(input$padj)]
+
+# Find significant genes that have annotations
+strictest_annotated_DEGs <- strictest_DEGs[strictest_DEGs %in% annotated_genes]
+
+# Percentage of DEGs that are annotated
+pc <-  round((length(strictest_annotated_DEGs) / length(strictest_DEGs)) * 100, 1)
+
+# Print the result
+cat("Number of DEGs at 1% threshold and |log2FC| > 1.5:", length(strictest_DEGs), "\nNumber of DEGs annotated with GO terms:", length(strictest_annotated_DEGs), "(",pc,"%)\n")
+
+```
+Have we over-filtered? 
+
+
+#### Run ORA
+
+Now that we have our input gene list, let's run ORA! We have 3 potential input lists - 'lenient_annotated_DEGs', 'stricter_annotated_DEGs', and 'strictest_annotated_DEGs'. Which do you think we should use? 
+
+```{r ORA lenient}
+
+# Perform ORA with clusterProfiler's 'enricher' function 
+
+lenient_enrichment <- enricher(
+  gene = lenient_annotated_DEGs,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  universe = background_genes,
+  minGSSize = 10,
+  maxGSSize = 500,
+  TERM2GENE = go_term2gene,
+  TERM2NAME = go_term2name
+)
+
+# Extract results. This will apply the P value filter.you need to convert the output to dataframe for the P value filter to be applied.
+lenient_enrichment_filt <- as.data.frame(lenient_enrichment)
+
+# report number of significant enrichments
+cat("Number of significant enrichments:", nrow(lenient_enrichment_filt), "\n")
+
+# Print the first few lines
+head(lenient_enrichment_filt)
+```
+
+There are enrichments present with Padj and Qvalues higher than our thresholds.In order to obtain the results fitlered on our thresholds, we need to extract these through `as.data.frame`.  Then, tests must pass i) pvalueCutoff on unadjusted pvalues, ii) pvalueCutoff on adjusted pvalues and iii) qvalueCutoff on qvalues to be reported. With identical cutoff values used for both pvalueCutoff (since pAdjustMethod = "BH", these are thus FDR values) and qvalueCutoff, you effectively will always filter on BH adjusted p-values and NOT q-values, because the BH procedure generates more conservative FDR than Storey's qvalue approach. If you would like to filter on qvalue, set pAdjustMethod = "none".
+
+Plan printing of the results will show how many enriched terms are significant: 
+
+```{r}
+lenient_enrichment # 169 enriched terms with P 0.05 and 89 enriched terms for P 0.01
+```
+
+
+We can save the ORA results to a text file, and plot them. 
+
+```{r save ORA table}
+
+# Save the filtered results to a text file
+output_file <- "axolotl_GO_lenient_ORA_results.tsv"
+write.table(lenient_enrichment_filt, file = output_file, sep = "\t", quote = FALSE, row.names = FALSE)	
+cat("ORA results written to:", output_file, "\n")
+	
+```
+
+```{r ORA stricter}
+
+# Perform ORA with clusterProfiler's 'enricher' function 
+
+stricter_enrichment <- enricher(
+  gene = stricter_annotated_DEGs,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  universe = background_genes,
+  minGSSize = 10,
+  maxGSSize = 500,
+  TERM2GENE = go_term2gene,
+  TERM2NAME = go_term2name
+)
+
+# Extract results. This will apply the P value filter. you need to convert the output to dataframe for the P value filter to be applied. 
+stricter_enrichment_filt <- as.data.frame(stricter_enrichment)
+
+# report number of significant enrichments
+cat("Number of significant enrichments:", nrow(stricter_enrichment_filt), "\n")
+
+# Print the first few lines
+head(stricter_enrichment_filt)
+```
+
+
+```{r}
+# Print it
+stricter_enrichment
+```
+
+
+
+```{r ORA strictest}
+
+# Perform ORA with clusterProfiler's 'enricher' function 
+
+strictest_enrichment <- enricher(
+  gene = strictest_annotated_DEGs,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  universe = background_genes,
+  minGSSize = 10,
+  maxGSSize = 500,
+  TERM2GENE = go_term2gene,
+  TERM2NAME = go_term2name
+)
+
+# Extract results. This will apply the P value filter. you need to convert the output to dataframe for the P value filter to be applied.
+strictest_enrichment_filt <- as.data.frame(strictest_enrichment)
+
+# report number of significant enrichments
+cat("Number of significant enrichments:", nrow(strictest_enrichment_filt), "\n")
+
+# Print the first few lines
+head(strictest_enrichment_filt)
+```
+
+```{r}
+# Print it
+strictest_enrichment
+```
+```{r save ORA table - stricted DEGs}
+
+# Save the filtered results to a text file
+output_file <- "axolotl_GO_strictest_ORA_results.tsv"
+write.table(strictest_enrichment_filt, file = output_file, sep = "\t", quote = FALSE, row.names = FALSE)	
+cat("ORA results written to:", output_file, "\n")
+	
+```
+
+
+
+#### Plot ORA
+
+Let's make a dotplot
+
+```{r}
+
+# Create plot with dynamic title
+p <- dotplot(
+  strictest_enrichment,
+  x = "geneRatio",
+  color = "p.adjust",
+  orderBy = "x",
+  showCategory = 15,
+  font.size = 8
+  ) +
+  ggtitle("Filter = DEGs Padj < 0.01 FC > |1.5|, DB = GO")
+    
+# Add annotations (number of input genes and number of input genes with GO terms)
+num_genes <- length(strictest_DEGs)
+genes_with_GO_terms <- sum(strictest_annotated_DEGs %in% go_term2gene$gene)
+
+    
+# Print the plot with custom sub-title
+p <- p + labs(subtitle = paste("Genes:", num_genes, "| Genes with GO terms:", genes_with_GO_terms))
+print(p)
+
+```
+
+
+And an upset plot - to show the shared genes among the enriched terms (since a gene can belong to multiple terms or pathways)
+For over-representation analysis, upsetplot will calculate the overlaps among different gene sets. For GSEA, it will plot the fold change distributions of different categories (e.g. unique to pathway, overlaps among different pathways).
+
+```{r upset plot}
+
+# n = the number of top enrichments to plot
+upsetplot(strictest_enrichment, n = 10)
+
+```
+
+
+And a bar plot
+
+```{r}
+barplot(strictest_enrichment, 
+        drop = TRUE, 
+        showCategory = 20, 
+        title = "ORA enrichment - DEGs Padj < 0.01 FC > |1.5|, db = GO",
+        font.size = 8)
+```
+
+Encrichment map: organizes enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
+
+With show category 5, only the skin development genes are coming out. Is this because there is more skin tissue to grow in fingers compared to whole arm, where more bone and muscle compared to skin? Are these upregulated in distal blastemas compared to proximal? 
+
+Increasing to 15 shows some potentially interesting regulators coming out. 
+
+
+```{r emapplot }
+# calculate pairwise similarities between the enriched terms
+strictest_enrichment <- pairwise_termsim(strictest_enrichment)
+
+# plot
+emapplot(strictest_enrichment, showCategory = 15, max.overlaps = Inf, cex_label_category = 0.6)
+
+```
+
+From here: https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html 
+
+"Both the barplot() and dotplot() only displayed most significant or selected enriched terms, while users may want to know which genes are involved in these significant terms. In order to consider the potentially biological complexities in which a gene may belong to multiple annotation categories and provide information of numeric changes if available, we developed the cnetplot() function to extract the complex association. The cnetplot() depicts the linkages of genes and biological concepts (e.g. GO terms or KEGG pathways) as a network. GSEA result is also supported with only core enriched genes displayed."
+
+cnetplot: https://rdrr.io/bioc/enrichplot/man/cnetplot.html 
+
+
+```{r cnetplot}
+# cex_label_gene to reduce the font size for gene ID
+# colorEdge adds the coloured legend and network bars 
+
+cnetplot(strictest_enrichment, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE)
+```
+
+
+A circular cnetplot, so pretty:
+
+```{r cnetplot circular}
+# cex_label_gene to reduce the font size for gene ID
+# colorEdge adds the coloured legend and network bars 
+
+cnetplot(strictest_enrichment, showCategory = 10, cex_label_gene = 0.4, cex_label_category = 0.8,  colorEdge = TRUE, circular = TRUE)
+```
+
+Heatplot:
+
+
+
+
+
+
+
+tree plot:
+
+
+
+#### What is the biological meaning here?
+
+I was expecting to see growth factors, regulatory genes and morphogens. We are seeing enrichment for things we already know are involved in limb and skin formation. It may be that the genes regulating this patterning in axolotl are some of those novel genes (not annotated to any GO terms). 
+
+
+### GSEA (GO)
+
+#### Create input list for GSEA
+
+```{r}
+# Create a ranked gene list for GSEA using log2FoldChange - sort by largest to smallest
+gsea_list <- input$log2FoldChange
+names(gsea_list) <- rownames(input) 
+gsea_list <- sort(gsea_list, decreasing = TRUE) 
+```
+
+
+#### Run GSEA
+
+```{r}
+gsea <- GSEA(geneList = gsea_list, 
+                     TERM2GENE = go_term2gene, 
+                     TERM2NAME = go_term2name, 
+                     pvalueCutoff = 0.05, 
+                     verbose = TRUE)
+
+```
+
+```{r}
+head(gsea)
+```
+
+
+#### Plot GSEA
+
+gsea-specific:
+ridgeplot
+gseaplot
+
+for ora or gsea:
+
+dotplot
+upsetplot
+barplot
+emapplot
+treeplot
+heatplot
+cnetplot
+
+
+## KEGG enrichment 
+
+### Load axolotl KEGG annotation file
+
+The file `Amex_term2gene_KEGG.tsv` was created by extracting the KEGG IDs mapped to the axolotl genes with emapper, and printing them one term per line alongside the gene ID. A gene can map to many terms and thus be present on multiple lines. A term can be mapped to more than one gene. 
+
+
+```{r load KEGG annotation}
+
+# load annotation input file
+infile <- "reference/Amex_term2gene_KEGG.tsv"
+term2gene <- read_tsv(infile, show_col_types = FALSE)
+
+# assign column names
+colnames(term2gene) <- c("term", "gene")
+
+# print the first 6 lines
+head(term2gene)
+
+```
+
+Now print the number of KEGG IDs found within the genome, and the number of genes with KEGG annotations
+
+```{r report KEGG annotation counts}
+
+total_terms<-nrow(term2gene)
+print(paste("Number of annotation terms:", total_terms))
+
+unique_genes <- length(unique(term2gene$gene))
+print(paste("Number of genes with 1 or more annotation terms:", unique_genes))
+
+```
+Ouch, this is a lot lower than GO!
+
+
+### Define background genes
+
+Our background gene list for KEGG is the same as it was for GO. Let's find out how many of our background have KEGG annotations. 
+
+
+```{r report KEGG annotation percentages}
+
+# from raw counts
+percent_annotated_raw <- (unique_genes / (nrow(raw_counts))) * 100
+
+# Now filter the term2gene table to only include genes in the background gene list
+filtered_term2gene <- term2gene %>% filter(gene %in% background_genes)
+
+# Count the number of unique background genes with at least one GO term
+unique_genes_with_anno <- filtered_term2gene %>% distinct(gene) %>% nrow()
+
+# Calculate the percentage of background genes that have GO annotations
+percent_annotated_filtered <- (unique_genes_with_anno / nrow(filtered_counts)) * 100
+
+# Print results
+cat("Number of background genes with annotationss:", unique_genes_with_anno, "(",percent_annotated_filtered,"%)\n")
+cat("Percentage of genome-wide genes with annotations:", percent_annotated_raw, "%\n")
+
+```
+KEGG annotations are present for almost half the number of background and genome-wide genes. Is it really worth pursuing this analysis? Let's just run it anyway (since the code is copy and paste, thanks R!)
+
+
+### ORA (KEGG)
+
+#### Create input list for ORA
+
+
+
+#### Run ORA
+
+
+#### Plot ORA
+
+
+### GSEA (KEGG)
+
+
+#### Create input list for GSEA
+
+
+
+#### Run GSEA
+
+
+#### Plot GSEA
+
