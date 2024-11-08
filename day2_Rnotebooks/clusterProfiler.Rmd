@@ -217,4 +217,117 @@ So the `TERM2GENE` file is species-specific, while the `TERM2NAME` is generic, b
 
 
 
+### placeholder plot code - TBA
+
+
+
+gsea-specific:
+- ridgeplot
+- gseaplot
+
+for ora or gsea:
+
+-dotplot
+-upsetplot
+-barplot
+-emapplot
+-treeplot
+-heatplot
+-cnetplot
+
+
+
+
+Let's make a dotplot
+
+```{r}
+
+# Create plot with dynamic title
+p <- dotplot(
+  strictest_enrichment,
+  x = "geneRatio",
+  color = "p.adjust",
+  orderBy = "x",
+  showCategory = 15,
+  font.size = 8
+  ) +
+  ggtitle("Filter = DEGs Padj < 0.01 FC > |1.5|, DB = GO")
+    
+# Add annotations (number of input genes and number of input genes with GO terms)
+num_genes <- length(strictest_DEGs)
+genes_with_GO_terms <- sum(strictest_annotated_DEGs %in% go_term2gene$gene)
+
+    
+# Print the plot with custom sub-title
+p <- p + labs(subtitle = paste("Genes:", num_genes, "| Genes with GO terms:", genes_with_GO_terms))
+print(p)
+
+```
+
+
+And an upset plot - to show the shared genes among the enriched terms (since a gene can belong to multiple terms or pathways)
+For over-representation analysis, upsetplot will calculate the overlaps among different gene sets. For GSEA, it will plot the fold change distributions of different categories (e.g. unique to pathway, overlaps among different pathways).
+
+```{r upset plot}
+
+# n = the number of top enrichments to plot
+upsetplot(strictest_enrichment, n = 10)
+
+```
+
+
+And a bar plot
+
+```{r}
+barplot(strictest_enrichment, 
+        drop = TRUE, 
+        showCategory = 20, 
+        title = "ORA enrichment - DEGs Padj < 0.01 FC > |1.5|, db = GO",
+        font.size = 8)
+```
+
+Encrichment map: organizes enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
+
+With show category 5, only the skin development genes are coming out. Is this because there is more skin tissue to grow in fingers compared to whole arm, where more bone and muscle compared to skin? Are these upregulated in distal blastemas compared to proximal? 
+
+Increasing to 15 shows some potentially interesting regulators coming out. 
+
+
+```{r emapplot }
+# calculate pairwise similarities between the enriched terms
+strictest_enrichment <- pairwise_termsim(strictest_enrichment)
+
+# plot
+emapplot(strictest_enrichment, showCategory = 15, max.overlaps = Inf, cex_label_category = 0.6)
+
+```
+
+From here: https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html 
+
+"Both the barplot() and dotplot() only displayed most significant or selected enriched terms, while users may want to know which genes are involved in these significant terms. In order to consider the potentially biological complexities in which a gene may belong to multiple annotation categories and provide information of numeric changes if available, we developed the cnetplot() function to extract the complex association. The cnetplot() depicts the linkages of genes and biological concepts (e.g. GO terms or KEGG pathways) as a network. GSEA result is also supported with only core enriched genes displayed."
+
+cnetplot: https://rdrr.io/bioc/enrichplot/man/cnetplot.html
+
+
+```{r cnetplot}
+# cex_label_gene to reduce the font size for gene ID
+# colorEdge adds the coloured legend and network bars 
+
+cnetplot(strictest_enrichment, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE)
+```
+
+
+A circular cnetplot, so pretty:
+
+```{r cnetplot circular}
+# cex_label_gene to reduce the font size for gene ID
+# colorEdge adds the coloured legend and network bars 
+
+cnetplot(strictest_enrichment, showCategory = 10, cex_label_gene = 0.4, cex_label_category = 0.8,  colorEdge = TRUE, circular = TRUE)
+```
+
+
+
+
+
 
