@@ -4,6 +4,17 @@ output: html_notebook
 ---
 
 
+```{r  Load libraries, include=FALSE }
+library(WebGestaltR)
+library(readr)
+library(dplyr)
+
+
+library(ReactomePA)
+library(clusterProfiler)
+```
+
+
 
 ~~~~
 Participants to save, KNIT, and close their clusterProfiler/gProfielr workbook
@@ -31,11 +42,29 @@ Drops the generic higher order parent terms so we have fewer more specific terms
 enrichMethod organism Enrichment methods: ORA, GSEA or NTA.
 NTA = network topology analysis
 
-makes great html reports with interactive plots
+
+LIST OF AMAZING THINGS ABOUT WEBGESTALTR:
+- makes great html reports with interactive plots and links to external dbs
+- saves the results to disk when running, no need to export stuf and save files manually 
+- many dbs and gene lists supported (n = 70) 
+- supports metabolomics, with 15 different ID types, see new paper https://academic.oup.com/nar/article/52/W1/W415/7684598#google_vignette 
+- can be used for novel species, but i havent tried it yet... 
+- does ORA, GSEA, and NTA. I wonder if the NTA works at all for novel species???! 
+- super easy to run. many supported namespaces (n = 73), does not require conversions for different functions like clusterProfiler, can even have different napesapce for ORA gene list and background list 
+- "Multiple databases in a vector are supported for ORA and GSEA" 
+
+**Must add GO vs GO Slim!**
+
+WebGestaltR supports 12 species directly, however, you can import your own database files to perform ORA and GSEA for novel species :-) 
+
+From the user guide: "Users can also input 'others' to perform the enrichment analysis for other organisms not supported by WebGestaltR. For other organisms, users need to provide the functional categories, interesting list and reference list (for ORA method). Because WebGestaltR does not perform the ID mapping for the other organisms, the above data should have the same ID type" 
 
 ```{r view organisms }
 listOrganism()
 ```
+
+
+
 ```{r list available namespace options}
 
 listIdType()
@@ -43,11 +72,345 @@ listIdType()
 ```
 
 
+WebGestaltR supports 70 databases!
+
+
 ```{r}
 #enrichDatabase : The functional categories for the enrichment analysis. Users can use the function listGeneSet to check the available functional databases for the selected organism. Multiple databases in a vector are supported for ORA and GSEA
 listGeneSet()
 
 ```
+
+
+# 1. Load input data and extract ranked gene list
+
+We will use the same Pezzini RNAseq dataset as earlier. First, confirm your working directory is the `Functional_enrichment_workshop_2024/day_2` folder.
+
+```{r setup, include=FALSE}
+# Set the root directory for all notebook chunks
+knitr::opts_knit$set(root.dir = "C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+
+# To set the working directory for the console, run this in the console itself:
+setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+
+
+getwd()
+
+```
+
+
+Please ask for assistance if this step does not show the day_2 folder path!
+
+Once your working directory is set, load the dataset and extract the gene lists.
+
+```{r load input data}
+
+# Full dataset
+data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
+```
+
+
+```{r extract gene lists}
+
+# Ranked gene list vector for GSEA - VECTOR - required for clsuterProfiler
+# ranked <- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.ID[order(-data$Log2FC)])
+
+# dataframe - required for webgestaltr 
+ranked <- data %>%
+  arrange(desc(Log2FC)) %>%
+  select(Gene.ID, Log2FC)
+
+
+head(ranked)
+tail(ranked)
+```
+
+
+
+
+ - this is taking a really long time... 
+
+
+```{r GSEA Reactome }
+
+#rankFile <- system.file("extdata", "GeneRankList.rnk", package="WebGestaltR")
+
+outputDirectory <- "../testing_WebGestaltR" 
+
+#gsea_vector <- setNames(gsea_gene_list$Log2FC, gsea_gene_list$Gene.ID)
+
+enrichResult <- WebGestaltR(enrichMethod="GSEA", 
+  organism="hsapiens",
+  enrichDatabase="pathway_Reactome",
+  interestGene=ranked,
+  interestGeneType="ensembl_gene_id",
+  sigMethod="top",
+  topThr=10,
+  minNum=5,
+  outputDirectory=outputDirectory)
+
+```
+Beautiful!! Output in folder named "Project_1731238499/" - is there a way to change the default naming??
+
+From the HTML report, user can click on the Reactome link for any of the enrichments, and be taken to the Reactome site page for that pathway. 
+
+LOVE THAT THE DEGS AND BG CAN BE IN DIFFERENT NAMESPACE! SO MUCH FLEXIBILITY! 
+
+STRING AND WEBGESTALTR HAVE BEEN MY 2 FAVES FROM ALL THIS 
+
+start 11.55pm 
+
+
+```{r ORA Reactome }
+
+outputDirectory <- "../testing_WebGestaltR" 
+project <- "ora_reactome"
+
+wgr_ora_reactome <- WebGestaltR(
+    organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
+    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
+    interestGene = DEGs,                # Your gene list
+    interestGeneType = "ensembl_gene_id",         # Specify the gene ID type
+    referenceGene = background,                    # Use the default background or provide your own
+    referenceGeneType = "ensembl_gene_id",        # Background gene ID type (if using a custom background)
+    enrichDatabase = "pathway_Reactome",  # The database for enrichment analysis
+    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
+    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
+    fdrThr = 0.05,                           # FDR significance threshold
+    minNum = 5,                              # Minimum number of genes per category
+    maxNum = 500,                             # Maximum number of genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+)
+```
+Run WebGestaltR over many databases at once: 
+
+Holy moly its so good 
+ 
+```{r ORA Reactome MANY DBS}
+databases <- c("pathway_Reactome", "pathway_KEGG", "pathway_Panther", "pathway_Wikipathway")
+
+outputDirectory <- "../testing_WebGestaltR" 
+project <- "ora_reactome_PATHWAYS"
+
+WebGestaltR(
+    organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
+    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
+    interestGene = DEGs,                # Your gene list
+    interestGeneType = "ensembl_gene_id",         # Specify the gene ID type
+    referenceGene = background,                    # Use the default background or provide your own
+    referenceGeneType = "ensembl_gene_id",        # Background gene ID type (if using a custom background)
+    enrichDatabase = databases,  # The database for enrichment analysis
+    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
+    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
+    fdrThr = 0.05,                           # FDR significance threshold
+    minNum = 5,                              # Minimum number of genes per category
+    maxNum = 500,                             # Maximum number of genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+)
+
+```
+
+
+
+
+
+
+
+
+
+
+- so far, i am really digging WebGestaltR - get it to work for novel would be rgeat, every user question i find on google is unanswered re how to do this for non-mdeol! Let's work it out and solve it
+
+WebGestaltR(enrichMethod="ORA", organism="others", enrichDatabaseFile = "/database-test.gmt",  enrichDatabaseDescriptionFile = "/description_test.des", interestGeneFile = "/genelist_test.txt", referenceGeneFile = "/reference.txt")
+
+
+Of the below, only enrichDatabaseFile ( = GMT) and enrichDatabaseDescriptionFile (description) are needed.  
+
+enrichDatabase = The functional categories for the enrichment analysis. Users can use the function listGeneSet to check the available functional databases for the selected organism. Multiple databases in a vector are supported for ORA and GSEA.
+
+enrichDatabaseFile = Users can provide one or more GMT files as the functional category for enrichment analysis. The extension of the file should be gmt and the first column of the file is the category ID, the second one is the external link for the category. Genes annotated to the category are from the third column. All columns are separated by tabs. The GMT files will be combined with enrichDatabase.
+
+enrichDatabaseType = The ID type of the genes in the enrichDatabaseFile. If users set organism as others, users do not need to set this ID type because WebGestaltR will not perform ID mapping for other organisms. The supported ID types of WebGestaltR for the selected organism can be found by the function listIdType
+
+enrichDatabaseDescriptionFile = Users can also provide description files for the custom enrichDatabaseFile. The extension of the description file should be des. The description file contains two columns: the first column is the category ID that should be exactly the same as the category ID in the custom enrichDatabaseFile and the second column is the description of the category. All columns are separated by tabs.
+
+
+GMT file format:
+- tab delimited text format 
+- first column is gene set name (category ID)
+- second column doc says "external link for the category"
+- third and subsequent columns are genes that belong in that gene set. 
+
+Description file:
+- tab delimited text format 
+- first column is same as first column of GMT
+- second column is the description of the category
+
+
+Question: are the links validated? Can they be NA? If not, it may be hard to convert them easily from the term files already made for clusterProfiler... 
+
+And yet, the official GMT format has description as 2nd column, not link, and there is a 'readGmt' function included in the package that says "A data frame with columns of "geneSet", "description", "gene" --> so do we really need the  link? There is no link in either the STRING or eggnog annotations for axolotl. Can we just have description? If the official GMT format has desc as 2nd col, why do we even need a description file?! 
+
+For STRING, use the downloaded file STRG0A90SNX.protein.enrichment.terms.v12.0.txt. This has the AMEX gene ID alongside db name and db term ID for many DBS. 
+
+```{bash}
+# awk -F "\t" 'NR>1 {print $2}' STRING/STRG0A90SNX.protein.enrichment.terms.v12.0.txt | sort | uniq        
+#Annotated Keywords (UniProt)
+#Biological Process (Gene Ontology)
+#Cellular Component (Gene Ontology)
+#Molecular Function (Gene Ontology)
+#KEGG (Kyoto Encyclopedia of Genes and Genomes)
+#Local Network Cluster (STRING)
+#Reactome Pathways
+#Subcellular localization (COMPARTMENTS)
+#Tissue expression (TISSUES)
+```
+
+its going to be so cool to compare the string v manual annotation! 
+
+
+```{r}
+loadGeneSet( 
+  organism = "hsapiens", 
+  enrichDatabase = NULL, 
+  enrichDatabaseFile = NULL, 
+  enrichDatabaseType = NULL, 
+  enrichDatabaseDescriptionFile = NULL, 
+  cache = NULL, 
+  hostName = "https://www.webgestalt.org/" )
+```
+
+
+
+#############################################
+# ReactomePA
+
+If wanting to do Reactome analysis, which is better out of WebGestaltR or ReactomePA? --> ANSWER: webgestaltR!!!!!!!!!!!!
+
+- input data needs to be a vector object with entrez gene ids. How is it that WebGestaltR can handle the EMSEMBL IDs but ReactomePA cannot???
+
+- ran ORA as a test just because its faster - webgestaltR is so much easier in terms of a) not needing to convert gene IDs and b) the amazing interoperability between the reactome db . clusterProfiler strengths would be if you wanted to use enrichPlot, WebGestaltR strengths would be for ease of use, has some plots built in, if they are good enough. then great. it may be that you run webgestaltR and use the link outs and toggles etc for working with your results, then go back to R and make specific plots that you are interested in eg cnet plot with enrichplot. 
+
+
+
+
+
+```{r get vectors for ORA }
+
+# Filter genes with adjusted p-value < 0.01 and absolute log2 fold change > 2
+DEGs <- data %>%
+  filter(FDR < 0.01, abs(Log2FC) > 2) %>%
+  pull(Gene.ID)
+
+# Extract all gene IDs as the background
+background <- data %>%
+  pull(Gene.ID)
+
+
+```
+
+```{r}
+
+length(DEGs)
+length(background)
+```
+
+
+```{r convert gene IDs}
+# Convert the Ensembl IDs to Entrez IDs, dropping NAs
+converted_ids <- bitr(background, 
+                      fromType = "ENSEMBL", 
+                      toType = "ENTREZID", 
+                      OrgDb = org.Hs.eg.db)
+
+# Handle any `1:many mapping` (ENSEMBL ID matches >1 ENTREZID) by keeping only the first Entrez ID for each Ensembl ID
+converted_ids <- converted_ids[!duplicated(converted_ids$ENSEMBL), ]
+
+# Keep only the rows with valid Entrez IDs
+converted_ids <- converted_ids[!is.na(converted_ids$ENTREZID), ]
+
+
+# Filter the DEGs gene list and  background gene list to include only the successfully mapped Ensembl IDs
+DEGs_entrez <- intersect(DEGs, converted_ids$ENSEMBL)
+bg_entrez <- intersect(background, converted_ids$ENSEMBL)
+
+# Replace Ensembl IDs with corresponding Entrez IDs
+DEGs_entrez <- converted_ids$ENTREZID[match(DEGs, converted_ids$ENSEMBL)]
+bg_entrez <- converted_ids$ENTREZID[match(background, converted_ids$ENSEMBL)]
+
+# Remove duplicates (keep only first occurrence of Entrez IDs)
+DEGs_entrez <- unique(DEGs_entrez)
+bg_entrez <- unique(bg_entrez)
+
+
+
+length(DEGs_entrez)
+length(bg_entrez)
+
+```
+
+
+
+```{r reactomePA - ORA}
+
+
+ReactomePA_ORA <- enrichPathway( 
+  gene = DEGs_entrez,  # a vector of entrez gene id.
+  organism = "human", # one of "human", "rat", "mouse", "celegans", "yeast", "zebrafish", "fly"
+  pvalueCutoff = 0.05,  # Cutoff value of pvalue.
+  pAdjustMethod = "BH", # one of "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"
+  qvalueCutoff = 0.2, # value of qvalue 
+  universe = bg_entrez, # background genes 
+  minGSSize = 10, # minimal size of genes annotated by Ontology term for testing
+  maxGSSize = 500, # maximal size of each geneSet for analyzing 
+  readable = FALSE ) # whether mapping gene ID to gene Name
+
+```
+
+
+
+
+
+
+
+PLot it:
+
+```{r}
+#enrichMap(ReactomePA_ORA, colorCategory="p.adjust", showCategory=10)
+# deprecated - use instead emapplot emapplot
+```
+
+###################
+
+
+
+```{r reactomepa - GSEA}
+
+gsePathway( 
+  geneList, 
+  organism = "human", 
+  exponent = 1, # weight of each step 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10, # This parameter sets the boundary for calculating the p value
+  pvalueCutoff = 0.05, 
+  pAdjustMethod = "BH", 
+  verbose = TRUE, 
+  seed = FALSE, 
+  by = "fgsea", ... ) # fgsea or DOSE 
+
+```
+
+
+
+###################################
+
 
 ```{r webgestalt ORA GO MF }
 
@@ -72,6 +435,11 @@ wg_ora_go_mf <- WebGestaltR(
     outputDirectory = outputDirectory,
     projectName = project
 )
+
+```
+
+
+
 
 
 ```{r webgestalt ORA GO MF non-redundant }
