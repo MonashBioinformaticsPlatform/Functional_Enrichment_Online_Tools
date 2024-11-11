@@ -5,7 +5,9 @@ Functional enrichment analysis can be performed using various web-based tools, e
 In this workshop, we will explore several popular tools for functional enrichment analysis, including gProfiler, STRING, Reactome, and MSigDB GSEA. Each tool offers unique features and insights, providing flexibility in selecting the right method for diverse datasets and research questions.
 
 
-## FEA in [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost)
+<!-- ## FEA in [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) -->
+## FEA in gProfiler <a href="https://biit.cs.ut.ee/gprofiler/gost" target="_blank"><img src="images/gp2-logo-new.png" alt="g:Profiler Logo" style="height:35px; vertical-align:middle;"></a>
+
 gProfiler is known for its integration of numerous species and databases. It supports both ORA and GSEA, enabling users to assess Gene Ontology (GO), biological pathways, regulatory motifs and protein databases. With gProfile one can 
 
 ### Steps to perform ORA in g:Profiler:
@@ -58,11 +60,11 @@ gProfiler is known for its integration of numerous species and databases. It sup
 
 Use 'All known genes' in one analysis and 'Custom' background in another. Download the results by clicking on CSV button. Browse the results in the spreadsheets and find out the difference between two.
 
-#### **Question 1** {- .rationale}
+#### **Questions ** {- .rationale}
 
 Which background would you use in your analysis?
 
-#### **Question 2** {- .rationale}
+How is multi-query provided to gProfiler?
 
 How can one perform Under Representation Analysis in gProfiler?
 
@@ -77,16 +79,104 @@ How can one perform Under Representation Analysis in gProfiler?
 
 <span style="color:orange;">- Set Significance Threshold:</span> Same as above.
 
-<span style="color:orange;">- Provide a Custom GMT:</span> This GMT file can be downloaded from MSigDB.
+<span style="color:orange;">- Provide a Custom GMT:</span> This GMT file can be downloaded from [MSigDB](https://www.gsea-msigdb.org/gsea/msigdb/index.jsp).
 
 <span style="color:orange;">- Run Query:</span> Same as above.
 
 #### **Challenge:** GSEA with gProfiler {- .challenge}
-Download the Hallmark gene sets (h.all.v2024.1.Hs.symbols.gmt) from [MSigDB](https://www.gsea-msigdb.org/gsea/msigdb/index.jsp) and use it as Custom GMT.
+Download the Hallmark gene sets ([h.all.v2024.1.Hs.symbols.gmt](https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2024.1.Hs/h.all.v2024.1.Hs.symbols.gmt)) from MSigDB and use it as Custom GMT.
 
+#### **Question ** {- .rationale}
 
-## STRING
+How can one use multi-GMT as custom background?
+
+<!-- ## [STRING](https://string-db.org) -->
+## FEA in STRING <a href="https://string-db.org" target="_blank"><img src="images/string-logo.png" alt="g:Profiler Logo" style="height:35px; vertical-align:middle;"></a>
+
 STRING (Search Tool for the Retrieval of Interacting Genes/Proteins) is a resource for exploring protein-protein interaction (PPI) networks. It combines experimental data, predictions, and curated information to build networks that highlight functional relationships, helping to reveal shared pathways or biological processes within gene or protein lists.
+
+### Steps to Perform ORA in STRING:
+
+<span style="color:orange;">- Select Multiple proteins tab.</span>
+
+<span style="color:orange;">- Input Gene List:</span> Paste your prepared gene list directly into the input box on the STRING web page or upload a file containing your list.
+
+<span style="color:orange;">- Select Organism:</span> Choose the appropriate organism from the `Organisms` dropdown menu (e.g., *Homo sapiens* for human data). STRING would auto-detect the organism if ENSEMBL IDs provided.
+
+<span style="color:orange;">- Modify Settings:</span> Under `Advanced Settings`, you can modify `Required score` from low (0.15) to highest (0.9) confidence. Similarly `FDR stringency` and `Network type` can be selected. 
+
+NOTE: In cases where long list of features is provided, STRING may chnage some of its settings so that:
+
+ - the nodes will have a simplified (not 3D) design
+ - previews of protein structures are not shown
+ - the network edges show interaction confidence only
+
+### Browse the Results
+
+STRING come up with a number of tabs as the outputs.
+
+![](images/string-results-tabs.png){ width=100% }
+
+#### Viewers
+
+Under the `Viewers` tab, various visualisation layouts are available, with the Network option being the most notable and widely used.
+
+#### Legend
+
+The `Legend` tab offers a guide to the colors of nodes and edges, along with annotations for each individual query in the input list.
+
+![Nodes and edges colour-coded](images/string-legend.png){ width=100% }
+
+#### Settings
+
+In the `Settings` tab of the STRING results, users have the flexibility to adjust existing settings and apply new filters to customise their data view and analysis. This tab you to switch between network types, strengths, data sources, intertaction scores and more.
+
+#### Analysis
+
+One of the most essential tabs is the `Analysis` tab, which offers comprehensive functional enrichment analysis from a range of databases. These include Gene Ontology (GO) for biological processes, molecular functions, and cellular components; Pathway enrichment from sources such as KEGG, Reactome, and WikiPathways; and other significant data sources such as Human Phenotype annotations and UniProt for protein function and structure.
+
+Columns of the STRING enrichment table are explained as following:
+
+<!-- ![Enrichment Table Columns](images/Enrichment-Table-Columns.png){ width=40% } -->
+<span style="color:orange;">- Count In Network:</span>
+The first number indicates how many proteins in your network are annotated with a particular term. The second number indicates how many proteins in total (in your network and in the background) have this term assigned. You can click on the numbers to see the network view of the gene sets behind them.
+
+<span style="color:orange;">- Strength:</span>
+Log10(observed / expected). This measure describes how large the enrichment effect is. It’s the ratio between i) the number of proteins in your network that are annotated with a term and ii) the number of proteins that we expect to be annotated with this term in a random network of the same size.
+
+<span style="color:orange;">- Signal:</span>
+The signal is defined as a weighted harmonic mean between the observed/expected ratio and -log(FDR). FDR tends to emphasize larger terms due to their potential for achieving lower p-values, while the observed/expected ratio highlights smaller terms, which have a high foreground to background ratio but cannot achieve low FDR values due to their size. The signal measure seeks to balance both metrics for a more intuittive ordering of enriched terms.
+
+<span style="color:orange;">- False Discovery Rate:</span>
+This measure describes how significant the enrichment is. Shown are p-values corrected for multiple testing within each category using the Benjamini–Hochberg procedure.
+
+STRING visualises terms within each category using a bubble plot, effectively showcasing the significance and size of enriched terms. Additionally, it renders groups of related terms based on a user-defined similarity level, allowing users to identify clusters of functionally related terms within the data. This helps in interpreting complex enrichment results and highlighting key biological processes or pathways that are closely associated.
+
+![Functional enrichment visualisation with STRING](images/string-enrichment_KEGG_sim0.7_graph_plus.png){ width=100% }
+
+Towards the the bottom of the `Analysis` page, one can change the background including adding one of their own.
+![Statistical background](images/string-statistical-background.png){ width=100% }
+
+Finally the enriched terms can be downloaded at the end of the `Analysis` page, either individually per category or all enriched terms together.
+
+#### Exports
+
+The network data can be exported with the `Exports` tab. Also Network data can be directly sent to [Cytoscape](https://cytoscape.org/) ![](images/network-to-Cytoscape.png) for further networking. It is expected to have Cytoscape installed before exporting to it.
+
+#### Clusters
+
+The `Clusters` tab essentially provides three different types of clustering algorithms:
+
+ - k-means clustering: Initialise *k* centroids randomly, assigns each data point to the nearest centroid, recompute the centroids as the mean of all points in a cluster until until centroids do not change significantly.
+ 
+ - MCL clustering (Markov clustering): is a graph-based algorithm that uses flow simulation to detect clusters in a network by modeling random walks.
+ 
+ - DBSCAN clustering: is a density-based algorithm that groups points closely packed together while marking points in low-density regions as outliers or noise
+
+![](images/string-clusters.png)
+
+Clusters can be downloaded in `.tsv` format.
+
 
 ## Reactome
 Reactome is an open-source database of curated biological pathways across species, offering pathway maps and enrichment tools to analyze gene lists in a pathway-focused context. It’s ideal for visualising data within established biochemical and cellular processes.
