@@ -10,11 +10,40 @@ library(readr)
 library(biomaRt)
 library(org.Hs.eg.db)
 library(dplyr)
+library(ggupset)
 ```
 
-[clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has inbuilt functions to run ORA (`enrich<DB>`) or GSEA (`gse<DB>`) over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as functions to perform ORA (`enricher`) or GSEA (`gsea`) with custom gene sets.
+Review the contents page of the [clusterProfiler user guide](https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf). 
 
-It supports all organisms available in KEGG. It has a companion plotting package `enrichPlot` dedicated to plotting `clusterProfiler` results. 
+`clusterProfiler` has a number of GSEA and ORA functions specifically designed to perform GSEA on key databases without having to manually import the database. 
+
+For GSEA, these are:
+
+- `gseGo`
+  - Database: GO
+  - Supported organisms: 
+- `gseKEGG`
+  - Database: KEGG
+  - Supported organisms: all KEGG organisms (thousands) 
+- `gseMKEGG`
+  - Database: KEGG Modules
+  - Supported organisms: 
+- `gsePC`
+  - Database: Pathway Commons
+  - Supported organisms: 
+- `gseWP`
+  - Database: WikiPathways
+  - Supported organisms: 
+  
+  
+For ORA, the same 5 databases are supported, eg function `enrichGO` for ORA of GO, with the addition of `enrichDAVID`. 
+
+Note that each of the in-built database functions has different supported organisms, and this is to do with the database itself. There are also limitations on which namespaces a database accepts, so you need to check the compatible namespace for the function you want to run, and perform gene ID conversion if required. `clusterProfiler` has the function `bitr` to do this; another popular choice is `biomaRt`. 
+
+
+`clusterProfiler` also has generic functions to perform ORA (`enricher`) or GSEA (`gsea`) with custom gene sets. These enable you to perform ORA or GSEA with your own annotations, with a little work on your part in preparing the required database files. 
+
+
 
 
 # 1. Load input data and extract ranked gene list
@@ -54,24 +83,14 @@ tail(ranked)
 
 # 2. Perform GSEA of GO terms with `gseGO` function 
 
-Review the contents page of the [clusterProfiler user guide](https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf). 
+Since we have covered ORA with `gprofiler`. 
 
-`clusterProfiler` has a number of `gse<DB>` functions specifically designed to perform GSEA on key databases without having to manually import the database:
-
-- GO
-- KEGG
-- KEGG Modules (MKEGG)
-- Pathway Commons (PC)
-- WikiPathways (WP)
-
-There are also database-specific ORA functions `enich<DB>` however we won't be running those today since we have covered ORA with `gprofiler`. 
-
-
-We will run GSEA over the GO database. If we choose `ALL` for the `ont` (ontology) parameter,  we can run over MF, BP and CC in one run. 
+We will run GSEA over the GO database. If we choose `ALL` for the `ont` (ontology) parameter,  we can run over MF, BP and CC in one run. However for simplicity, let's choose just `MF`.  
 
 ## Species
 
 For this function, we need an [annotation database from Bioconductor](https://bioconductor.org/packages/3.20/data/annotation/). The package `org.Hs.eg.db` has been installed and loaded for you. 
+
 
 ## Namespace
 
@@ -108,9 +127,264 @@ gsea_GO <- gseGO(
 ```
 
 
+```{r gseGO MF }
+gsea_GO_MF <- gseGO( 
+  ranked, 
+  ont = "MF", 
+  OrgDb = "org.Hs.eg.db",
+  keyType = "ENSEMBL", 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10, 
+  pvalueCutoff = 0.05, 
+  pAdjustMethod = "BH", 
+  verbose = TRUE, 
+  seed = 1234, 
+  by = "fgsea",
+  nPermSimple = 10000
+)
+
+```
+
+
 #3. Visualise  GSEA GO results 
 
-Next we will visualise the GSEA results with `enrichplot`. 
+Next we will visualise the GSEA results.
+
+## As a table
+
+Simple view: 89 enriched terms for GO: MF
+
+```{r}
+print(gsea_GO_MF)
+
+```
+
+Extract results to a TSV: this will print the significant enrichments, sorted by adjusted P value. 
+
+```{r GSEA GO MF results table }
+
+write.table(clsuterProfiler_gsea_GO_MF, file = "gsea_GO_MF_results.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+```
+
+
+
+## Dotplot 
+
+this function is part of `lcusterProfiler` as well as `enrichPlot`. 
+
+An easy to interpret visualisation, but  loses the details of the source `CC`, `MF`, `BP`. 
+
+
+```{r GSEA GO dotplot }
+
+# Create plot with dynamic title
+p <- dotplot(
+  gsea_GO,
+  x = "geneRatio",
+  color = "p.adjust",
+  orderBy = "x",
+  showCategory = 15,
+  font.size = 8
+  ) +
+  ggtitle("GSEA GO")
+    
+
+
+print(p)
+
+```
+
+```{r GSEA GO MF dotplot }
+
+# Create plot with dynamic title
+p <- dotplot(
+  gsea_GO_MF,
+  x = "geneRatio",
+  color = "p.adjust",
+  orderBy = "x",
+  showCategory = 15,
+  font.size = 8
+  ) +
+  ggtitle("GSEA GO: Molecular function")
+    
+
+
+print(p)
+
+```
+
+
+## Upset plot
+
+Shows the shared genes among the enriched terms (since a gene can belong to multiple terms or pathways).
+
+For ORA, upsetplot will calculate the overlaps among different gene sets. 
+
+For GSEA, it will plot the fold change distributions of different categories (e.g. unique to pathway, overlaps among different pathways).
+
+`n` controls the number of terms plotted - her we have restricted to 10 for ease of viewing. Plot view is quite small within a notebook, but if wanted to plot more terms, you could print to an A4 size for enhanced clarity. 
+
+
+
+```{r GSEA GO upset plot}
+
+# n = the number of top enrichments to plot
+p<- upsetplot(gsea_GO, n = 10)
+print(p)
+
+```
+
+
+```{r GSEA GO MF upset plot}
+
+# n = the number of top enrichments to plot
+p<- upsetplot(gsea_GO_MF, n = 10)
+print(p)
+
+```
+
+
+```{r GSEA GO upset plot print PDF }
+# Make the plot, save to plot object 
+p<- upsetplot(gsea_GO, n = 30)
+
+# Open PDF in A4 landscape size in inches
+pdf("GSEA_GO_upsetplot.pdf", width = 11.69, height = 8.27)  
+
+# Print the plot to the device
+print(p)
+
+# Close the device (this saves the plot)
+dev.off()
+```
+
+
+- Personally, i dislike upset plots, although they seem popular... 
+
+
+# Enrichment map
+
+Encrichment map with `emapplot` function from `clsuterProfiler`/`enrichPlot`: organizes enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
+
+
+```{r GSEA GO emapplot }
+# calculate pairwise similarities between the enriched terms
+gsea_GO <- pairwise_termsim(gsea_GO)
+
+# plot
+p<-emapplot(gsea_GO, showCategory = 15)
+print(p)
+
+```
+
+```{r GSEA GO MF emapplot }
+# calculate pairwise similarities between the enriched terms
+gsea_GO_MF <- pairwise_termsim(gsea_GO_MF)
+
+# plot
+p<-emapplot(gsea_GO_MF, showCategory = 15)
+print(p)
+
+```
+
+
+
+# cnet plot
+
+From here: https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html 
+
+"Both the barplot() and dotplot() only displayed most significant or selected enriched terms, while users may want to know which genes are involved in these significant terms. In order to consider the potentially biological complexities in which a gene may belong to multiple annotation categories and provide information of numeric changes if available, we developed the cnetplot() function to extract the complex association. The cnetplot() depicts the linkages of genes and biological concepts (e.g. GO terms or KEGG pathways) as a network. GSEA result is also supported with only core enriched genes displayed."
+
+cnetplot: https://rdrr.io/bioc/enrichplot/man/cnetplot.html
+
+
+```{r GSEA GO cnetplot}
+# cex_label_gene to reduce the font size for gene ID
+# colorEdge adds the coloured legend and network bars 
+
+cnetplot(gsea_GO, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE)
+```
+
+
+```{r GSEA GO MF cnetplot}
+
+cnetplot( gsea_GO_MF, 
+  showCategory = 15, 
+  node_label = "category", 
+)
+```
+
+
+- These look hideous and nothing like the last time I ran them on different dataset... 
+
+
+## circular cnetplot 
+
+ = no longer available in latest pacakge! damn they were so nice 
+
+## treeplot
+
+Functional grouping tree diagram (enrichPlot) 
+
+```{r treeplot gSEA GO MF}
+p<- treeplot(gsea_GO_MF, showCategory = 15, color = "p.adjust")
+
+print(p)
+```
+
+## heatplot
+
+```{r heatplot GSEA GO MF }
+heatplot(gsea_GO_MF, showCategory = 15)
+```
+- Absolutely terrible, just no! 
+
+
+# ridgeplot
+
+This function is specific for GSEA (does not apply to ORA, since it plots NES) 
+
+The height of the ridge in the ridge plot represents the density of genes from the gene set at different points in the ranked list.
+
+The area under the curve represents the distribution of these genes across the ranked list. 
+
+Higher peaks and more concentrated areas under the curve at the top of the list indicate stronger enrichment.
+
+
+```{r ridgeplot  gsea GO MF, fig.height=10, fig.width=7}
+ridgeplot(gsea_GO_MF, 
+  showCategory = 30, 
+  fill = "p.adjust", 
+  core_enrichment = TRUE, 
+  label_format = 30, 
+  orderBy = "NES", 
+  decreasing = FALSE )
+```
+
+## gseaplot
+
+Another GSEA-specific plot. This will provide the GSEA plot for one term.
+
+```{r gseaplot GSEA GO MF }
+
+gene_set_id <- "GO:0008094"
+
+p<- gseaplot( gsea_GO_MF,
+  gene_set_id, 
+  by = "all", 
+  title = paste("GSEA result:", gene_set_id),
+  color = "black", 
+  color.line = "green", 
+  color.vline = "#FA5860"
+)
+
+print(p)
+```
+
 
 
 
@@ -195,11 +469,181 @@ gsea_kegg <- gseKEGG(
 
 #5. Visualise  GSEA KEGG results 
 
-Next we will visualise the GSEA results with `enrichplot`. 
+First let's extract the tabular results: 
+
+
+## As a table
+
+40 enriched terms 
+
+```{r}
+print(gsea_kegg)
+
+```
+
+Extract results to a TSV: this will print the significant enrichments, sorted by adjusted P value. 
+
+```{r GSEA GO MF results table }
+
+write.table(gsea_kegg, file = "gsea_KEGG_results.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+```
+
+## Plotting - challenge!
+
+
+- select your favourite plot from the plots generated for the `gseGO` MF results.
+- create a new code chunk below and give it a unique chunk label
+- paste the code for the plot into the code chunk
+- edit the code to run on the `gseKEGG` output object
+- run the code to p[roduce your plot! 
+- What plot did you choose and why? Did ti work ok?
 
 
 
+## Dotplot 
 
+
+
+```{r GSEA KEGG dotplot }
+
+# Create plot with dynamic title
+p <- dotplot(
+  gsea_kegg,
+  x = "geneRatio",
+  color = "p.adjust",
+  orderBy = "x",
+  showCategory = 15,
+  font.size = 8
+  ) +
+  ggtitle("GSEA KEGG")
+    
+
+print(p)
+
+```
+
+
+
+## Upset plot
+
+Shows the shared genes among the enriched terms (since a gene can belong to multiple terms or pathways).
+
+For ORA, upsetplot will calculate the overlaps among different gene sets. 
+
+For GSEA, it will plot the fold change distributions of different categories (e.g. unique to pathway, overlaps among different pathways).
+
+`n` controls the number of terms plotted - her we have restricted to 10 for ease of viewing. Plot view is quite small within a notebook, but if wanted to plot more terms, you could print to an A4 size for enhanced clarity. 
+
+
+
+```{r GSEA KEGG upset plot}
+
+# n = the number of top enrichments to plot
+p<- upsetplot(gsea_kegg, n = 10)
+print(p)
+
+```
+
+
+
+# Enrichment map
+
+Encrichment map with `emapplot` function from `clsuterProfiler`/`enrichPlot`: organizes enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
+
+
+```{r GSEA KEGG emapplot }
+# calculate pairwise similarities between the enriched terms
+gsea_kegg <- pairwise_termsim(gsea_kegg)
+
+# plot
+p<-emapplot(gsea_kegg, showCategory = 15)
+print(p)
+
+```
+
+
+
+# cnet plot
+
+From here: https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html 
+
+"Both the barplot() and dotplot() only displayed most significant or selected enriched terms, while users may want to know which genes are involved in these significant terms. In order to consider the potentially biological complexities in which a gene may belong to multiple annotation categories and provide information of numeric changes if available, we developed the cnetplot() function to extract the complex association. The cnetplot() depicts the linkages of genes and biological concepts (e.g. GO terms or KEGG pathways) as a network. GSEA result is also supported with only core enriched genes displayed."
+
+cnetplot: https://rdrr.io/bioc/enrichplot/man/cnetplot.html
+
+
+```{r GSEA KEGG cnetplot}
+# cex_label_gene to reduce the font size for gene ID
+# colorEdge adds the coloured legend and network bars 
+
+cnetplot(gsea_kegg, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE)
+```
+
+
+- These look hideous and nothing like the last time I ran them on different dataset... 
+
+
+
+## treeplot
+
+Functional grouping tree diagram (enrichPlot) 
+
+```{r treeplot GSEA KEGG}
+p<- treeplot(gsea_kegg, showCategory = 15, color = "p.adjust")
+
+print(p)
+```
+
+## heatplot
+
+```{r heatplot GSEA KEGG }
+heatplot(gsea_kegg, showCategory = 15)
+```
+- Absolutely terrible, just no! 
+
+
+# ridgeplot
+
+This function is specific for GSEA (does not apply to ORA, since it plots NES) 
+
+The height of the ridge in the ridge plot represents the density of genes from the gene set at different points in the ranked list.
+
+The area under the curve represents the distribution of these genes across the ranked list. 
+
+Higher peaks and more concentrated areas under the curve at the top of the list indicate stronger enrichment.
+
+
+```{r ridgeplot  gsea KEGG, fig.height=10, fig.width=7}
+ridgeplot(gsea_kegg, 
+  showCategory = 30, 
+  fill = "p.adjust", 
+  core_enrichment = TRUE, 
+  label_format = 30, 
+  orderBy = "NES", 
+  decreasing = FALSE )
+```
+
+## gseaplot
+
+Another GSEA-specific plot. This will provide the GSEA plot for one term.
+
+```{r gseaplot GSEA GO MF }
+
+gene_set_id <- "hsa04110"
+
+p<- gseaplot( gsea_kegg,
+  gene_set_id, 
+  by = "all", 
+  title = paste("GSEA result:", gene_set_id),
+  color = "black", 
+  color.line = "green", 
+  color.vline = "#FA5860"
+)
+
+print(p)
+```
 
 
 
@@ -216,115 +660,10 @@ The `TERM2NAME` file will contain the ID of the term from the database, alongsid
 So the `TERM2GENE` file is species-specific, while the `TERM2NAME` is generic, but subset to only include the terms that are present in the `TERM2GENE` file. 
 
 
+ *** MAYBE THIS WILL BE INCLUDED IN NOTEBOOK 4 FOR NOVEL SPECIES - UNDECIDED WHETHER TO DO CLUSTERPROFILER, WEBGESTALTR, OR BOTH ***
+ *** WEBGESTALTR IS AMAZING BUT I HAVE NOT YET TRIED ITS NON MODEL DB FILES ***
+ *** IF IT WORKS, I WILL PROBABLY USE IT OVER CP. MAYBE CAN INCLUDE EXAMPEL CODE FOR BOTH SOMEWHERE *** 
 
-### placeholder plot code - TBA
-
-
-
-gsea-specific:
-- ridgeplot
-- gseaplot
-
-for ora or gsea:
-
--dotplot
--upsetplot
--barplot
--emapplot
--treeplot
--heatplot
--cnetplot
-
-
-
-
-Let's make a dotplot
-
-```{r}
-
-# Create plot with dynamic title
-p <- dotplot(
-  strictest_enrichment,
-  x = "geneRatio",
-  color = "p.adjust",
-  orderBy = "x",
-  showCategory = 15,
-  font.size = 8
-  ) +
-  ggtitle("Filter = DEGs Padj < 0.01 FC > |1.5|, DB = GO")
-    
-# Add annotations (number of input genes and number of input genes with GO terms)
-num_genes <- length(strictest_DEGs)
-genes_with_GO_terms <- sum(strictest_annotated_DEGs %in% go_term2gene$gene)
-
-    
-# Print the plot with custom sub-title
-p <- p + labs(subtitle = paste("Genes:", num_genes, "| Genes with GO terms:", genes_with_GO_terms))
-print(p)
-
-```
-
-
-And an upset plot - to show the shared genes among the enriched terms (since a gene can belong to multiple terms or pathways)
-For over-representation analysis, upsetplot will calculate the overlaps among different gene sets. For GSEA, it will plot the fold change distributions of different categories (e.g. unique to pathway, overlaps among different pathways).
-
-```{r upset plot}
-
-# n = the number of top enrichments to plot
-upsetplot(strictest_enrichment, n = 10)
-
-```
-
-
-And a bar plot
-
-```{r}
-barplot(strictest_enrichment, 
-        drop = TRUE, 
-        showCategory = 20, 
-        title = "ORA enrichment - DEGs Padj < 0.01 FC > |1.5|, db = GO",
-        font.size = 8)
-```
-
-Encrichment map: organizes enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
-
-With show category 5, only the skin development genes are coming out. Is this because there is more skin tissue to grow in fingers compared to whole arm, where more bone and muscle compared to skin? Are these upregulated in distal blastemas compared to proximal? 
-
-Increasing to 15 shows some potentially interesting regulators coming out. 
-
-
-```{r emapplot }
-# calculate pairwise similarities between the enriched terms
-strictest_enrichment <- pairwise_termsim(strictest_enrichment)
-
-# plot
-emapplot(strictest_enrichment, showCategory = 15, max.overlaps = Inf, cex_label_category = 0.6)
-
-```
-
-From here: https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html 
-
-"Both the barplot() and dotplot() only displayed most significant or selected enriched terms, while users may want to know which genes are involved in these significant terms. In order to consider the potentially biological complexities in which a gene may belong to multiple annotation categories and provide information of numeric changes if available, we developed the cnetplot() function to extract the complex association. The cnetplot() depicts the linkages of genes and biological concepts (e.g. GO terms or KEGG pathways) as a network. GSEA result is also supported with only core enriched genes displayed."
-
-cnetplot: https://rdrr.io/bioc/enrichplot/man/cnetplot.html
-
-
-```{r cnetplot}
-# cex_label_gene to reduce the font size for gene ID
-# colorEdge adds the coloured legend and network bars 
-
-cnetplot(strictest_enrichment, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE)
-```
-
-
-A circular cnetplot, so pretty:
-
-```{r cnetplot circular}
-# cex_label_gene to reduce the font size for gene ID
-# colorEdge adds the coloured legend and network bars 
-
-cnetplot(strictest_enrichment, showCategory = 10, cex_label_gene = 0.4, cex_label_category = 0.8,  colorEdge = TRUE, circular = TRUE)
-```
 
 
 
