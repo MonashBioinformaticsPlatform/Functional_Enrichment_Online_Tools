@@ -733,7 +733,7 @@ keggP_gsea <- GSEA(
 
 33 enriched pathways. 
 
-
+ Dotplots don't show up v down reg... 
 
 
 ```{r dotplot gsea keggP, fig.height=10, fig.width=7}
@@ -749,6 +749,44 @@ dotplot(
 ```
 
 
+```{r ridgeplot  gsea keggP,  fig.height=10, fig.width=7}
+ridgeplot(keggP_gsea, 
+  showCategory = 30, 
+  fill = "p.adjust", 
+  core_enrichment = TRUE, 
+  label_format = 50, 
+  orderBy = "NES", 
+  decreasing = FALSE )
+```
+
+
+Neither does ridge plot. Good old volcano plot works - 
+
+```{r volcano plot  gsea keggP,  fig.height=7, fig.width=10}
+
+p<- ggplot(keggP_gsea@result, aes(x = enrichmentScore, y = -log10(p.adjust), color = p.adjust)) + 
+  geom_point(alpha = 0.7, size = 2) +  # Adjust point size
+  scale_color_gradient(low = "blue", high = "red") +  # Color by p.adjust values
+  theme_minimal() + 
+  labs(title = "Axolotl GSEA KEGG Pathways", 
+       x = "Enrichment Score (NES)", 
+       y = "-log10(Adjusted P-value)",
+       color = "Adjusted P-value") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels for readability
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +  # Add vertical line at x=0
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "black") +  # Add horizontal line at p=0.05 cutoff
+  geom_text(aes(label = Description), 
+            hjust = 0.5, 
+            vjust = -0.5,  # Move labels higher off the points
+            size = 3, 
+            check_overlap = TRUE, 
+            alpha = 0.7)  # Add labels for each pathway term
+
+print(p)
+```
+
+
+
 ### Why are we seeing a lot of infection related terms?
 
 Many genes involved in infection responses are also part of broader stress response pathways. These genes may be activated under different conditions, such as environmental stress, tissue injury, or other disruptions to homeostasis, which are common in various types of experiments. Pathways related to immune responses can also be interconnected with pathways controlling inflammation, wound healing, and metabolic processes. As a result, infection-related pathways can appear in enrichment analysis even when the experimental conditions don't directly involve infection. This does not mean the result is spurious - it just requires that you exercise pragmatism, employ a basic understanding of the statistical approach, and a steadfast conviction to always interpret the results in the context of your experiment and dig more deeply into what is being enriched, which of your genes are involved in the term, and an understanding that the FEA results are to guide further investigation rather than answer "the question". 
@@ -756,10 +794,240 @@ Many genes involved in infection responses are also part of broader stress respo
 
 ## novel species with WebGestaltR!!!
 
+#### file prep 
+
+This requires a `GMT` file and a `description` file. 
+
+A GMT file is a standard file format (ie not specific to WebGestaltR). It is a tab-delimited text file that specifies gene sets associated with particular pathways or functional terms. Each row represents one gene set (eg a GO term, a KEGG pathway), and the columns include the name of the gene set and the genes associated with it
+
+
+Re external links - for KEGG apthways, can add here - https://www.genome.jp/dbget-bin/www_bget?<mapID>
+
+eg https://www.genome.jp/dbget-bin/www_bget?map04139 - so this would be easy to code
+
+
+
+An for GO: https://www.ebi.ac.uk/QuickGO/term/<GOID>
+
+eg https://www.ebi.ac.uk/QuickGO/term/GO:0000981
+
+
+Try for KEGG PAthways:
+
+
+
+```{r  kegg pathways gmt file for webgestaltr }
+
+# Step 1: Create the external link for each KEGG pathway ID
+keggP_term2gene <- keggP_term2gene %>%
+  dplyr::mutate(external_link = paste0("https://www.genome.jp/dbget-bin/www_bget?", term))
+
+# Step 2: Group by KEGG pathway term and concatenate the gene list
+keggP_term2gene_grouped <- keggP_term2gene %>%
+  dplyr::group_by(term) %>%
+  dplyr::summarize(genes = paste(gene, collapse = "\t"), .groups = "drop")
+
+# Step 3: Ensure that external links are correctly linked to the pathways
+keggP_term2gene_grouped <- keggP_term2gene_grouped %>%
+  dplyr::left_join(keggP_term2gene %>% dplyr::select(term, external_link) %>% distinct(), by = "term")
+
+# Step 4: Create the final GMT format entry (Pathway, External Link, Genes)
+keggP_gmt <- keggP_term2gene_grouped %>%
+  dplyr::mutate(gmt_entry = paste(term, external_link, genes, sep = "\t")) %>%
+  dplyr::select(gmt_entry)
+
+# Save as GMT file
+writeLines(keggP_gmt$gmt_entry, "Amex_kegg_pathways_2024-11-13.gmt")
+
+```
+
+
+
+Description file is same as clsuterProfiler term2name: 
+
+```{r kegg pathways description file for webgestaltr }
+keggP_desc <- keggP_term2name
+head(keggP_desc)
+
+# Write keggP_desc to a TSV file without headers
+write.table(keggP_desc, "Amex_kegg_pathways_2024-11-13.des", sep = "\t", col.names = FALSE, row.names = FALSE, quote = FALSE)
+
+```
 
 
 
 
+Try oRA first as is faster:
+
+WebGestaltR(enrichMethod="ORA", organism="others", enrichDatabaseFile = "/database-test.gmt",  enrichDatabaseDescriptionFile = "/description_test.des", interestGeneFile = "/genelist_test.txt", referenceGeneFile = "/reference.txt")
 
 
+Of the below, only enrichDatabaseFile ( = GMT) and enrichDatabaseDescriptionFile (description) are needed.  
+
+enrichDatabase = The functional categories for the enrichment analysis. Users can use the function listGeneSet to check the available functional databases for the selected organism. Multiple databases in a vector are supported for ORA and GSEA.
+
+enrichDatabaseFile = Users can provide one or more GMT files as the functional category for enrichment analysis. The extension of the file should be gmt and the first column of the file is the category ID, the second one is the external link for the category. Genes annotated to the category are from the third column. All columns are separated by tabs. The GMT files will be combined with enrichDatabase.
+
+enrichDatabaseType = The ID type of the genes in the enrichDatabaseFile. If users set organism as others, users do not need to set this ID type because WebGestaltR will not perform ID mapping for other organisms. The supported ID types of WebGestaltR for the selected organism can be found by the function listIdType
+
+enrichDatabaseDescriptionFile = Users can also provide description files for the custom enrichDatabaseFile. The extension of the description file should be des. The description file contains two columns: the first column is the category ID that should be exactly the same as the category ID in the custom enrichDatabaseFile and the second column is the description of the category. All columns are separated by tabs.
+
+##### ORA KEGG WebGestaltR
+
+```{r webgestalt ORA keggP custom GMT }
+
+outputDirectory <- getwd() 
+project <- "webgestaltR_axolotl_ORA_KEGG_Pathways"
+
+WebGestaltR(
+    organism = "others",                   # Use your species (e.g., "hsapiens" for humans)
+    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
+    interestGene = degs,                # Your gene list
+    referenceGene = background,                    # Use the default background or provide your own
+    enrichDatabaseFile = "Amex_kegg_pathways_2024-11-13.gmt", 
+    enrichDatabaseDescriptionFile = "Amex_kegg_pathways_2024-11-13.des", 
+    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
+    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
+    fdrThr = 0.05,                           # FDR significance threshold
+    minNum = 5,                              # Minimum number of genes per category
+    maxNum = 500,                             # Maximum number of genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+)
+
+```
+
+FREAKING WORKS, YEA!!!!!!!!!!!!!!
+
+##### GSEA KEGG WebGestaltR
+
+```{r webgestalt gsea keggP custom GMT }
+
+outputDirectory <- getwd() 
+project <- "webgestaltR_axolotl_GSEA_KEGG_Pathways"
+
+WebGestaltR(
+    organism = "others",                   # Use your species (e.g., "hsapiens" for humans)
+    enrichMethod = "GSEA",                    # Perform ORA, GSEA or NTA
+    interestGene = ranked_df,                # Ranked gene list data frame 
+    enrichDatabaseFile = "Amex_kegg_pathways_2024-11-13.gmt", 
+    enrichDatabaseDescriptionFile = "Amex_kegg_pathways_2024-11-13.des", 
+    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
+    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
+    fdrThr = 0.05,                           # FDR significance threshold
+    minNum = 5,                              # Minimum number of genes per category
+    maxNum = 500,                             # Maximum number of genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+)
+
+```
+
+
+
+#### Now for GO:
+
+
+##### file prep 
+
+```{r  GO gmt file for webgestaltr }
+
+# Step 1: Create the external link for each GO term ID
+go_term2gene <- go_term2gene %>%
+  dplyr::mutate(external_link = paste0("https://www.ebi.ac.uk/QuickGO/term/", term))
+
+# Step 2: Group by GO term and concatenate the gene list
+go_term2gene_grouped <- go_term2gene %>%
+  dplyr::group_by(term) %>%
+  dplyr::summarize(genes = paste(gene, collapse = "\t"), .groups = "drop")
+
+# Step 3: Ensure that external links are correctly linked to the pathways
+go_term2gene_grouped <- go_term2gene_grouped %>%
+  dplyr::left_join(go_term2gene %>% dplyr::select(term, external_link) %>% distinct(), by = "term")
+
+# Step 4: Create the final GMT format entry (geneset/term ID, external Link, genes -  all separated by tabs even the genes)
+go_gmt <- go_term2gene_grouped %>%
+  dplyr::mutate(gmt_entry = paste(term, external_link, genes, sep = "\t")) %>%
+  dplyr::select(gmt_entry)
+
+# Save as GMT file
+writeLines(go_gmt$gmt_entry, "Amex_GO_2024-11-13.gmt")
+
+```
+
+
+
+Description file is same as clsuterProfiler term2name: 
+
+```{r GO description file for webgestaltr }
+go_desc <- go_term2name
+head(go_desc)
+
+# Write GO_desc to a TSV file without headers
+write.table(go_desc, "Amex_GO_2024-11-13.des", sep = "\t", col.names = FALSE, row.names = FALSE, quote = FALSE)
+
+
+```
+
+##### ORA GO WebGestaltR
+
+```{r webgestalt ORA GO custom GMT }
+
+outputDirectory <- getwd() 
+project <- "webgestaltR_axolotl_ORA_GO"
+
+WebGestaltR(
+    organism = "others",                   # Use your species (e.g., "hsapiens" for humans)
+    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
+    interestGene = degs,                # Your gene list
+    referenceGene = background,                    # Use the default background or provide your own
+    enrichDatabaseFile = "Amex_GO_2024-11-13.gmt", 
+    enrichDatabaseDescriptionFile = "Amex_GO_2024-11-13.des", 
+    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
+    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
+    fdrThr = 0.05,                           # FDR significance threshold
+    minNum = 5,                              # Minimum number of genes per category
+    maxNum = 500,                             # Maximum number of genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+)
+
+```
+** really need to remember to research affinity propagation vs weighted set cover vs default!!!
+
+##### GSEA GO WebGestaltR
+
+```{r webgestalt gsea keggP custom GMT }
+
+outputDirectory <- getwd() 
+project <- "webgestaltR_axolotl_GSEA_GO"
+
+# add supressWarnigns as there are many GO terms with < 5 or > 500 
+
+suppressWarnings({
+  WebGestaltR(
+    organism = "others",                   # Your organism
+    enrichMethod = "GSEA",                  # GSEA enrichment method
+    interestGene = ranked_df,               # Your ranked gene list
+    enrichDatabaseFile = "Amex_GO_2024-11-13.gmt", 
+    enrichDatabaseDescriptionFile = "Amex_GO_2024-11-13.des", 
+    isOutput = TRUE,                        # Whether to output files
+    fdrMethod = "BH",                       # FDR correction method
+    sigMethod = "fdr",                      # Significance method
+    fdrThr = 0.05,                          # FDR threshold
+    minNum = 5,                             # Minimum genes per category
+    maxNum = 500,                           # Maximum genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+  )
+})
+
+```
 

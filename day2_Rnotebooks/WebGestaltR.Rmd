@@ -308,6 +308,8 @@ loadGeneSet(
 
 
 #############################################
+END WEBGETALTR the rest is other stuff to be moved/deleted
+#############################################
 # ReactomePA
 
 If wanting to do Reactome analysis, which is better out of WebGestaltR or ReactomePA? --> ANSWER: webgestaltR!!!!!!!!!!!!
