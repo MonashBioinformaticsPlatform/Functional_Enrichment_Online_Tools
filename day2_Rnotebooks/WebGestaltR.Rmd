@@ -118,7 +118,7 @@ data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
 # dataframe - required for webgestaltr 
 ranked <- data %>%
   arrange(desc(Log2FC)) %>%
-  select(Gene.ID, Log2FC)
+  dplyr::select(Gene.ID, Log2FC)
 
 
 head(ranked)
@@ -163,10 +163,10 @@ start 11.55pm
 
 ```{r ORA Reactome }
 
-outputDirectory <- "../testing_WebGestaltR" 
+outputDirectory <- "../testing_WebGestaltR"  # outdiur must exist! 
 project <- "ora_reactome"
 
-wgr_ora_reactome <- WebGestaltR(
+system.time({wgr_ora_reactome <- WebGestaltR(
     organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
     enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
     interestGene = DEGs,                # Your gene list
@@ -184,6 +184,8 @@ wgr_ora_reactome <- WebGestaltR(
     outputDirectory = outputDirectory,
     projectName = project
 )
+
+})
 ```
 Run WebGestaltR over many databases at once: 
 
