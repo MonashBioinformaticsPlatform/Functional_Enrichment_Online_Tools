@@ -35,7 +35,7 @@ First, ensure that your working directory reflects this day_2 folder:
 # Set the root directory for all notebook chunks
 #knitr::opts_knit$set(root.dir = "C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
 
-knitr::opts_knit$set(root.dir = "/home/user1/Functional_enrichment_workshop_2024/day_2")
+knitr::opts_knit$set(root.dir = "Functional_enrichment_workshop_2024/day_2")
 
 # and set the working directory for the console:
 #setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
@@ -71,6 +71,8 @@ getwd()
 Please ask for assistance if this step does not show the day_2 folder path! 
 
 Once your working directory is set, load the DE input file, and inspect the first few lines: 
+
+sdgfg
 
 
 ```{r load input data}
@@ -461,7 +463,7 @@ In day 1 of the workshop, you ran ORA with g:Profiler web tool and saved the res
 
 ```{r import g:profiler web results}
 # ensure the filepath matches yours. Note the "../" means one directory level below this one
-web <- read.csv("../day_1/gProfiler_hsapiens_07-11-2024_11-27-09__intersections.csv")
+web <- read.csv("gProfiler_hsapiens_07-11-2024_11-27-09__intersections.csv")
 ```
 
 

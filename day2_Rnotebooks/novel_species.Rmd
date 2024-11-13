@@ -1,5 +1,5 @@
 ---
-title: "Non-model species enrichment analysis with clusterProfiler"
+title: "Non-model species functional enrichment analysis"
 output:
   html_document:
     df_print: paged
@@ -50,7 +50,9 @@ This is where the flexibility of R can help, in particular clusterProfiler which
 
 The gene names are flexible - they do not have to conform to any specific gene ID namespace. In order to obtain the functional annotations, you may need to run the annotation yourself with tools such as eggNog emapper, which will provide annotations against GO, KEGG and a number of other databases. In order to run the annotation, you of course need a genome assembly and gene prediction GTF/GFF file. You can then filter the annotation output for the correct fields (ie organisms-specific gene ID and annotation ID) in order to create the 'TERM2GENE' file. 
 
-To create 'TERM2NAME', you then use the relevant database eg (GO, KEGG) to create a text file with the annotation IDs detected in your organism to the annotation names. 
+To create 'TERM2NAME', you then use the relevant database to create a text file with the annotation IDs detected in your organism to the annotation names. 
+
+For KEGG, we don't actually need to use a `TERM2NAME` file if we can map KEGG ortology IDs to our genes. We can then use `enrichKEGG` and `gseKEGG` :-) 
 
 # Axolotl functional enrichment analysis
 
@@ -69,11 +71,10 @@ Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles
 - [Raw fastq](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA300706)
 - [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obohea)
 
-**ADD GO.OBO
 
 ### Data pre-processing
 
-The reference genome was annotated with emapper and GO and KEGG IDs extracted to create required database files. The raw reads were trimmed with bbduk and aligned to the reference genome with STAR. Feature counting was performed with HTSeq-counts and formatted into a counts matrix. Differential gene expression analysis was performed with DESeq2, filtering for genes with at least a count of 10 in at least 2 samples. The background gene lists (DEGs filtered for P.adj < 0.05 and log2fold change 1, background genes, genes ranked on log2fold change) have been exracted from this DESeq2 results file, and included in your 'day_2' folder for input into this analysis.  
+The reference genome was annotated with emapper and GO and KEGG IDs extracted to create required database files. The raw reads were trimmed with bbduk and aligned to the reference genome with STAR. Feature counting was performed with HTSeq-counts and formatted into a counts matrix. Differential gene expression analysis was performed with DESeq2, filtering for genes with at least a count of 10 in at least 2 samples. The DESeq2 results file is included in your 'day_2' folder for input into this Notebook. We will extract our gene lists from here.  
 
 
 ## Load input genes
@@ -81,6 +82,9 @@ The reference genome was annotated with emapper and GO and KEGG IDs extracted to
 
 ```{r}
 knitr::opts_knit$set(root.dir = "Functional_enrichment_workshop_2024/day_2")
+
+# to set irectory in your console, copy paste below and run i console directly:
+# setwd("Functional_enrichment_workshop_2024/day_2")
 ```
 
 
@@ -94,19 +98,18 @@ head(de_matrix)
 ```
 
 
-```{r}
-# Assuming your dataframe is named 'full_data'
+```{r create gene lists}
 
-# 1. Extract DEGs based on your criteria
+#  Extract DEGs 
 degs <- de_matrix %>%
   filter(padj < 0.01 & abs(log2FoldChange) > 1.5) %>%
   pull(geneID)  # Extract gene IDs as a vector
 
-# 2. Extract the background gene list
+# Extract the background gene list
 background <- de_matrix %>%
   pull(geneID)  # Extract all gene IDs as a background vector
 
-# 3. Create the ranked gene vector for GSEA
+# Create the ranked gene vector for GSEA
 ranked <- setNames(de_matrix$log2FoldChange, de_matrix$geneID) %>% sort(decreasing = TRUE)  # Named vector
 
 # Check the results
@@ -118,53 +121,105 @@ head(ranked)  # Preview of the ranked vector
 
 
 
-## Gene Ontology enrichment 
+## Prepare custom database files 
 
-### Load axolotl GO annotation file
+### Load axolotl eggNOG annotation file
 
-The file `Amex_term2gene_GO.tsv` was created by extracting the GO terms mapped to the axolotl genes with emapper, and printing them one term per line alongside the gene ID. A gene can map to many terms and thus be present on multiple lines. A term can be mapped to more than one gene. 
+This file was produced by running the `eggNOG emapper` tool over the axolotl proteome. It contains annotations against GO, KEGG anda handful of other databases. We will extract the GO and KEGG IDs to `TERM2GENE` files for `clsuterProfiler`. The "TERM" is the GO or KEGG ID, and the "GENE" is the gene/transcript ID used in your proteome. Note that the same gene/transcript IDs must also have been provided when running feature counting and differential expression analysis. 
 
 
-```{r load GO annotation}
 
-# load annotation input file
-infile <- "Amex_term2gene_GO.tsv"
-go_term2gene <- read_tsv(infile, show_col_types = FALSE)
+```{r Load eggnog annotation}
 
-# assign column names
+eggnog_anno <- read_tsv("AmexG_v6.0-DD.emapper.annotations.txt", show_col_types = FALSE) 
+head(eggnog_anno)
+```
+
+
+### Create TERM2GENE files
+
+These are 2 column text files with the term ID (one per line) alongside the ID of the gene that maps to the term. A gene can map to many terms and thus be present on multiple lines. A term can be mapped to more than one gene and thus be present on many lines.
+
+#### KEGG
+
+```{r KEGG TERM2GENE}
+
+# Extract KEGG IDs from eggNOG annotation file to correct format for clusterProfiler
+
+kegg_term2gene <- eggnog_anno %>%
+    dplyr::select(KEGG_ko, `#query`) %>%
+    dplyr::filter(KEGG_ko != "-") %>%
+    separate_rows(KEGG_ko, sep = ",") %>%
+    dplyr::mutate(gene = gsub("\\..*", "", `#query`)) %>%
+    dplyr::mutate(term = gsub("ko:", "", KEGG_ko)) %>%
+    dplyr::select(term, gene) %>%
+    distinct() %>%
+    drop_na()
+
+
+```
+
+```{r view kegg }
+head(kegg_term2gene)
+```
+
+
+** changing to kegg pathways! *** 
+
+
+
+```{r}
+# Extract KEGG MAP IDs from eggNOG annotation file to correct format for clusterProfiler
+
+keggP_term2gene <- eggnog_anno %>%
+    dplyr::select(KEGG_Pathway, `#query`) %>%  # Select the relevant columns
+    dplyr::filter(grepl("map", KEGG_Pathway)) %>%  # Keep only rows where KEGG_Pathway contains 'map'
+    separate_rows(KEGG_Pathway, sep = ",") %>%  # Split multiple pathways into separate rows
+    dplyr::mutate(gene = gsub("\\..*", "", `#query`)) %>%  # Clean up gene IDs by removing version numbers
+    dplyr::mutate(term = gsub("map:", "", KEGG_Pathway)) %>%  # Remove the "map:" prefix
+    dplyr::filter(grepl("^map", term)) %>%  # Filter again to make sure we only have map pathways (after removing "map:")
+    dplyr::select(term, gene) %>%  # Select the pathway (term) and gene columns
+    distinct() %>%  # Remove duplicate rows
+    drop_na()  # Remove rows with missing values
+
+# View result to check
+head(keggP_term2gene)
+
+```
+
+
+#### GO
+
+```{r GO TERM2GENE}
+
+# Extract KEGG IDs from eggNOG annotation file to correct format for clusterProfiler
+
+go_term2gene <- eggnog_anno %>%
+    dplyr::select(GOs, `#query`) %>%
+    dplyr::filter(GOs != "-") %>%
+    separate_rows(GOs, sep = ",") %>%
+    mutate(gene = gsub("\\..*", "", `#query`)) %>%
+    dplyr::select(GOs, gene) %>%
+    distinct() %>%
+    drop_na()
+
+# Renaming columns to match desired output format
 colnames(go_term2gene) <- c("term", "gene")
 
-# print the first 6 lines
+```
+
+```{r view go}
 head(go_term2gene)
 
 ```
 
-Now print the number of GO terms found within the genome, and the number of genes with GO annotations
+### TERM2NAME 
 
-```{r report GO annotation counts}
-
-total_terms<-nrow(go_term2gene)
-print(paste("Number of annotation terms:", total_terms))
-
-unique_genes <- length(unique(go_term2gene$gene))
-print(paste("Number of genes with 1 or more annotation terms:", unique_genes))
-
-```
-
-
-
-
-
-
-### Create TERM2NAME
+#### GO
 
 The 'core' gene ontology database file [`go.obo`](https://purl.obolibrary.org/obo/go.obo) has been downloaded and included in your working directory. This will enable us to assign GO names to all of the GO IDs within our axolotl 'TERM2GENE' file.  
 
-Prepare the term to name table:
-
-```{r GO term2name}
-
-# Extract ontology info from go.obo
+```{r GO TERM2NAME}
 
 infile <- "go.obo"
 
@@ -191,6 +246,42 @@ write_tsv(go_term2name, "Amex_term2name_GO.tsv")
 head(go_term2name)
 
 ```
+
+
+
+Now print the number of GO terms found within the genome, and the number of genes with GO annotations
+
+```{r report GO annotation counts}
+
+total_terms<-nrow(go_term2gene)
+print(paste("Number of annotation terms:", total_terms))
+
+unique_genes <- length(unique(go_term2gene$gene))
+print(paste("Number of genes with 1 or more annotation terms:", unique_genes))
+
+```
+
+
+
+
+
+#### KEGG PATHWAYS
+
+
+The KEGG `map` pathway list was downloaded from https://rest.kegg.jp/list/pathway and saved to your `day_2` folder. It was available to download in the correct format for `TERM2NAME`
+
+
+```{r KEGG TERM2NAME}
+# Load the KEGG pathways file
+keggP_term2name <- read.table("kegg_pathways_2024-11-13.txt", header = FALSE, sep = "\t", col.names = c("term", "name"))
+
+# View 
+head(keggP_term2name)
+```
+
+
+
+
 
 
 ### Annotated background genes
@@ -292,6 +383,10 @@ go_ora
 ```
 
 91 significantly enriched terms at P.adj < 0.05. 
+
+Note that we used the gene list object `degs` which had 247 genes, but the tool has applied the input size as 145 - this is because it is automatically discarding any that do not have annotations. Results would be the same if we instead used `annotated_degs` object. Likewise, the background size is being reported as 15072 (the number annotated) not 24,419 (the total in background list). 
+
+
 
 Save the results to a text file:
 
@@ -416,12 +511,22 @@ I was expecting to see growth factors, regulatory genes and morphogens. We are s
 
 #### Run GSEA
 
-```{r}
-go_gsea <- GSEA(geneList = ranked, 
-                     TERM2GENE = go_term2gene, 
-                     TERM2NAME = go_term2name, 
-                     pvalueCutoff = 0.05, 
-                     verbose = TRUE)
+Any more params to add here?! 
+
+```{r GO GSEA}
+go_gsea <- GSEA(
+  geneList = ranked, 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  TERM2GENE = go_term2gene, 
+  TERM2NAME = go_term2name, 
+  seed = 1234, 
+  by = "fgsea"
+)
 
 ```
 
@@ -455,87 +560,206 @@ barplot
 
 ## KEGG enrichment 
 
-### Load axolotl KEGG annotation file
+We have already amde the KEGG `TERM2GENE` file earlier. 
 
-The file `Amex_term2gene_KEGG.tsv` was created by extracting the KEGG IDs mapped to the axolotl genes with emapper, and printing them one term per line alongside the gene ID. A gene can map to many terms and thus be present on multiple lines. A term can be mapped to more than one gene. 
-
-
-```{r load KEGG annotation}
-
-# load annotation input file
-infile <- "Amex_term2gene_KEGG.tsv"
-term2gene_kegg <- read_tsv(infile, show_col_types = FALSE)
-
-# assign column names
-colnames(term2gene_kegg) <- c("term", "gene")
-
-# print the first 6 lines
-head(term2gene_kegg)
-
+```{r }
+head(keggP_term2gene)
+head(keggP_term2name)
 ```
 
 Now print the number of KEGG IDs found within the genome, and the number of genes with KEGG annotations
 
 ```{r report KEGG annotation counts}
 
-total_terms_kegg<-nrow(term2gene_kegg)
+total_terms_kegg<-nrow(kegg_term2gene)
 print(paste("Number of annotation terms:", total_terms_kegg))
 
-unique_genes_kegg <- length(unique(term2gene_kegg$gene))
+unique_genes_kegg <- length(unique(kegg_term2gene$gene))
 print(paste("Number of genes with 1 or more annotation terms:", unique_genes_kegg))
 
 ```
-Ouch, this is a lot lower than GO!
+Slightly lower than GO which had 21,373. 
 
 
-### Define background genes
+How many background genes and DEGs have KEGG annotation?
 
-Our background gene list for KEGG is the same as it was for GO. Let's find out how many of our background have KEGG annotations. 
+```{r}
+
+kegg_annotated_degs <- kegg_term2gene %>%
+    dplyr::filter(gene %in% degs) %>%
+    dplyr::pull(term) %>%
+    unique() 
 
 
-```{r report KEGG annotation percentages}
 
-# from raw counts
-percent_annotated_raw <- (unique_genes / (nrow(raw_counts))) * 100
+paste0("Number of DEGs annotated with KEGG: ", length(kegg_annotated_degs))
 
-# Now filter the term2gene table to only include genes in the background gene list
-filtered_term2gene <- term2gene %>% filter(gene %in% background_genes)
-
-# Count the number of unique background genes with at least one GO term
-unique_genes_with_anno <- filtered_term2gene %>% distinct(gene) %>% nrow()
-
-# Calculate the percentage of background genes that have GO annotations
-percent_annotated_filtered <- (unique_genes_with_anno / nrow(filtered_counts)) * 100
-
-# Print results
-cat("Number of background genes with annotationss:", unique_genes_with_anno, "(",percent_annotated_filtered,"%)\n")
-cat("Percentage of genome-wide genes with annotations:", percent_annotated_raw, "%\n")
 
 ```
-KEGG annotations are present for almost half the number of background and genome-wide genes. Is it really worth pursuing this analysis? Let's just run it anyway (since the code is copy and paste, thanks R!)
+Slightly more than GO, which had 145!
 
 
-### ORA (KEGG)
+```{r}
+# Filter the term2gene table to only include genes in the background gene list
+filtered_kegg_term2gene <- kegg_term2gene %>% filter(gene %in% background)
 
-#### Create input list for ORA
+# Count the number of unique background genes with at least one GO term
+unique_genes_with_kegg_anno <- filtered_kegg_term2gene %>% distinct(gene) %>% nrow()
 
+# Calculate the percentage of background genes that have GO annotations
+percent_kegg_annotated_filtered <- (unique_genes_with_kegg_anno / length(background)) * 100
 
+# Print results
+cat("Number of background genes with KEGG annotations:", unique_genes_with_kegg_anno, "(",percent_kegg_annotated_filtered,"%)\n")
 
-#### Run ORA
-
-
-#### Plot ORA
-
-
-### GSEA (KEGG)
-
-
-#### Create input list for GSEA
-
+```
+Quite similar overall to GO. 
 
 
-#### Run GSEA
+
+### Enrichment using KEGG orthology IDs
+
+For KEGG, we can use the KEGG ortholog IDs (ko), which are part of the KEGG pathway database, and specify `organism = "ko"`. For this method, we don't need `TERM2NAME` as `clusterProfiler` is equipped to read the KEGG ortholog IDs. HOWEVER, there is loss of data here, as a KEGG term that is represented by many genes in this DEGs list is collapsed into one representation of the KEGG term, so the import of that term will be underestimated!!
+
+```{r get kegg ora lists}
 
 
-#### Plot GSEA
+degs_kegg <- kegg_term2gene %>%
+  dplyr::filter(gene %in% degs) %>%  # Filter for DEGs present in kegg_term2gene
+  dplyr::pull(term)   # Extract all KEGG pathway IDs (including duplicates)
+
+background_kegg <- kegg_term2gene %>%
+  dplyr::filter(gene %in% background) %>%  # Filter for background genes present in kegg_term2gene
+  dplyr::pull(term)   # Extract all KEGG pathway IDs (including duplicates)
+  
+head(degs_kegg)
+tail(degs_kegg)
+length(degs_kegg)
+length(background_kegg)
+length(unique(degs_kegg))
+length(unique(background_kegg))
+
+```
+
+
+
+```{r run kegg ora }
+
+kegg_ora <- enrichKEGG(degs_kegg,
+           organism = "ko",
+           keyType = "kegg",
+           pvalueCutoff = 0.05,
+           pAdjustMethod = "BH",
+           universe = background_kegg,
+           minGSSize = 10,
+           maxGSSize = 500,
+           qvalueCutoff = 0.05,
+           use_internal_data = FALSE)
+
+kegg_ora
+```
+
+```{r}
+barplot(kegg_ora, 
+        drop = TRUE, 
+        showCategory = 20, 
+        title = "ORA enrichment - DEGs Padj < 0.01 FC > |1.5|, db = KEGG genes",
+        font.size = 8)
+```
+
+With the  `TERM2GENE` and `TERM2NAME` method, we don't have to convert the input gene list to different IDs, so we aren't dropping many axolotl gene IDs into one KEGG term. This will change the results, hopefully for the better! 
+
+Since we  are using our gene list with axolotl gene IDs, we use the generic `enricher` function with `TERM2GENE` and `TERM2NAME` files we made against KEGG Pathway (map) IDs. `enricher` runs ORA, and `GSEA` runs GSEA, instead of say `enrichKEGG` and `gseKEGG`. 
+
+
+```{r kegg pathways ora}
+
+keggP_ora <- enricher(
+  gene = degs,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  universe = background,
+  minGSSize = 10,
+  maxGSSize = 500,
+  TERM2GENE = keggP_term2gene,
+  TERM2NAME = keggP_term2name
+)
+
+
+keggP_ora
+```
+
+
+11 enrichments, only 80 genes annotated to KEGG pathways, and 8000 background genes annotated to pathways. This is fewer inputs that with the previous method (108 KO IDs in degs_kegg) and more background (8000 vs 5164). 
+
+There are 7 shared terms, so that's a reassurance! 
+
+```{r}
+
+barplot(keggP_ora, 
+        drop = TRUE, 
+        showCategory = 20, 
+        title = "ORA enrichment - DEGs Padj < 0.01 FC > |1.5|, db = KEGG pathways",
+        font.size = 8)
+```
+
+
+#### KEGG subsription access to data downloads 
+
+KEGG FTP access requires an academic subscription, for which I could not obtain the free version, as I would not be the "only user of the KEGG FTP Data". The pathways list was available freely. As a single user, you can request academic access here https://www.pathway.jp/en/academic.html and adapt this code to extract the IDs of your choice for example TERM2NAME from KO IDs rather than map IDs as we have done here. 
+
+Given the restrictions, we will continue with the pathway mappings for the `TERM2NAME` and `TERM2GENE` method, which is preferable here as it does not pose the same issues with gene:name duplicate records as the `organisms="ko"` method does. 
+
+#### KEGG PATHWAYS GSEA
+
+
+```{r kegg pathways gsea}
+
+keggP_gsea <- GSEA(
+  geneList = ranked, 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  TERM2GENE = keggP_term2gene, 
+  TERM2NAME = keggP_term2name, 
+  seed = 1234, 
+  by = "fgsea"
+)
+
+```
+
+33 enriched pathways. 
+
+
+
+
+```{r dotplot gsea keggP, fig.height=10, fig.width=7}
+dotplot(
+  keggP_gsea,
+  x = "geneRatio",
+  color = "p.adjust",
+  orderBy = "x",
+  showCategory = 20,
+  font.size = 8
+  ) +
+  ggtitle("GSEA enrichment over KEGG pathways")
+```
+
+
+### Why are we seeing a lot of infection related terms?
+
+Many genes involved in infection responses are also part of broader stress response pathways. These genes may be activated under different conditions, such as environmental stress, tissue injury, or other disruptions to homeostasis, which are common in various types of experiments. Pathways related to immune responses can also be interconnected with pathways controlling inflammation, wound healing, and metabolic processes. As a result, infection-related pathways can appear in enrichment analysis even when the experimental conditions don't directly involve infection. This does not mean the result is spurious - it just requires that you exercise pragmatism, employ a basic understanding of the statistical approach, and a steadfast conviction to always interpret the results in the context of your experiment and dig more deeply into what is being enriched, which of your genes are involved in the term, and an understanding that the FEA results are to guide further investigation rather than answer "the question". 
+
+
+## novel species with WebGestaltR!!!
+
+
+
+
+
+
+
 
