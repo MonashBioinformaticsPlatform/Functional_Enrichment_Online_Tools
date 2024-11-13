@@ -154,7 +154,7 @@ Immediately above the `Load input data` is a code chunk labelled `Load R package
 
 Note that the packages that are loaded to the session with the R `library` command must first be installed; this has already been been done for you on these VMs. Attempts to load a package that is not installed will meet a fatal error, and installation can then be peformed (not difficult in R) before resuming.
 
-Note that the code chunk label also contaisn the text `include=FALSE`. This prevents the loading of libraries, which can at times have verbose output, from cluttering up your rendered notebook when it is previewed or knit. 
+Note that the code chunk label also contains the text `include=FALSE`. This prevents the loading of libraries, which can at times have verbose output, from cluttering up your rendered notebook when it is previewed or knit. 
 
 &#x27A4; Run the `Load R packages` code chunk. 
 
