@@ -159,7 +159,7 @@ ontology <- get_ontology(file = infile,
 # Create term to name table, removing duplicates, missing values and obsolete terms 
 go_term2name <- go_term2gene %>%
     mutate(name = ontology$name[term]) %>%
-    select(term, name) %>%
+    dplyr::select(term, name) %>%
     distinct() %>%
     drop_na() %>%
     filter(!grepl("obsolete", name))
