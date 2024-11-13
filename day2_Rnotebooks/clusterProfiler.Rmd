@@ -170,7 +170,7 @@ write.table(clsuterProfiler_gsea_GO_MF, file = "gsea_GO_MF_results.tsv", sep = "
 
 ```
 
-
+- view the table, can put in ecel for cusotm filters, get genes etc
 
 ## Dotplot 
 
@@ -490,16 +490,6 @@ write.table(gsea_kegg, file = "gsea_KEGG_results.tsv", sep = "\t", quote = FALSE
 
 ```
 
-## Plotting - challenge!
-
-
-- select your favourite plot from the plots generated for the `gseGO` MF results.
-- create a new code chunk below and give it a unique chunk label
-- paste the code for the plot into the code chunk
-- edit the code to run on the `gseKEGG` output object
-- run the code to p[roduce your plot! 
-- What plot did you choose and why? Did ti work ok?
-
 
 
 ## Dotplot 
@@ -578,7 +568,12 @@ cnetplot: https://rdrr.io/bioc/enrichplot/man/cnetplot.html
 # cex_label_gene to reduce the font size for gene ID
 # colorEdge adds the coloured legend and network bars 
 
-cnetplot(gsea_kegg, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE)
+cnetplot(gsea_kegg, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "category")
+
+# node_label = one of ’all’, ’none’, ’category’ and ’item’
+# cnetplot(gsea_kegg, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "item")
+#cnetplot(gsea_kegg, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "category")
+
 ```
 
 
@@ -588,6 +583,8 @@ cnetplot(gsea_kegg, showCategory = 15, cex_label_gene = 0.5, cex_label_category 
 
 ## treeplot
 
+ - need to research more on what this tree does - consider cull if not clear  
+
 Functional grouping tree diagram (enrichPlot) 
 
 ```{r treeplot GSEA KEGG}
@@ -596,12 +593,8 @@ p<- treeplot(gsea_kegg, showCategory = 15, color = "p.adjust")
 print(p)
 ```
 
-## heatplot
+## heatplot = BAD, DELETED
 
-```{r heatplot GSEA KEGG }
-heatplot(gsea_kegg, showCategory = 15)
-```
-- Absolutely terrible, just no! 
 
 
 # ridgeplot
