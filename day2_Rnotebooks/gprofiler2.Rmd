@@ -20,6 +20,10 @@ Like the web interface, gprofiler2 performs ORA with `g:GOSt` against multiple d
 
 # 1. Load input data
 
+
+
+############### THIS WILL NEED CHANING TO MATCH VMS ##################
+
 The dataset comprises 2 experimental groups (differentiated and undifferentiated cells in response to  treatment) with 3 replicates in each group. The raw data from [Pezzini et al 2016](https://link.springer.com/article/10.1007/s10571-016-0403-y) was subjected to differential gene expression analysis with [Degust](https://degust.erc.monash.edu/) and the results file saved. 
 
 You will find a copy of the DE results `Pezzini_DE.txt` within the `Functional_enrichment_workshop_2024/day_2` folder. 
@@ -27,15 +31,38 @@ You will find a copy of the DE results `Pezzini_DE.txt` within the `Functional_e
 First, ensure that your working directory reflects this day_2 folder:
 
 
-```{r setup, include=FALSE}
+```{r  include=FALSE}
 # Set the root directory for all notebook chunks
-knitr::opts_knit$set(root.dir = "C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+#knitr::opts_knit$set(root.dir = "C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+
+knitr::opts_knit$set(root.dir = "/home/user1/Functional_enrichment_workshop_2024/day_2")
 
 # and set the working directory for the console:
-setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+#setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
 
+#setwd("/home/user1/Functional_enrichment_workshop_2024/day_2")
+getwd()
+
+```
+
+
+################# TESTING VMS ###################
+
+why is it that when i run this single chunk from its green run arrow, the chunk ABOVE is run?! 
+
+
+
+```{r setup TEST VM , include=FALSE}
+
+# Set the root directory for all notebook chunks
+#knitr::opts_knit$set(root.dir = "/home/user1/Functional_enrichment_workshop_2024/day_2")
+
+knitr::opts_knit$set(root.dir = "Functional_enrichment_workshop_2024/day_2")
+# and for the notebook session: 
+#setwd("/home/user1/Functional_enrichment_workshop_2024/day_2")
 
 getwd()
+
 
 ```
 
@@ -48,6 +75,9 @@ Once your working directory is set, load the DE input file, and inspect the firs
 
 ```{r load input data}
 data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
+
+
+
 head(data)
 ```
 
