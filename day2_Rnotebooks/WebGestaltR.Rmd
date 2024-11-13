@@ -88,10 +88,7 @@ We will use the same Pezzini RNAseq dataset as earlier. First, confirm your work
 
 ```{r setup, include=FALSE}
 # Set the root directory for all notebook chunks
-knitr::opts_knit$set(root.dir = "C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
-
-# To set the working directory for the console, run this in the console itself:
-setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
+knitr::opts_knit$set(root.dir = "Functional_enrichment_workshop_2024/day_2")
 
 
 getwd()
@@ -107,6 +104,7 @@ Once your working directory is set, load the dataset and extract the gene lists.
 
 # Full dataset
 data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
+head(data)
 ```
 
 
@@ -125,6 +123,25 @@ head(ranked)
 tail(ranked)
 ```
 
+```{r get vectors for ORA }
+
+# Filter genes with adjusted p-value < 0.01 and absolute log2 fold change > 2
+DEGs <- data %>%
+  filter(FDR < 0.01, abs(Log2FC) > 2) %>%
+  pull(Gene.ID)
+
+# Extract all gene IDs as the background
+background <- data %>%
+  pull(Gene.ID)
+
+
+```
+
+```{r}
+
+length(DEGs)
+length(background)
+```
 
 
 
@@ -163,10 +180,10 @@ start 11.55pm
 
 ```{r ORA Reactome }
 
-outputDirectory <- "../testing_WebGestaltR"  # outdiur must exist! 
+outputDirectory <- "../testing_WebGestaltR" 
 project <- "ora_reactome"
 
-system.time({wgr_ora_reactome <- WebGestaltR(
+system.time({ wgr_ora_reactome <- WebGestaltR(
     organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
     enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
     interestGene = DEGs,                # Your gene list
