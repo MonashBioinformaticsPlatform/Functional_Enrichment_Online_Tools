@@ -115,7 +115,11 @@ NOTE: In cases where long list of features is provided, STRING may chnage some o
 
 STRING generates multiple tabs as output, shown here:
 
-![](images/string-results-tabs.png){ width=100% }
+<!-- ![](images/string-results-tabs.png){ width=100% } -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Results tabs in STRING"} 
+#  out.width="50%",
+knitr::include_graphics("images/string-results-tabs.png")
+```
 
 #### Viewers
 
@@ -125,7 +129,11 @@ Under the `Viewers` tab, various visualisation layouts are available, with the N
 
 The `Legend` tab offers a guide to the colors of nodes and edges, along with annotations for each individual query in the input list.
 
-![Nodes and edges colour-coded](images/string-legend.png){ width=100% }
+<!-- ![Nodes and edges colour-coded](images/string-legend.png){ width=100% } -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Nodes and edges colour-coded"} 
+#  out.width="50%",
+knitr::include_graphics("images/string-legend.png")
+```
 
 #### Settings
 
@@ -152,10 +160,18 @@ This measure describes how significant the enrichment is. Shown are p-values cor
 
 STRING visualises terms within each category using a bubble plot, effectively showcasing the significance and size of enriched terms. Additionally, it renders groups of related terms based on a user-defined similarity level, allowing users to identify clusters of functionally related terms within the data. This helps in interpreting complex enrichment results and highlighting key biological processes or pathways that are closely associated.
 
-![Functional enrichment visualisation with STRING](images/string-enrichment_KEGG_sim0.7_graph_plus.png){ width=100% }
+<!-- ![Functional enrichment visualisation with STRING](images/string-enrichment_KEGG_sim0.7_graph_plus.png){ width=100% } -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Functional enrichment visualisation with STRING"} 
+#  out.width="50%",
+knitr::include_graphics("images/string-enrichment_KEGG_sim0.7_graph_plus.png")
+```
 
 Towards the the bottom of the `Analysis` page, one can change the background including adding one of their own.
-![Statistical background](images/string-statistical-background.png){ width=100% }
+<!-- ![Statistical background](images/string-statistical-background.png){ width=100% } -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Statistical background"} 
+#  out.width="50%",
+knitr::include_graphics("images/string-statistical-background.png")
+```
 
 Finally the enriched terms can be downloaded at the end of the `Analysis` page, either individually per category or all enriched terms together.
 
@@ -173,7 +189,11 @@ The `Clusters` tab essentially provides three different types of clustering algo
  
  - DBSCAN clustering: is a density-based algorithm that groups points closely packed together while marking points in low-density regions as outliers or noise
 
-![](images/string-clusters.png)
+<!-- ![](images/string-clusters.png) -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Network clustering in STRING"} 
+#  out.width="50%",
+knitr::include_graphics("images/string-clusters.png")
+```
 
 Clusters can be downloaded in `.tsv` format.
 
@@ -190,7 +210,12 @@ MSigDB (Molecular Signatures Database) is a collection of gene sets for Gene Set
 
 - Click on the Run button and then the Public Server
 
-![](images/GenePattern-Run.png)
+<!-- ![](images/GenePattern-Run.png) -->
+```{r, echo=FALSE, fig.align = "center", fig.cap="Navigate to Public Server"} 
+#  out.width="50%",
+knitr::include_graphics("images/GenePattern-Run.png")
+```
+
 
 - Sign in to GenePattern or Enter as Guest
 
@@ -198,7 +223,12 @@ MSigDB (Molecular Signatures Database) is a collection of gene sets for Gene Set
 
 - Find gsea in the Browse Modules by Category page and hit GSEA
 
-![](images/Browse_Modules_gsea.png){ width=100% }
+<!-- ![](images/Browse_Modules_gsea.png){ width=100% } -->
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Browse GSEA module in GenePattern"} 
+#  out.width="50%",
+knitr::include_graphics("images/Browse_Modules_gsea.png")
+```
+
 
 ### Steps to Perform GSEA:
 <!-- https://cloud.genepattern.org/gp/pages/index.jsf?jobid=613752&openVisualizers=true&openNewWindow=false -->
@@ -297,6 +327,9 @@ data <- data.frame(
 kable(data, caption = "Summary of GSEA Results for REACTOME_FRS_MEDIATED_FGFR2_SIGNALING Gene Set")
 ```
 
+<!-- HALLMARK_CHOLESTEROL_HOMEOSTASIS -->
+<!-- 68	0.59	1.49	0.012	0.059	0.201	4015	tags=60%, list=28%, signal=83% -->
+
 The leading edge column has three values:
   
   - tags: 38% of the genes in the gene set are key to the enrichment result.
@@ -306,12 +339,19 @@ The leading edge column has three values:
 
 #### **Challenge:** How different ranking metrics impact the output? {- .challenge}
 
-Run GSEA analysis using Hallmark gene sets with two metrics (SignaltoNoise and tTest). How do these differ in reporting enriched terms?
+Run GSEA analysis using Hallmark gene sets with two metrics (tTest and Ratio_of_Classes). What are the upregulated terms (FDR < 0.1) in the `Diff` class, based on the t-test and Ratio of Classes metrics?
 
 #### **Question ** {- .rationale}
 
-Which gene set category (or categories) offers the most valuable insights for a cell differentiation experiment?
+Why might the HALLMARK_CHOLESTEROL_HOMEOSTASIS gene set be upregulated specifically in the differentiation condition of SH-SY5Y cells in [Pezzini, et al 2016](https://pubmed.ncbi.nlm.nih.gov/27422411/) experiment?
 
+<details>
+<summary>Show</summary>
+  - Relevance: Cholesterol is essential for neuronal function and membrane fluidity, particularly in processes like axonal growth and synapse formation. Neurons have a high demand for cholesterol, especially during differentiation when they extend axons and dendrites.
+  - Possible Insight: Upregulation of genes in this set could signify that differentiating cells are actively producing or transporting cholesterol to support membrane synthesis and cellular remodeling required for mature neuronal structures.
+</details>
+
+####  {-}
 
 ## Reactome
 Reactome is an open-source database of curated biological pathways across species, offering pathway maps and enrichment tools to analyse gene lists in a pathway-focused context. It’s ideal for visualising data within established biochemical and cellular processes.
