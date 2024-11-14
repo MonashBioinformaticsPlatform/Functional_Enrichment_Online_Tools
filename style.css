@@ -1,4 +1,15 @@
 
+/* Adjust the width of the main content area */
+.book .book-body .body-inner {
+  max-width: 60%;
+  margin: auto;
+}
+
+/* Adjust the width of the left and right side columns */
+.book .book-summary {
+  width: 20%;
+}
+
 /*
 .book h1:contains("Day 1"),
 .book h1:contains("Day 2") {
