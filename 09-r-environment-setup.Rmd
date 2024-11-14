@@ -4,7 +4,7 @@ For today's session, we will be using the [R](https://www.r-project.org/) statis
 
 This will create a central place to write code, comments, run code, view and save graphics.
 
-![RStudio logo](images/rstudio_logo.png)
+![](images/rstudio_logo.png)
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -19,7 +19,7 @@ RStudio with all the required R packages for today's activities are installed on
 
 When RStudio opens, you will see empty `Console`, `History` and `Plots` panes. 
 
-![RStudio logo](images/rstudio-default-open.png)
+![](images/rstudio-default-open.png){ width=100% }
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -33,7 +33,7 @@ The `Console` contains the command prompt (`>`) which is where R commands are en
 
 &#x27A4; Test this out by copy pasting or typing the below command into your console then pressing `enter` key. This will print the path of your current working directory:
 
-```{r getwd}
+```{r getwd, echo=TRUE, eval=FALSE}
 getwd()
 ```
 
@@ -53,10 +53,11 @@ Let's put something in there:
 
 &#x27A4; Create an R variable called `name` and fill it with your name, then print it with the `cat` command:
 
-```{r my name}
+```{r my name, echo=TRUE, eval=FALSE}
 name <- 'Cali'
 cat(name)
 ```
+
 
 Note that the object `name` is now listed in the environment. 
 
@@ -66,7 +67,7 @@ Now let's see the `plots` pane in action by creating a simple dummy barplot:
 
 &#x27A4; Copy paste the below code into your console then press enter:
 
-```{r plot}
+```{r plot, echo=TRUE, eval=FALSE}
 values <- c(5, 10, 15)
 labels <- c("A", "B", "C")
 barplot(values, names.arg = labels)
@@ -90,7 +91,7 @@ Using notebooks in RStudio is a great way to save your code and comments, as wel
 
 &#x27A4; Open a new R notebook from the RStudio toolbar by selecting `File` &rarr; `New file` &rarr; `R Notebook`:   
 
-![RStudio logo](images/rstudio-new-notebook.png)
+![](images/rstudio-new-notebook.png){ width=100% }
 
 
 The new notebook opens in the `Editor` pane. It has a placeholder title and basic starting instructions. 
@@ -109,7 +110,7 @@ New code chunks can be added with the shortcut `ctrl + alt + i` or via the toolb
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; Run the demo code chunk to plot `cars`
+&#x27A4; Run the demo code chunk that was included in the new notebook to plot `cars`
 
 Note that the plot dispalys *inside* the notebook, rather than within the plot pane as we saw earlier.
 
@@ -119,7 +120,7 @@ Note that the plot dispalys *inside* the notebook, rather than within the plot p
 &#x27A4; Add a new code chunk by entering `ctrl + alt + i` and label it `barplot`. Then copy the dummy barplot code from earlier into the code chunk and run it
 
 
-```{r barplot}
+```{r barplot, echo=TRUE, eval=FALSE}
 values <- c(5, 10, 15)
 labels <- c("A", "B", "C")
 barplot(values, names.arg = labels)
@@ -205,3 +206,5 @@ Note that the code chunk label also contains the text `include=FALSE`. This prev
 Please let us know if you have any errors loading the packages :raised_hand:
 
 Don't be alarmed that the output is <span style="color: red;">red</span>! :slightly_smiling_face:
+
+Now here is a unicode smiling face: `r cat("\U0001F603")`
