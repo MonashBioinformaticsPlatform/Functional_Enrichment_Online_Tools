@@ -4,7 +4,7 @@ FEA can be easily performed for many non-model species with user friendly web to
 
 For species that are not supported by web tools, FEA is still possible with `clusterProfiler` or `WebGestaltR` in R, or with STRING. The requirements for this are a predicted proteome fasta. If you do not have a predicted proteome for your species, you would need to perform gene prediction, for which there are a number of *in silico* tools available. It must be kept in mind that *in silico* predicted proteomes can vary greatly in quality. Those that include multiple data sources such as polished genome assemblies generated with both short and long read shotgun sequencing and gene prediction that includes RNAseq data are likely to produce better gene predictions than those that are based only on for example short read sequencing. 
 
-- insert workflow diagram. 
+- **TBA:** insert workflow diagram. 
 
 
 In this activity, we will use all three tools to perform FEA on a species that has a publicly available reference genome and gene predictions, but is not currently supported by any web-based FEA tool. 
@@ -58,7 +58,7 @@ The DE results file is included in your `day_2` data folder, and we will import 
 
 ### clusterProfiler
 
-This tool can perform ORA or GSEA for any organism with the provision of custom `TERM2GENE` an `TERM2NAME` files.  `TERM2GENE` maps the species gene ID to database (eg GO, KEGG) terms, and `TERM2NAME` maps the terms to their descriptive names. 
+This tool can perform ORA or GSEA for any organism with the provision of custom `TERM2GENE` and `TERM2NAME` files.  `TERM2GENE` maps the species gene ID to database (eg GO, KEGG) terms, and `TERM2NAME` maps the terms to their descriptive names. 
 
 
 **Example TERM2GENE format:**  <!-- caption text in italics -->
@@ -68,14 +68,54 @@ This tool can perform ORA or GSEA for any organism with the provision of custom 
 
 **Example TERM2NAME format:**  <!-- caption text in italics -->
 
-![t2gene](images/axolotl-term2name.png)
+![t2name](images/axolotl-term2name.png)
 
+There are then provided to the universal enrichment functions `GSEA` and `enricher` (ORA). It is essential that the gene lists provided have the same gene IDs as those in the `TERM2GENE` file. 
+
+In RStudio, we will extract these file formats from the eggNOG annotations file for axolotl and proceed with FEA. 
+
+### WebGestaltR
+
+This tool can perform ORA or GSEA for any organism with the provision of custom `GMT` and `description` file. 
+
+The `GMT` file format is slightly different than the typical `gene set matrix transposed file format` you may have seen before. For `WebGestaltR`, the tab-delimited GMT file with `.gmt` suffix has these columns:
+
+1. Gene set ID
+2. Web link for gene set
+3. Third and sunsequent columns are genes belonging to the gene set
+
+A typical `GMT` file has the gene set description in the second column. For `WebGestaltR`, the tab delimited `description` file with `.des` suffix has these columns:
+
+1. Gene set ID
+2. Gene set description
+
+- **TBA:** - webgr file format images 
+
+**Example .gmt format:**  <!-- caption text in italics -->
+
+![webgr-gmt](images/webgr-gmt.png)
+
+
+**Example TERM2NAME format:**  <!-- caption text in italics -->
+
+![webgr-des](images/webgr-des.png)
+
+These files are then provided to the single FEA function within the package. The function has the same name as the package, `WebGestaltR`, with the parameter `enrichMethod` controlling whether ORA, GSEA or NTA is performed. 
+
+The `.gmt` file is provided to the parameter `enrichDatabaseFile` and the `.des` file is provided to the parameter `enrichDatabaseDescriptionFile`. Specifying `organism = "others"` is also required to run the FEA analysis with the custom databse files. Same as with `clsuterProfiler`, it is essential that the `.gmt` file has the same gene IDs as those in query gene list. 
+
+![webgr-others](images/webgestaltr-others-organisms.png)
+
+
+## RNotebook FEA
+
+&#x27A4; Return to RStudio and open the notebook `novel_species.Rmd`.
+
+We will now continue with the activity in RStudio, before returning here to finish up with STRING web-based analysis. 
 
 ## STRING FEA
 
-*Annotation Summary Image*  <!-- caption text in italics -->
-
-The axolotl putative proteome was previosuly uploaded to STRING and custom annotation performed:
+The axolotl putative proteome was previosuly uploaded to STRING and custom annotation performed. This completed using the STRING servers, with compute time less than one day. 
 
 
 <div style="display: flex; justify-content: space-between;">
@@ -108,3 +148,25 @@ Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`.
 &#x27A4; In the RStudio `Files` pane, locate your saved ORA gene list from earlier - `axolotl_DEGs.txt`. Clcik the file to view it in RStudio, then copy the list into the STRING `List of Names` search field, then select `SEACRH`. 
 
 Click `CONTINUE` at the gene ID review page, and then explore the results! 
+
+Clicking on the `Analysis` tab will show the enichment tables with results for GO, STRING, KEGG, Reactome, TISSUES and UniProt.
+
+Below the tables, under `Functional enrichment visualization` you can change `Category` to alter which databases results are plotted. 
+
+### How do the STRING results compare to those we generated in R? 
+
+- **TBA:** - side by side plot comparison for STRING v R one of the ORA (CP GO, CO KEGG, WGR GO, or WGR KEGG)
+
+We expect quite a bit of difference in the results because of the vast difference in annotation method. 
+
+
+
+`eggNOG emapper` appears more stringent than STRING in its similarity matches between the axolotl putative proteins and annotated orthologs. The table below compares the number of annotations yielded from the 47,196 putative axolotl proteins from both tools. 
+
+|   Method    | GO      | KEGG Pathways | All     |
+|-------|---------|---------------|---------|
+| emapper | 21,376 | 12,229        | 39,539  |
+| STRING  | 36,895 | 21,502        | 38,398  |
+
+
+This suggests that the `emapper` results may be more specific, while the `STRING` results may be more sensitive. Using both methods for your novel speciues analysis may help validate and focus your FEA findings.    
