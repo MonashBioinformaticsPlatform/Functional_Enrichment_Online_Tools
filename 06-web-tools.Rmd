@@ -91,7 +91,7 @@ Download the Hallmark gene sets ([h.all.v2024.1.Hs.symbols.gmt](https://www.gsea
 How can one use multi-GMT as custom background?
 
 <!-- ## [STRING](https://string-db.org) -->
-## FEA in STRING <a href="https://string-db.org" target="_blank"><img src="images/string-logo.png" alt="g:Profiler Logo" style="height:35px; vertical-align:middle;"></a>
+## FEA in STRING <a href="https://string-db.org" target="_blank"><img src="images/string-logo.png" alt="STRING Logo" style="height:35px; vertical-align:middle;"></a>
 
 STRING (Search Tool for the Retrieval of Interacting Genes/Proteins) is a resource for exploring protein-protein interaction (PPI) networks. It combines experimental data, predictions, and curated information to build networks that highlight functional relationships, helping to reveal shared pathways or biological processes within gene or protein lists.
 
@@ -201,7 +201,7 @@ Clusters can be downloaded in `.tsv` format.
 What was the overlap in enrichment terms between gProfiler and STRING at FDR ≤ 0.05?
 
 <!-- ## FEA in [GenePattern](https://www.genepattern.org/#gsc.tab=0) -->
-## FEA in GenePattern <a href="https://www.genepattern.org/#gsc.tab=0" target="_blank"><img src="images/GenePattern-logo.png" alt="g:Profiler Logo" style="height:35px; vertical-align:middle;"></a>
+## FEA in GenePattern <a href="https://www.genepattern.org/#gsc.tab=0" target="_blank"><img src="images/GenePattern-logo.png" alt="GenePattern Logo" style="height:35px; vertical-align:middle;"></a>
 GenePattern, an online platform developed by the Broad Institute, offers a suite of tools for analyzing and visualizing genomic data, making bioinformatics accessible to researchers through a user-friendly, no-programming interface. Among its supported tools is Gene Set Enrichment Analysis (GSEA), which implements [MSigDB GSEA](https://www.gsea-msigdb.org/gsea/index.jsp) analysis for identifying enriched gene sets in genomic data. 
 
 MSigDB (Molecular Signatures Database) is a collection of gene sets for Gene Set Enrichment Analysis, representing pathways and gene signatures linked to biological states or diseases. It helps identify enriched gene sets, aiding the analysis of gene expression changes and key pathways in experimental data.
@@ -353,6 +353,8 @@ Why might the HALLMARK_CHOLESTEROL_HOMEOSTASIS gene set be upregulated specifica
 
 ####  {-}
 
-## Reactome
+<!-- ## FEA in [Reactome](https://reactome.org/) -->
+## FEA in Reactome <a href="https://reactome.org/" target="_blank"><img src="images/reactome-logo.png" alt="Reactome Logo" style="height:35px; vertical-align:middle;"></a>
+
 Reactome is an open-source database of curated biological pathways across species, offering pathway maps and enrichment tools to analyse gene lists in a pathway-focused context. It’s ideal for visualising data within established biochemical and cellular processes.
 
