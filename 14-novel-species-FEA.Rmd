@@ -45,14 +45,16 @@ The DE results file is included in your `day_2` data folder, and we will import 
 
 ## Activity overview
 
-1. Create required axolotl database files for GO and KEGG FEA analysis with `clusterProfiler`
+1. Import `emapper` axolotl annotation file, GO ontology file and KEGG Pathways file
+2. Reformat these to create the axolotl database files required by `clusterProfiler` for GO and KEGG FEA analysis
 2. Import axolotl DE results file and extract gene lists for ORA and GSEA
-3. Run `clusterProfiler` package functions `enricher` and `GSEA`
+3. Run `clusterProfiler` universal FEA functions `enricher` and `GSEA` using custom database files
 4. Visualise `clusterProfiler` results with R plots
-5. Create required axolotl database files for GO and KEGG FEA analysis with `WebGestaltR`
-6. Run ORA and GSEA with `WebGestaltR` package function `WebGestaltR` for ORA and GSEA 
-7. Visualise `WebGestaltR` results in the output HTML report
-8. Run ORA with `STRING` online using custom axolotl annotation 
+5. Reformat the files imported at (1) to create the axolotl database files required by `WebGestaltR` for GO and KEGG FEA analysis
+6. Run ORA and GSEA with `WebGestaltR` package (function name is also `WebGestaltR`) 
+7. Visualise `WebGestaltR` results in the saved output HTML report
+8. Run ORA with `STRING` online using custom axolotl annotation
+9. Compare `STRING` ORA web results to those generated using the `emapper` annotations in R 
 
 ## R-based FEA
 

@@ -11,11 +11,21 @@ This will create a central place to write code, comments, run code, view and sav
 
 ## RStudio basics
 
-You have previosuly been provided with an RStudio VM. These have all the required R packages for today's activities.
+You have previosuly been provided with an IP address, user name and password for a VM for this workshop. Th VM runs RStudio and has all of the required R libraries for today's workshop pre-installed. 
+
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; Open the RStudio VM using the login details provided to you.
+&#x27A4; Open the RStudio VM by copying the IP address into a web browser. 
+
+When prompted, select `RStudio` from the options: 
+
+<img src="images/vm-rstudio-open.png" style="border: none; box-shadow: none; background: none;">
+
+
+
+
+
 
 - **TBA:** - inset VM screenshots and instructions
 

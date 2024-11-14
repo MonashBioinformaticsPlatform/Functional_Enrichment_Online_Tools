@@ -18,7 +18,7 @@ One of the challenges when working with `clusterProfiler` for FEA is that each e
 1. Explore the functions of `clusterProfiler` including which FEA functions support which organisms and which namespaces
 2. Load input dataset (a gene matrix with adjusted P values and log2 fold change values) 
 3. Extract the gene IDs and sort by log2 fold change to create the GSEA gene list R object
-4. Use `bitr` to convert gene IDs from ENSEMBL to ENTREZ for comptability with `gseKEGG`
+4. Use `bitr` to convert gene IDs from ENSEMBL to ENTREZ for compatability with `gseKEGG`
 5. Perform GSEA with `gseKEGG`
 6. Visualise results with `enrichplot`
 
@@ -47,7 +47,7 @@ One of the challenges when working with `clusterProfiler` for FEA is that each e
 
 ## Poll
 
-:question: What was your favourite plot? :thinking:
+❓What was your favourite R plot from this activity? 🤔
 
 This may be the one you found most informative, easiest to interpret, most eye-catching... 
 
