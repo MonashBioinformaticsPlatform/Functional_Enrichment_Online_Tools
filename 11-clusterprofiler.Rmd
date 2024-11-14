@@ -24,7 +24,7 @@ One of the challenges when working with `clusterProfiler` for FEA is that each e
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; Go back to your RStudio interface and clear your environment by selecting `Session` &rarr; `Quit session` &rarr; `Dont save` &rarr;`Start mew session`
+&#x27A4; Go back to your RStudio interface and clear your environment by selecting `Session` &rarr; `Quit session` &rarr; `Dont save` &rarr;`Start new session`
 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
