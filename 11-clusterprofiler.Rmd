@@ -1,62 +1,53 @@
 # GSEA with clusterProfiler
 
 
-[clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has inbuilt functions to run ORA (`enrich<DB>`) or GSEA (`gse<DB>`) over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as generic functions to perform ORA (`enricher`) or GSEA (`gsea`) with custom gene sets.
+[clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has functions to run ORA or GSEA over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as generic functions to perform ORA or GSEA with custom gene sets.
 
-It has a companion plotting package `enrichPlot` dedicated to plotting `clusterProfiler` results. 
+It has a companion plotting package [enrichplot](https://www.bioconductor.org/packages/release/bioc/html/enrichplot.html) dedicated to plotting enrichment results. 
 
 The `clusterProfiler` user guide can be found [here](https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf). 
 
 The `enrichplot` user guide can be found [here](https://www.bioconductor.org/packages/devel/bioc/manuals/enrichplot/man/enrichplot.pdf). 
 
+One of the challenges when working with `clusterProfiler` for FEA is that each enrichment function has different supported organisms and different namespace requirements, so you can not necessarily use all of the functions over the same gene list. In this activity, we will review the FEA functions and investigate their requirements, before performing a gene ID conversion with the `bitr` function to enable compatability with our ([Pezzini et al 2016](https://link.springer.com/article/10.1007/s10571-016-0403-y)) dataset. 
 
-## Input data 
-
-We will use the same RNAseq dataset from the previous activity ([Pezzini et al 2016](https://link.springer.com/article/10.1007/s10571-016-0403-y)).
-
+<p>&nbsp;</p>  <!-- insert blank line -->
 
 ## Activity overview
 
-** THINKING TO DROP GSEGO ENTIERLY, AND JUST DO GESKEGG 
+1. Explore the functions of `clusterProfiler` including which FEA functions support which organisms and which namespaces
+2. Load input dataset (a gene matrix with adjusted P values and log2 fold change values) 
+3. Extract the gene IDs and sort by log2 fold change to create the GSEA gene list R object
+4. Use `bitr` to convert gene IDs from ENSEMBL to ENTREZ for comptability with `gseKEGG`
+5. Perform GSEA with `gseKEGG`
+6. Visualise results with `enrichplot`
 
-PAT A:  A REVIEW OF SUPPORTED DBS, DIFFERENT SUPPORTED ORGANISMS AND NAMESPACES DEPENDING ON DB, AND HOW TO FIND OUT WHAT IS REQUIRED/APPLICABLE PER EACH FUNCTION
-PART B -  GSEKEGG WHICH REQUIRES A GENE ID CONVERSION USIN GBITR, THEN RUN GSEA, THEN SOME PPLOTS
-PART C - INCLUDE HERE OR IN NOTEBOOK 4 - TERM2GENE AND TERM2NAME
+<p>&nbsp;</p>  <!-- insert blank line -->
 
-REASON: GO IS DONE TO DEATH, AND THE TRICK OF THIS PACKAGE IS THAT EACH FUNCTION HAS ITS OWN LIST OF SUPPORTED SPECIES AND NAMESPACES DEPENDING ON THE DATABASE, THE PDF IS NOT SUPER CLEAR ON WHICH IS WHICH. 
-
-WOULD LIKE MORE TIME TO DO THE TERM2GENE ADN TERM2NAME AS MANY APPLICANTS MENTIONED THIS EITHER INDIRECTLY VIA REQUEST FOR NON MODEL OR DIRECTLY. 
-
-1. Load input dataset (a gene matrix with adjusted P values and log2 fold change values) 
-2. Extract the gene IDs and sort by log2 fold change to create the GSEA gene list
-3. Use the `gseGO` function to run GSEA over GO MF
-4. Visualise GO results with `enrichplot`
-5. Use `bitr` to convert gene IDs then use the `gseKEGG` function to run GSEA over KEGG
-6. Visualise KEGG results with `enrichplot`
-7. Review  `enricher` and `gsea` generic functions to perform ORA and GSEA
+&#x27A4; Go back to your RStudio interface and clear your environment by selecting `Session` &rarr; `Quit session` &rarr; `Dont save` &rarr;`Start mew session`
 
 
-&#x27A4; Refresh your Rstudio workspace with option 1 or option 2
+<p>&nbsp;</p>  <!-- insert blank line -->
 
-***Option 1: close and re-open RStudio***
+&#x27A4; Open the `clusterProfiler.Rmd` notebook using `File` &rarr; `Open file`, or use the keyboard shortcut `ctrl + o`. 
 
-Close RStudio, and if asked `Save workspace image to ~/R.Data?` select `Don't Save`. Then, re-open RStudio. 
 
-***Option 2: manualy clear environment and history***
+**Instructions for the analysis will continue from the notebook.**
 
-Close the Rmd file, clear the command history by selecting the broom icon in the history pane, then clear all objects from the environment by entering the following R command in the console:
-
-```{r}
-rm(list = ls())
-```
-
-&#x27A4; Open the `clusterProfiler.Rmd` notebook in RStudio
-
-**Instructions and information for the rest of this activity will continue from the notebook.**
-
+<p>&nbsp;</p>  <!-- insert blank line -->
 
 ## End of activity summary
 
+- We have explored the supported organisms and namespaces of the `clusterProfiler`enrichment functions 
+- We have extracted a ranked gene list for GSEA and converted the gene IDs for compatability with `gseKEGG`
+- We have performed GSEA on the KEGG database with `gseKEGG` and visualised the results with multiple plot types 
+- We have captured all version details relevant to the session within the R notebook
 
+<p>&nbsp;</p>  <!-- insert blank line -->
 
+## Poll
+
+:question: What was your favourite plot? :thinking:
+
+This may be the one you found most informative, easiest to interpret, most eye-catching... 
 

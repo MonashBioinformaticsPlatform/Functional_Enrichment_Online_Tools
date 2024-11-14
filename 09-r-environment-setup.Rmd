@@ -168,7 +168,7 @@ Saving the workspace image saves all objects from the session such as your varia
 
 Now that we have a clear workspace, we will prepare for the first analysis activity by opening the notebook and checking our working directory. 
 
-You have previosuly downloaded an unzipped `Functional_enrichment_workshop_2024`. This contains a folder `day_2`. 
+You have previosuly downloaded `Functional_enrichment_workshop_2024`. This contains a folder `day_2`. 
 
 &#x27A4; On the `Files` pane, open the `day_2` folder and confirm that it contains the input data file `Pezzini_DE.txt`
 
@@ -194,12 +194,14 @@ Scroll down to the code chunk labelled `Load input data`. Note that the filepath
 
 Immediately above the `Load input data` is a code chunk labelled `Load R packages`. This contains all of the R packages required to run the analysis contained within the workbook. Loading all required packages within the notebook, rather than directly via the console, ensures that anyone running your notebook does not encounter errors if they forget to load a required package. 
 
-Note that the packages that are loaded to the session with the R `library` command must first be installed; this has already been been done for you on these VMs. Attempts to load a package that is not installed will meet a fatal error, and installation can then be peformed (not difficult in R) before resuming.
+Note that the packages that are loaded to the session with the R `library` command must first be installed; this has already been been done for you on these VMs. Attempts to load a package that is not installed will produce an error, and installation can then be peformed (not difficult in R) before resuming.
 
-Note that the code chunk label also contains the text `include=FALSE`. This prevents the loading of libraries, which can at times have verbose output, from cluttering up your rendered notebook when it is previewed or knit. 
+Note that the code chunk label also contains the text `include=FALSE`. This prevents the loading of libraries (which can at times have verbose output) from cluttering up your rendered notebook when it is previewed or knit. 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 &#x27A4; Run the `Load R packages` code chunk. 
 
-Please let us know if you have any errors loading the packages. Don't be alarmed that the output is red! :relaxed:
+Please let us know if you have any errors loading the packages :raised_hand:
+
+Don't be alarmed that the output is <span style="color: red;">red</span>! :slightly_smiling_face:
