@@ -74,6 +74,8 @@ There are then provided to the universal enrichment functions `GSEA` and `enrich
 
 In RStudio, we will extract these file formats from the eggNOG annotations file for axolotl and proceed with FEA. 
 
+Acknowledgement to [Armin Dadras](https://github.com/dadrasarmin) for sharing his [code](https://github.com/dadrasarmin/enrichment_analysis_for_non_model_organism]) to extract `TERM2GENE` and `TERM2NAME` from `emapper` output. 
+
 ### WebGestaltR
 
 This tool can perform ORA or GSEA for any organism with the provision of custom `GMT` and `description` file. 
