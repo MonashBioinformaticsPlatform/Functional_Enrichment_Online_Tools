@@ -358,26 +358,3 @@ Why might the HALLMARK_CHOLESTEROL_HOMEOSTASIS gene set be upregulated specifica
 
 Reactome is an open-source database of curated biological pathways across species, offering pathway maps and enrichment tools to analyse gene lists in a pathway-focused context. It’s ideal for visualising data within established biochemical and cellular processes.
 
-Some content with emojis:
-
-- ❓ What do you think about this question?
-
-- 🤔 I'm thinking about how to solve this.
-
-
-
-With the Logo:
-
-Option 1
-
-![RStudio Logo](images/rstudio_logo.png)
-
-
-
-Option 2:
-
-```{r, echo=FALSE, fig.align = "left", fig.cap="RStudio Logo"} 
-knitr::include_graphics("images/rstudio_logo.png")
-```
-
-
