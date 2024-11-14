@@ -1,6 +1,10 @@
 bookdown::bs4_book:
   css: style.css
+  # includes:
+  #   in_header: custom-header.html
   # before_body: custom.js
+  # includes:
+  #   in_header: custom.js
   theme:
     primary: "#1D0F81"
   repo: https://github.com/MonashBioinformaticsPlatfor/Functional_Enrichment_BioCommons_2024

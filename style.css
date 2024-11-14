@@ -1,12 +1,12 @@
-/*
-table {
-  max-width: 500px;
-  border-spacing: 0px;
-  width: auto;
-}
 
-th, td {
-  padding: 2px 5px;
+/*
+.book h1:contains("Day 1"),
+.book h1:contains("Day 2") {
+    font-size: 2.5em;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
 }
 */
 

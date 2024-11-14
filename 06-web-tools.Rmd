@@ -116,7 +116,7 @@ NOTE: In cases where long list of features is provided, STRING may chnage some o
 STRING generates multiple tabs as output, shown here:
 
 <!-- ![](images/string-results-tabs.png){ width=100% } -->
-```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Results tabs in STRING"} 
+```{r, echo=FALSE, eval=TRUE, out.width="100%", fig.align = "center", fig.cap="Results tabs in STRING"} 
 #  out.width="50%",
 knitr::include_graphics("images/string-results-tabs.png")
 ```
@@ -337,7 +337,7 @@ The leading edge column has three values:
   - signal: They contribute 40% of the enrichment signal, highlighting their importance in driving the association between this gene set and the biological phenotype being studied.
 
 
-#### **Challenge:** How different ranking metrics impact the output? {- .challenge}
+#### **Challenge:** How do different ranking metrics impact the output? {- .challenge}
 
 Run GSEA analysis using Hallmark gene sets with two metrics (tTest and Ratio_of_Classes). What are the upregulated terms (FDR < 0.1) in the `Diff` class, based on the t-test and Ratio of Classes metrics?
 
@@ -357,4 +357,11 @@ Why might the HALLMARK_CHOLESTEROL_HOMEOSTASIS gene set be upregulated specifica
 ## FEA in Reactome <a href="https://reactome.org/" target="_blank"><img src="images/reactome-logo.png" alt="Reactome Logo" style="height:35px; vertical-align:middle;"></a>
 
 Reactome is an open-source database of curated biological pathways across species, offering pathway maps and enrichment tools to analyse gene lists in a pathway-focused context. It’s ideal for visualising data within established biochemical and cellular processes.
+
+Some content with emojis:
+
+- ❓ What do you think about this question?
+
+- 🤔 I'm thinking about how to solve this.
+
 
