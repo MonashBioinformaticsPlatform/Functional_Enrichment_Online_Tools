@@ -1,0 +1,1033 @@
+---
+title: "Non-model species functional enrichment analysis"
+output:
+  html_document:
+    df_print: paged
+    self_contained: false
+---
+
+
+
+
+THOUGHTS - instead of doing GO and KEGG, just do GO, but do it for the manual annotation and compare to the STRING annotation. 
+
+
+
+```{r  Load libraries, include=FALSE }
+# for readTSV
+library(readr)
+
+# for %>% syntax and GSEA
+library(dplyr)
+
+# for extracting ontology from go.obo
+library(ontologyIndex)
+
+# required for drop.na()
+library(tidyverse)
+
+library(DESeq2)
+library(clusterProfiler)
+
+# upset plot
+library(enrichplot) # gsea plot
+library(ggupset)
+
+```
+
+
+# Non-model species
+
+## Options for species with the right annotation resources
+
+FEA can be easily performed for many non-model species with user friendly web tools (eg g:Profiler) or R packages. For clusterProfiler, organisms with the required annotations can be analysed using the convenient tools enrichGO, enrichKEGG, gseGO, gseKEGG etc. If a species is listed on [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html), they can be analysed online or with clusterProfiler using enrichKEGG or gseKEGG. To use enrichGO or gseGO, an [Org.db annotation package](https://bioconductor.org/packages/3.19/data/annotation/) is required. 
+
+## What options are available if your species does not have either of these two resources? 
+
+If you have performed an in-house genome assembly or are working with an understudied species, it is unlikely/impossible that your species will have the required annotations and thus your options for performing FEA become limited. How frustrating, given that you are already faced with numerous challenges working with an under-resourced species!
+
+This is where the flexibility of R can help, in particular clusterProfiler which has some generic functions for ORA (function 'enricher') and GSEA (function 'GSEA') that allow you to input your own annotation database in the form of two complimentary files, 'TERM2GENE' (maps your specific organism gene IDs to annotation IDs) and 'TERM2NAME' (maps those annotation IDs to descriptive names, eg GO term 'GO:0003676' is mapped to name 'nucleic acid binding'. These sound complicated but are simply 2-column text files. 
+
+The gene names are flexible - they do not have to conform to any specific gene ID namespace. In order to obtain the functional annotations, you may need to run the annotation yourself with tools such as eggNog emapper, which will provide annotations against GO, KEGG and a number of other databases. In order to run the annotation, you of course need a genome assembly and gene prediction GTF/GFF file. You can then filter the annotation output for the correct fields (ie organisms-specific gene ID and annotation ID) in order to create the 'TERM2GENE' file. 
+
+To create 'TERM2NAME', you then use the relevant database to create a text file with the annotation IDs detected in your organism to the annotation names. 
+
+For KEGG, we don't actually need to use a `TERM2NAME` file if we can map KEGG ortology IDs to our genes. We can then use `enrichKEGG` and `gseKEGG` :-) 
+
+# Axolotl functional enrichment analysis
+
+## Background 
+
+The axolotl (Ambystoma mexicanum) is a salamander with some very cool abilities: it can regenerate damaged or amputated tissue, including spinal cord and some brain regions. While this species has reference genome on NCBI, it is not annotated. There is no Org.db nor does this species exist in KEGG Organisms. There is however an [axolotl genome browser](https://www.axolotl-omics.org/) where you can download a (slightly less contiguous than the NCBI version) reference genome plus a (non-curated) GTF file.
+
+Despite the lack of quality resources, there is much 'omics work conducted in axolotl due to its regenerative capabilities.
+
+Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5419050/#SD7) from axolotl, comparing gene expression in the blastema after proximal (at the shoulder) and distal (at the hand) limb amputation. The blastema is a collection of undifferentiated progenitor cells that give rise to the regenerated limb. Hopefully, our functional enrichment analysis of differentially expressed genes can help us understand what tells the blastema to grow into a full limb or just a hand! 
+
+### Raw data sources
+
+- [Reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz)
+- [GTF file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz)
+- [Raw fastq](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA300706)
+- [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obohea)
+
+
+### Data pre-processing
+
+The reference genome was annotated with emapper and GO and KEGG IDs extracted to create required database files. The raw reads were trimmed with bbduk and aligned to the reference genome with STAR. Feature counting was performed with HTSeq-counts and formatted into a counts matrix. Differential gene expression analysis was performed with DESeq2, filtering for genes with at least a count of 10 in at least 2 samples. The DESeq2 results file is included in your 'day_2' folder for input into this Notebook. We will extract our gene lists from here.  
+
+
+## Load input genes
+
+
+```{r}
+knitr::opts_knit$set(root.dir = "Functional_enrichment_workshop_2024/day_2")
+
+# to set irectory in your console, copy paste below and run i console directly:
+# setwd("Functional_enrichment_workshop_2024/day_2")
+```
+
+
+
+```{r}
+de_matrix <- read_tsv("axolotl_DE_results.txt", col_names = TRUE, show_col_types = FALSE)
+
+head(de_matrix)
+
+
+```
+
+
+```{r create gene lists}
+
+#  Extract DEGs 
+degs <- de_matrix %>%
+  filter(padj < 0.01 & abs(log2FoldChange) > 1.5) %>%
+  pull(geneID)  # Extract gene IDs as a vector
+
+# Extract the background gene list
+background <- de_matrix %>%
+  pull(geneID)  # Extract all gene IDs as a background vector
+
+# Create the ranked gene vector for GSEA
+ranked <- setNames(de_matrix$log2FoldChange, de_matrix$geneID) %>% sort(decreasing = TRUE)  # Named vector
+
+# Check the results
+length(degs)         # Number of DEGs
+length(background)   # Number of background genes
+head(ranked)  # Preview of the ranked vector
+
+```
+
+
+
+## Prepare custom database files 
+
+### Load axolotl eggNOG annotation file
+
+This file was produced by running the `eggNOG emapper` tool over the axolotl proteome. It contains annotations against GO, KEGG anda handful of other databases. We will extract the GO and KEGG IDs to `TERM2GENE` files for `clsuterProfiler`. The "TERM" is the GO or KEGG ID, and the "GENE" is the gene/transcript ID used in your proteome. Note that the same gene/transcript IDs must also have been provided when running feature counting and differential expression analysis. 
+
+
+
+```{r Load eggnog annotation}
+
+eggnog_anno <- read_tsv("AmexG_v6.0-DD.emapper.annotations.txt", show_col_types = FALSE) 
+head(eggnog_anno)
+```
+
+
+### Create TERM2GENE files
+
+These are 2 column text files with the term ID (one per line) alongside the ID of the gene that maps to the term. A gene can map to many terms and thus be present on multiple lines. A term can be mapped to more than one gene and thus be present on many lines.
+
+#### KEGG
+
+```{r KEGG TERM2GENE}
+
+# Extract KEGG IDs from eggNOG annotation file to correct format for clusterProfiler
+
+kegg_term2gene <- eggnog_anno %>%
+    dplyr::select(KEGG_ko, `#query`) %>%
+    dplyr::filter(KEGG_ko != "-") %>%
+    separate_rows(KEGG_ko, sep = ",") %>%
+    dplyr::mutate(gene = gsub("\\..*", "", `#query`)) %>%
+    dplyr::mutate(term = gsub("ko:", "", KEGG_ko)) %>%
+    dplyr::select(term, gene) %>%
+    distinct() %>%
+    drop_na()
+
+
+```
+
+```{r view kegg }
+head(kegg_term2gene)
+```
+
+
+** changing to kegg pathways! *** 
+
+
+
+```{r}
+# Extract KEGG MAP IDs from eggNOG annotation file to correct format for clusterProfiler
+
+keggP_term2gene <- eggnog_anno %>%
+    dplyr::select(KEGG_Pathway, `#query`) %>%  # Select the relevant columns
+    dplyr::filter(grepl("map", KEGG_Pathway)) %>%  # Keep only rows where KEGG_Pathway contains 'map'
+    separate_rows(KEGG_Pathway, sep = ",") %>%  # Split multiple pathways into separate rows
+    dplyr::mutate(gene = gsub("\\..*", "", `#query`)) %>%  # Clean up gene IDs by removing version numbers
+    dplyr::mutate(term = gsub("map:", "", KEGG_Pathway)) %>%  # Remove the "map:" prefix
+    dplyr::filter(grepl("^map", term)) %>%  # Filter again to make sure we only have map pathways (after removing "map:")
+    dplyr::select(term, gene) %>%  # Select the pathway (term) and gene columns
+    distinct() %>%  # Remove duplicate rows
+    drop_na()  # Remove rows with missing values
+
+# View result to check
+head(keggP_term2gene)
+
+```
+
+
+#### GO
+
+```{r GO TERM2GENE}
+
+# Extract KEGG IDs from eggNOG annotation file to correct format for clusterProfiler
+
+go_term2gene <- eggnog_anno %>%
+    dplyr::select(GOs, `#query`) %>%
+    dplyr::filter(GOs != "-") %>%
+    separate_rows(GOs, sep = ",") %>%
+    mutate(gene = gsub("\\..*", "", `#query`)) %>%
+    dplyr::select(GOs, gene) %>%
+    distinct() %>%
+    drop_na()
+
+# Renaming columns to match desired output format
+colnames(go_term2gene) <- c("term", "gene")
+
+```
+
+```{r view go}
+head(go_term2gene)
+
+```
+
+### TERM2NAME 
+
+#### GO
+
+The 'core' gene ontology database file [`go.obo`](https://purl.obolibrary.org/obo/go.obo) has been downloaded and included in your working directory. This will enable us to assign GO names to all of the GO IDs within our axolotl 'TERM2GENE' file.  
+
+```{r GO TERM2NAME}
+
+infile <- "go.obo"
+
+ontology <- get_ontology(file = infile,
+                         propagate_relationships = "is_a",
+                         extract_tags = "everything",
+                         merge_equivalent_terms = TRUE)
+
+
+# Create term to name table, removing duplicates, missing values and obsolete terms 
+go_term2name <- go_term2gene %>%
+    mutate(name = ontology$name[term]) %>%
+    dplyr::select(term, name) %>%
+    distinct() %>%
+    drop_na() %>%
+    filter(!grepl("obsolete", name))
+
+
+
+# Write to a file
+write_tsv(go_term2name, "Amex_term2name_GO.tsv")
+
+# Show the first few lines
+head(go_term2name)
+
+```
+
+
+
+Now print the number of GO terms found within the genome, and the number of genes with GO annotations
+
+```{r report GO annotation counts}
+
+total_terms<-nrow(go_term2gene)
+print(paste("Number of annotation terms:", total_terms))
+
+unique_genes <- length(unique(go_term2gene$gene))
+print(paste("Number of genes with 1 or more annotation terms:", unique_genes))
+
+```
+
+
+
+
+
+#### KEGG PATHWAYS
+
+
+The KEGG `map` pathway list was downloaded from https://rest.kegg.jp/list/pathway and saved to your `day_2` folder. It was available to download in the correct format for `TERM2NAME`
+
+
+```{r KEGG TERM2NAME}
+# Load the KEGG pathways file
+keggP_term2name <- read.table("kegg_pathways_2024-11-13.txt", header = FALSE, sep = "\t", col.names = c("term", "name"))
+
+# View 
+head(keggP_term2name)
+```
+
+
+
+
+
+
+### Annotated background genes
+
+
+We know that we have 24,419 background genes, and 21,373 genes annotated with GO terms. How many of our background genes are annotated? 
+
+
+```{r report GO annotation percentages}
+
+
+# Filter the term2gene table to only include genes in the background gene list
+filtered_term2gene <- go_term2gene %>% filter(gene %in% background)
+
+# Count the number of unique background genes with at least one GO term
+unique_genes_with_anno <- filtered_term2gene %>% distinct(gene) %>% nrow()
+
+# Calculate the percentage of background genes that have GO annotations
+percent_annotated_filtered <- (unique_genes_with_anno / length(background)) * 100
+
+# Print results
+cat("Number of background genes with GO annotations:", unique_genes_with_anno, "(",percent_annotated_filtered,"%)\n")
+
+
+```
+
+
+How does that compare to the number of genes genome-wide? From the axolotl gene prediction file downloaded from www.axolotl-omics.org, there were 99,088 predicted gene models! In order to annotate these with eggnog emapper and STRING, a proteome was made to include all predicted coding sequences, restricting to a single isoform per gene, and this was a total of 48,115 predicted proteins. 
+
+So the annotation percentages are:
+
+- based on genome-wide gene predictions: 21.6%
+- based on predicted coding sequence: 48.6% 
+- based on genes that were expressed within the tissue: 61.7% 
+
+
+
+This highlights a major caveat when performing FEA on non-model species: the results are only as good as the annotations behind them. Therefore, all results must be interpreted with caution. For many non-model species, there are little opportunities (at present) to improve the annotation. Some in-silico predicted genes appear to be highly expressed and significantly regulated yet have no significant similarity to anything in the non-redundant nucleotide or protein databases. When working with datasets like this, it is critical to explore those individual genes through other methods, in addition to trying to garner some higher level overview such as we aim to obtain from FEA. Hopefully, recent advances in AI protein modelling can help provide insights into the functions of these novel genes. 
+
+For the axolotl with only 22% of predicted genes annotated, its clear that the in-silico gene predictions within the GTF file require much curation! 
+
+
+
+### ORA (GO)
+
+#### Create input list for ORA
+
+We have filtered our DEGs to include genes with P.adj < 0.01  and log2 fold change greater than |2|. 
+
+How many of these are annotated?  Genes that have no annotations provide no meaning to the functional enrichment analysis so must be excluded
+
+```{r count annotated DEGs }
+
+# Extract the gene IDs from the term2gene file
+annotated_genes <- go_term2gene$gene
+
+# Find significant genes that have annotations
+annotated_degs <- degs[degs %in% annotated_genes]
+
+# Percentage of DEGs that are annotated
+pc <-  round((length(annotated_degs) / length(degs)) * 100, 1)
+
+# Print the result
+cat("Number of DEGs at 5% threshold:", length(degs), "\nNumber of DEGs annotated with GO terms:", length(annotated_degs), "(",pc,"%)\n")
+
+```
+This is quite a bit  lower than the percentage of background genes with GO annotations, which was 61.7%. What are these 41% of clearly important (dysregualted) genes that were not annotated by DIAMOND similarity search against the GO database? This is the problem with novel species analysis - you must keep in mind that there is a fair bit of data loss, and other investigations are warranted!
+
+
+
+
+
+#### Run ORA
+
+Now that we have our input gene lists and our required `TERM2GENE` and `TERM2NAME` files, we can run FEA on axolotl! 
+
+The `enricher` functon has a number of significance thresholds you can apply. 
+
+Tests must pass i) pvalueCutoff on unadjusted pvalues, ii) pvalueCutoff on adjusted pvalues and iii) qvalueCutoff on qvalues to be reported. With identical cutoff values used for both pvalueCutoff (since pAdjustMethod = "BH", these are thus FDR values) and qvalueCutoff, you effectively will always filter on BH adjusted p-values and NOT q-values, because the BH procedure generates more conservative FDR than Storey's qvalue approach. If you would like to filter on qvalue, set pAdjustMethod = "none".
+
+```{r GO ORA }
+
+# Perform ORA with clusterProfiler's 'enricher' function 
+
+go_ora <- enricher(
+  gene = degs,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  universe = background,
+  minGSSize = 10,
+  maxGSSize = 500,
+  TERM2GENE = go_term2gene,
+  TERM2NAME = go_term2name
+)
+
+# view result summary
+go_ora
+
+```
+
+91 significantly enriched terms at P.adj < 0.05. 
+
+Note that we used the gene list object `degs` which had 247 genes, but the tool has applied the input size as 145 - this is because it is automatically discarding any that do not have annotations. Results would be the same if we instead used `annotated_degs` object. Likewise, the background size is being reported as 15072 (the number annotated) not 24,419 (the total in background list). 
+
+
+
+Save the results to a text file:
+
+
+```{r save ORA table}
+
+output_file <- "axolotl_GO_ORA_results.tsv"
+write.table(go_ora, file = output_file, sep = "\t", quote = FALSE, row.names = FALSE)	
+
+	
+```
+
+
+
+
+#### Dotplot GO ORA 
+
+```{r}
+
+# Create plot with dynamic title
+p <- dotplot(
+  go_ora,
+  x = "geneRatio",
+  color = "p.adjust",
+  orderBy = "x",
+  showCategory = 15,
+  font.size = 8
+  ) +
+  ggtitle("ORA enrichment of DEGs Padj < 0.01 FC > |1.5|, db = GO")
+    
+# Add annotations (number of input genes and number of input genes with GO terms)
+num_genes <- length(degs)
+genes_with_GO_terms <- sum(degs %in% go_term2gene$gene)
+
+    
+# Print the plot with custom sub-title
+p <- p + labs(subtitle = paste("Genes:", num_genes, "| Genes with GO terms:", genes_with_GO_terms))
+print(p)
+
+```
+
+Showing the number of DEGs that were actually annotated and included in the FEA is very important for novel species, where the annotation quality may (probably is) low. In this case, we need to keep in mind that 102 of the DEGs were not included in the analysis! These may be very interesting genes, and it is up to you as the researcher to investigate those genes to determine their importance through other means. 
+
+
+
+#### Upset plot GO ORA
+
+And an upset plot - to show the shared genes among the enriched terms (since a gene can belong to multiple terms or pathways)
+For over-representation analysis, upsetplot will calculate the overlaps among different gene sets. For GSEA, it will plot the fold change distributions of different categories (e.g. unique to pathway, overlaps among different pathways).
+
+```{r upset plot}
+
+# n = the number of top enrichments to plot
+upsetplot(go_ora, n = 10)
+
+```
+
+
+#### Bar plot GO ORA
+
+```{r}
+barplot(go_ora, 
+        drop = TRUE, 
+        showCategory = 15, 
+        title = "ORA enrichment of DEGs Padj < 0.01 FC > |1.5|, db = GO",
+        font.size = 8)
+```
+
+#### emapplot GO ORA
+
+The encrichment map organizes enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
+
+To run this function, we first need to calculate pairwise similarities between the enriched terms with function `pairwise_termsim`. 
+
+
+
+```{r emapplot }
+# calculate pairwise similarities between the enriched terms
+go_ora <- pairwise_termsim(go_ora)
+
+# plot
+emapplot(go_ora, showCategory = 15)
+
+```
+
+From here: https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html 
+
+"Both the barplot() and dotplot() only displayed most significant or selected enriched terms, while users may want to know which genes are involved in these significant terms. In order to consider the potentially biological complexities in which a gene may belong to multiple annotation categories and provide information of numeric changes if available, we developed the cnetplot() function to extract the complex association. The cnetplot() depicts the linkages of genes and biological concepts (e.g. GO terms or KEGG pathways) as a network. GSEA result is also supported with only core enriched genes displayed."
+
+cnetplot: https://rdrr.io/bioc/enrichplot/man/cnetplot.html 
+
+
+```{r cnetplot}
+# cex_label_gene to reduce the font size for gene ID
+# colorEdge adds the coloured legend and network bars 
+
+cnetplot(go_ora, showCategory = 15, node_label = "category")
+```
+
+
+
+
+
+
+
+
+#### Tree plot GO ORA
+
+```{r}
+treeplot(go_ora, showCategory = 15, color = "p.adjust")
+```
+
+
+
+#### What is the biological meaning here?
+
+I was expecting to see growth factors, regulatory genes and morphogens. We are seeing enrichment for things we already know are involved in limb and skin formation. It may be that the genes regulating this patterning in axolotl are some of those novel genes (not annotated to any GO terms), or that this was completely the wrong experiment type :-) It was a dummy experiment contrived from public data where the results were generated for genome assembly purposes, and not an actual DE study, so please don't read into the actual resutls too much :-) 
+
+
+### GSEA (GO)
+
+
+#### Run GSEA
+
+Any more params to add here?! 
+
+```{r GO GSEA}
+go_gsea <- GSEA(
+  geneList = ranked, 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  TERM2GENE = go_term2gene, 
+  TERM2NAME = go_term2name, 
+  seed = 1234, 
+  by = "fgsea"
+)
+
+```
+
+```{r}
+head(go_gsea)
+```
+
+
+
+
+#### Plot GSEA
+
+gsea-specific:
+ridgeplot
+gseaplot
+
+for ora or gsea:
+
+dotplot
+upsetplot
+emapplot
+treeplot
+heatplot
+cnetplot
+
+for ora only (weirdly):
+barplot
+
+
+
+
+## KEGG enrichment 
+
+We have already amde the KEGG `TERM2GENE` file earlier. 
+
+```{r }
+head(keggP_term2gene)
+head(keggP_term2name)
+```
+
+Now print the number of KEGG IDs found within the genome, and the number of genes with KEGG annotations
+
+```{r report KEGG annotation counts}
+
+total_terms_kegg<-nrow(kegg_term2gene)
+print(paste("Number of annotation terms:", total_terms_kegg))
+
+unique_genes_kegg <- length(unique(kegg_term2gene$gene))
+print(paste("Number of genes with 1 or more annotation terms:", unique_genes_kegg))
+
+```
+Slightly lower than GO which had 21,373. 
+
+
+How many background genes and DEGs have KEGG annotation?
+
+```{r}
+
+kegg_annotated_degs <- kegg_term2gene %>%
+    dplyr::filter(gene %in% degs) %>%
+    dplyr::pull(term) %>%
+    unique() 
+
+
+
+paste0("Number of DEGs annotated with KEGG: ", length(kegg_annotated_degs))
+
+
+```
+Slightly more than GO, which had 145!
+
+
+```{r}
+# Filter the term2gene table to only include genes in the background gene list
+filtered_kegg_term2gene <- kegg_term2gene %>% filter(gene %in% background)
+
+# Count the number of unique background genes with at least one GO term
+unique_genes_with_kegg_anno <- filtered_kegg_term2gene %>% distinct(gene) %>% nrow()
+
+# Calculate the percentage of background genes that have GO annotations
+percent_kegg_annotated_filtered <- (unique_genes_with_kegg_anno / length(background)) * 100
+
+# Print results
+cat("Number of background genes with KEGG annotations:", unique_genes_with_kegg_anno, "(",percent_kegg_annotated_filtered,"%)\n")
+
+```
+Quite similar overall to GO. 
+
+
+
+### Enrichment using KEGG orthology IDs
+
+For KEGG, we can use the KEGG ortholog IDs (ko), which are part of the KEGG pathway database, and specify `organism = "ko"`. For this method, we don't need `TERM2NAME` as `clusterProfiler` is equipped to read the KEGG ortholog IDs. HOWEVER, there is loss of data here, as a KEGG term that is represented by many genes in this DEGs list is collapsed into one representation of the KEGG term, so the import of that term will be underestimated!!
+
+```{r get kegg ora lists}
+
+
+degs_kegg <- kegg_term2gene %>%
+  dplyr::filter(gene %in% degs) %>%  # Filter for DEGs present in kegg_term2gene
+  dplyr::pull(term)   # Extract all KEGG pathway IDs (including duplicates)
+
+background_kegg <- kegg_term2gene %>%
+  dplyr::filter(gene %in% background) %>%  # Filter for background genes present in kegg_term2gene
+  dplyr::pull(term)   # Extract all KEGG pathway IDs (including duplicates)
+  
+head(degs_kegg)
+tail(degs_kegg)
+length(degs_kegg)
+length(background_kegg)
+length(unique(degs_kegg))
+length(unique(background_kegg))
+
+```
+
+
+
+```{r run kegg ora }
+
+kegg_ora <- enrichKEGG(degs_kegg,
+           organism = "ko",
+           keyType = "kegg",
+           pvalueCutoff = 0.05,
+           pAdjustMethod = "BH",
+           universe = background_kegg,
+           minGSSize = 10,
+           maxGSSize = 500,
+           qvalueCutoff = 0.05,
+           use_internal_data = FALSE)
+
+kegg_ora
+```
+
+```{r}
+barplot(kegg_ora, 
+        drop = TRUE, 
+        showCategory = 20, 
+        title = "ORA enrichment - DEGs Padj < 0.01 FC > |1.5|, db = KEGG genes",
+        font.size = 8)
+```
+
+With the  `TERM2GENE` and `TERM2NAME` method, we don't have to convert the input gene list to different IDs, so we aren't dropping many axolotl gene IDs into one KEGG term. This will change the results, hopefully for the better! 
+
+Since we  are using our gene list with axolotl gene IDs, we use the generic `enricher` function with `TERM2GENE` and `TERM2NAME` files we made against KEGG Pathway (map) IDs. `enricher` runs ORA, and `GSEA` runs GSEA, instead of say `enrichKEGG` and `gseKEGG`. 
+
+
+```{r kegg pathways ora}
+
+keggP_ora <- enricher(
+  gene = degs,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  universe = background,
+  minGSSize = 10,
+  maxGSSize = 500,
+  TERM2GENE = keggP_term2gene,
+  TERM2NAME = keggP_term2name
+)
+
+
+keggP_ora
+```
+
+
+11 enrichments, only 80 genes annotated to KEGG pathways, and 8000 background genes annotated to pathways. This is fewer inputs that with the previous method (108 KO IDs in degs_kegg) and more background (8000 vs 5164). 
+
+There are 7 shared terms, so that's a reassurance! 
+
+```{r}
+
+barplot(keggP_ora, 
+        drop = TRUE, 
+        showCategory = 20, 
+        title = "ORA enrichment - DEGs Padj < 0.01 FC > |1.5|, db = KEGG pathways",
+        font.size = 8)
+```
+
+
+#### KEGG subsription access to data downloads 
+
+KEGG FTP access requires an academic subscription, for which I could not obtain the free version, as I would not be the "only user of the KEGG FTP Data". The pathways list was available freely. As a single user, you can request academic access here https://www.pathway.jp/en/academic.html and adapt this code to extract the IDs of your choice for example TERM2NAME from KO IDs rather than map IDs as we have done here. 
+
+Given the restrictions, we will continue with the pathway mappings for the `TERM2NAME` and `TERM2GENE` method, which is preferable here as it does not pose the same issues with gene:name duplicate records as the `organisms="ko"` method does. 
+
+#### KEGG PATHWAYS GSEA
+
+
+```{r kegg pathways gsea}
+
+keggP_gsea <- GSEA(
+  geneList = ranked, 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 1e-10,
+  pvalueCutoff = 0.05,
+  pAdjustMethod = "BH",
+  TERM2GENE = keggP_term2gene, 
+  TERM2NAME = keggP_term2name, 
+  seed = 1234, 
+  by = "fgsea"
+)
+
+```
+
+33 enriched pathways. 
+
+ Dotplots don't show up v down reg... 
+
+
+```{r dotplot gsea keggP, fig.height=10, fig.width=7}
+dotplot(
+  keggP_gsea,
+  x = "geneRatio",
+  color = "p.adjust",
+  orderBy = "x",
+  showCategory = 20,
+  font.size = 8
+  ) +
+  ggtitle("GSEA enrichment over KEGG pathways")
+```
+
+
+```{r ridgeplot  gsea keggP,  fig.height=10, fig.width=7}
+ridgeplot(keggP_gsea, 
+  showCategory = 30, 
+  fill = "p.adjust", 
+  core_enrichment = TRUE, 
+  label_format = 50, 
+  orderBy = "NES", 
+  decreasing = FALSE )
+```
+
+
+Neither does ridge plot. Good old volcano plot works - 
+
+```{r volcano plot  gsea keggP,  fig.height=7, fig.width=10}
+
+p<- ggplot(keggP_gsea@result, aes(x = enrichmentScore, y = -log10(p.adjust), color = p.adjust)) + 
+  geom_point(alpha = 0.7, size = 2) +  # Adjust point size
+  scale_color_gradient(low = "blue", high = "red") +  # Color by p.adjust values
+  theme_minimal() + 
+  labs(title = "Axolotl GSEA KEGG Pathways", 
+       x = "Enrichment Score (NES)", 
+       y = "-log10(Adjusted P-value)",
+       color = "Adjusted P-value") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels for readability
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +  # Add vertical line at x=0
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "black") +  # Add horizontal line at p=0.05 cutoff
+  geom_text(aes(label = Description), 
+            hjust = 0.5, 
+            vjust = -0.5,  # Move labels higher off the points
+            size = 3, 
+            check_overlap = TRUE, 
+            alpha = 0.7)  # Add labels for each pathway term
+
+print(p)
+```
+
+
+
+### Why are we seeing a lot of infection related terms?
+
+Many genes involved in infection responses are also part of broader stress response pathways. These genes may be activated under different conditions, such as environmental stress, tissue injury, or other disruptions to homeostasis, which are common in various types of experiments. Pathways related to immune responses can also be interconnected with pathways controlling inflammation, wound healing, and metabolic processes. As a result, infection-related pathways can appear in enrichment analysis even when the experimental conditions don't directly involve infection. This does not mean the result is spurious - it just requires that you exercise pragmatism, employ a basic understanding of the statistical approach, and a steadfast conviction to always interpret the results in the context of your experiment and dig more deeply into what is being enriched, which of your genes are involved in the term, and an understanding that the FEA results are to guide further investigation rather than answer "the question". 
+
+
+## novel species with WebGestaltR!!!
+
+#### file prep 
+
+This requires a `GMT` file and a `description` file. 
+
+A GMT file is a standard file format (ie not specific to WebGestaltR). It is a tab-delimited text file that specifies gene sets associated with particular pathways or functional terms. Each row represents one gene set (eg a GO term, a KEGG pathway), and the columns include the name of the gene set and the genes associated with it
+
+
+Re external links - for KEGG apthways, can add here - https://www.genome.jp/dbget-bin/www_bget?<mapID>
+
+eg https://www.genome.jp/dbget-bin/www_bget?map04139 - so this would be easy to code
+
+
+
+An for GO: https://www.ebi.ac.uk/QuickGO/term/<GOID>
+
+eg https://www.ebi.ac.uk/QuickGO/term/GO:0000981
+
+
+Try for KEGG PAthways:
+
+
+
+```{r  kegg pathways gmt file for webgestaltr }
+
+# Step 1: Create the external link for each KEGG pathway ID
+keggP_term2gene <- keggP_term2gene %>%
+  dplyr::mutate(external_link = paste0("https://www.genome.jp/dbget-bin/www_bget?", term))
+
+# Step 2: Group by KEGG pathway term and concatenate the gene list
+keggP_term2gene_grouped <- keggP_term2gene %>%
+  dplyr::group_by(term) %>%
+  dplyr::summarize(genes = paste(gene, collapse = "\t"), .groups = "drop")
+
+# Step 3: Ensure that external links are correctly linked to the pathways
+keggP_term2gene_grouped <- keggP_term2gene_grouped %>%
+  dplyr::left_join(keggP_term2gene %>% dplyr::select(term, external_link) %>% distinct(), by = "term")
+
+# Step 4: Create the final GMT format entry (Pathway, External Link, Genes)
+keggP_gmt <- keggP_term2gene_grouped %>%
+  dplyr::mutate(gmt_entry = paste(term, external_link, genes, sep = "\t")) %>%
+  dplyr::select(gmt_entry)
+
+# Save as GMT file
+writeLines(keggP_gmt$gmt_entry, "Amex_kegg_pathways_2024-11-13.gmt")
+
+```
+
+
+
+Description file is same as clsuterProfiler term2name: 
+
+```{r kegg pathways description file for webgestaltr }
+keggP_desc <- keggP_term2name
+head(keggP_desc)
+
+# Write keggP_desc to a TSV file without headers
+write.table(keggP_desc, "Amex_kegg_pathways_2024-11-13.des", sep = "\t", col.names = FALSE, row.names = FALSE, quote = FALSE)
+
+```
+
+
+
+
+Try oRA first as is faster:
+
+WebGestaltR(enrichMethod="ORA", organism="others", enrichDatabaseFile = "/database-test.gmt",  enrichDatabaseDescriptionFile = "/description_test.des", interestGeneFile = "/genelist_test.txt", referenceGeneFile = "/reference.txt")
+
+
+Of the below, only enrichDatabaseFile ( = GMT) and enrichDatabaseDescriptionFile (description) are needed.  
+
+enrichDatabase = The functional categories for the enrichment analysis. Users can use the function listGeneSet to check the available functional databases for the selected organism. Multiple databases in a vector are supported for ORA and GSEA.
+
+enrichDatabaseFile = Users can provide one or more GMT files as the functional category for enrichment analysis. The extension of the file should be gmt and the first column of the file is the category ID, the second one is the external link for the category. Genes annotated to the category are from the third column. All columns are separated by tabs. The GMT files will be combined with enrichDatabase.
+
+enrichDatabaseType = The ID type of the genes in the enrichDatabaseFile. If users set organism as others, users do not need to set this ID type because WebGestaltR will not perform ID mapping for other organisms. The supported ID types of WebGestaltR for the selected organism can be found by the function listIdType
+
+enrichDatabaseDescriptionFile = Users can also provide description files for the custom enrichDatabaseFile. The extension of the description file should be des. The description file contains two columns: the first column is the category ID that should be exactly the same as the category ID in the custom enrichDatabaseFile and the second column is the description of the category. All columns are separated by tabs.
+
+##### ORA KEGG WebGestaltR
+
+```{r webgestalt ORA keggP custom GMT }
+
+outputDirectory <- getwd() 
+project <- "webgestaltR_axolotl_ORA_KEGG_Pathways"
+
+WebGestaltR(
+    organism = "others",                   # Use your species (e.g., "hsapiens" for humans)
+    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
+    interestGene = degs,                # Your gene list
+    referenceGene = background,                    # Use the default background or provide your own
+    enrichDatabaseFile = "Amex_kegg_pathways_2024-11-13.gmt", 
+    enrichDatabaseDescriptionFile = "Amex_kegg_pathways_2024-11-13.des", 
+    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
+    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
+    fdrThr = 0.05,                           # FDR significance threshold
+    minNum = 5,                              # Minimum number of genes per category
+    maxNum = 500,                             # Maximum number of genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+)
+
+```
+
+FREAKING WORKS, YEA!!!!!!!!!!!!!!
+
+##### GSEA KEGG WebGestaltR
+
+```{r webgestalt gsea keggP custom GMT }
+
+outputDirectory <- getwd() 
+project <- "webgestaltR_axolotl_GSEA_KEGG_Pathways"
+
+WebGestaltR(
+    organism = "others",                   # Use your species (e.g., "hsapiens" for humans)
+    enrichMethod = "GSEA",                    # Perform ORA, GSEA or NTA
+    interestGene = ranked_df,                # Ranked gene list data frame 
+    enrichDatabaseFile = "Amex_kegg_pathways_2024-11-13.gmt", 
+    enrichDatabaseDescriptionFile = "Amex_kegg_pathways_2024-11-13.des", 
+    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
+    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
+    fdrThr = 0.05,                           # FDR significance threshold
+    minNum = 5,                              # Minimum number of genes per category
+    maxNum = 500,                             # Maximum number of genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+)
+
+```
+
+
+
+#### Now for GO:
+
+
+##### file prep 
+
+```{r  GO gmt file for webgestaltr }
+
+# Step 1: Create the external link for each GO term ID
+go_term2gene <- go_term2gene %>%
+  dplyr::mutate(external_link = paste0("https://www.ebi.ac.uk/QuickGO/term/", term))
+
+# Step 2: Group by GO term and concatenate the gene list
+go_term2gene_grouped <- go_term2gene %>%
+  dplyr::group_by(term) %>%
+  dplyr::summarize(genes = paste(gene, collapse = "\t"), .groups = "drop")
+
+# Step 3: Ensure that external links are correctly linked to the pathways
+go_term2gene_grouped <- go_term2gene_grouped %>%
+  dplyr::left_join(go_term2gene %>% dplyr::select(term, external_link) %>% distinct(), by = "term")
+
+# Step 4: Create the final GMT format entry (geneset/term ID, external Link, genes -  all separated by tabs even the genes)
+go_gmt <- go_term2gene_grouped %>%
+  dplyr::mutate(gmt_entry = paste(term, external_link, genes, sep = "\t")) %>%
+  dplyr::select(gmt_entry)
+
+# Save as GMT file
+writeLines(go_gmt$gmt_entry, "Amex_GO_2024-11-13.gmt")
+
+```
+
+
+
+Description file is same as clsuterProfiler term2name: 
+
+```{r GO description file for webgestaltr }
+go_desc <- go_term2name
+head(go_desc)
+
+# Write GO_desc to a TSV file without headers
+write.table(go_desc, "Amex_GO_2024-11-13.des", sep = "\t", col.names = FALSE, row.names = FALSE, quote = FALSE)
+
+
+```
+
+##### ORA GO WebGestaltR
+
+```{r webgestalt ORA GO custom GMT }
+
+outputDirectory <- getwd() 
+project <- "webgestaltR_axolotl_ORA_GO"
+
+WebGestaltR(
+    organism = "others",                   # Use your species (e.g., "hsapiens" for humans)
+    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
+    interestGene = degs,                # Your gene list
+    referenceGene = background,                    # Use the default background or provide your own
+    enrichDatabaseFile = "Amex_GO_2024-11-13.gmt", 
+    enrichDatabaseDescriptionFile = "Amex_GO_2024-11-13.des", 
+    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
+    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
+    fdrThr = 0.05,                           # FDR significance threshold
+    minNum = 5,                              # Minimum number of genes per category
+    maxNum = 500,                             # Maximum number of genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+)
+
+```
+** really need to remember to research affinity propagation vs weighted set cover vs default!!!
+
+##### GSEA GO WebGestaltR
+
+```{r webgestalt gsea keggP custom GMT }
+
+outputDirectory <- getwd() 
+project <- "webgestaltR_axolotl_GSEA_GO"
+
+# add supressWarnigns as there are many GO terms with < 5 or > 500 
+
+suppressWarnings({
+  WebGestaltR(
+    organism = "others",                   # Your organism
+    enrichMethod = "GSEA",                  # GSEA enrichment method
+    interestGene = ranked_df,               # Your ranked gene list
+    enrichDatabaseFile = "Amex_GO_2024-11-13.gmt", 
+    enrichDatabaseDescriptionFile = "Amex_GO_2024-11-13.des", 
+    isOutput = TRUE,                        # Whether to output files
+    fdrMethod = "BH",                       # FDR correction method
+    sigMethod = "fdr",                      # Significance method
+    fdrThr = 0.05,                          # FDR threshold
+    minNum = 5,                             # Minimum genes per category
+    maxNum = 500,                           # Maximum genes per category
+    boxplot = TRUE,
+    outputDirectory = outputDirectory,
+    projectName = project
+  )
+})
+
+```
+

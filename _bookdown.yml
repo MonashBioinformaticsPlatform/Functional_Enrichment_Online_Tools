@@ -18,8 +18,12 @@ rmd_files:
   - 07-reporting.Rmd
   - 08-resources.Rmd
   - part-day2.Rmd
-  - 09-challenge.Rmd
-  - 10-end.Rmd
+  - 09-r-environment-setup.Rmd
+  - 10-gprofiler2.Rmd
+  - 11-clusterprofiler.Rmd
+  - 12-webgestaltr.Rmd
+  - 13-novel-species.Rmd
+  - 14-reporting-results.Rmd
 
 copy_resources:
   - files/
