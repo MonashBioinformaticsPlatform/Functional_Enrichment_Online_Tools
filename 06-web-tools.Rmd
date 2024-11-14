@@ -365,3 +365,19 @@ Some content with emojis:
 - 🤔 I'm thinking about how to solve this.
 
 
+
+With the Logo:
+
+Option 1
+
+![RStudio Logo](images/rstudio_logo.png)
+
+
+
+Option 2:
+
+```{r, echo=FALSE, fig.align = "left", fig.cap="RStudio Logo"} 
+knitr::include_graphics("images/rstudio_logo.png")
+```
+
+
