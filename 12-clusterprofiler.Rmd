@@ -9,7 +9,7 @@ The `clusterProfiler` user guide can be found [here](https://bioconductor.org/pa
 
 The `enrichplot` user guide can be found [here](https://www.bioconductor.org/packages/devel/bioc/manuals/enrichplot/man/enrichplot.pdf). 
 
-One of the challenges when working with `clusterProfiler` for FEA is that each enrichment function has different supported organisms and different namespace requirements, so you can not necessarily use all of the functions over the same gene list. In this activity, we will review the FEA functions and investigate their requirements, before performing a gene ID conversion with the `bitr` function to enable compatability with our ([Pezzini et al 2016](https://link.springer.com/article/10.1007/s10571-016-0403-y)) dataset. 
+One of the challenges when working with `clusterProfiler` for FEA is that each enrichment function has different supported organisms and different namespace requirements, so you can not necessarily use all of the functions over the same gene list. In this activity, we will review the FEA functions and investigate their requirements, before performing a gene ID conversion with the `bitr` function to enable compatability with our [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) dataset. 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
