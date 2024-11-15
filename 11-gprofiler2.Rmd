@@ -33,7 +33,7 @@ Since we are doing ORA, we will need a filtered gene list, and a background gene
 
 &#x27A4; Go back to your RStudio interface, where we have opened the `gprofiler2.Rmd` notebook and loaded the required R packages. 
 
-**Instructions for the analysis will continue from the notebook.**
+**<span style="color: #006400;">Instructions for the analysis will continue from the R notebook.</span>**
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
