@@ -14,7 +14,7 @@ The `gprofiler2` user guide can be found [here](https://cran.r-project.org/web/p
 
 ## Input data 
 
-Since we are doing ORA, we will need a filtered gene list, and a background gene list. We will continue with the RNAseq dataset from [Pezzini et al 2016](https://link.springer.com/article/10.1007/s10571-016-0403-y) introduced yesterday. 
+Since we are doing ORA, we will need a filtered gene list, and a background gene list. We will continue with the RNAseq dataset from [Pezzini et al 2017](https://link.springer.com/article/10.1007/s10571-016-0403-y) introduced yesterday. 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -51,6 +51,6 @@ The last task is to `knit` the notebook. Our notebook is editable, and can be ch
 
 &#x27A4; Knit the notebook to HTML
 
-Note that the notebook will only knit if there are no errors in the code. If your knit fails, please ask for assistance resolving the errors :raised_hand: 
+Note that the notebook will only knit if there are no errors in the code. If your knit fails, please ask for assistance resolving the errors ✋ 
 
 

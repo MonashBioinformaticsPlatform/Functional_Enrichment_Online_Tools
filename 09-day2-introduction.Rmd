@@ -28,7 +28,7 @@ In day 2 of this workshop, we will focus on FEA with R-based tools.
 At a high level, there are 3 fundamental questions to consider when selecting an anaylsis tool:
 
 **1.** Does the governance of your data prohibit you from analysing it on an external server? (ie "highly protected" data) 
-**2.** What web or R tools support your species?
+**2.** What web or R tools support your species and relevant annotation database?
 **3.** Are you comfortable using R? 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
@@ -37,7 +37,7 @@ At a high level, there are 3 fundamental questions to consider when selecting an
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-Beyond that, there are of ocurse biological questions pertaining to to the database used and type of statistical analysis applied. 
+ 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -51,11 +51,11 @@ There are numerous R packages for FEA, each with their strenghts and limitations
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-Ultimately, the following tools were chosen in order to provide a collection of code notebooks that could hopefully encompass the needs of most experiments:  
+The following 3 R tools have been selected for today's workshop:  
 
 **1.** `gprofiler1` due to its ease of use, high number of supported species, and multiple database enrichments produced within a single run. Caveat: only ORA analysis 
 **2.** `clusterProfiler2` due to its integrated database support, runs both GSEA and ORA, companion plotting tool, and novel species support. 
-**3.** `WebGestaltR` due to its ease of use, high number of suported databases and namespaces, runs both GSEA and ORA, interactive HTML reports and plots, and novel species support. 
+**3.** `WebGestaltR` due to its ease of use, high number of suported databases and namespaces, runs both GSEA and ORA, interactive HTML reports and plots, and novel species support 
 
 
 
