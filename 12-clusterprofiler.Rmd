@@ -30,13 +30,16 @@ To obtain this information, 3 sources were required:
 
 1. The [clusterProfiler user guide](https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf)
 2. External websites ([Bioconductor](https://bioconductor.org/packages/3.20/data/annotation/) and [KEGG Organisms](https://www.genome.jp/kegg/catalog/org_list.html))
-3. `clusterProfiler` functions (`get_wp_organisms()`, `keytypes(org.Hs.eg.db)`)
+3. `clusterProfiler` functions (eg `get_wp_organisms()`, `keytypes(org.Hs.eg.db)`)
 
 This highlights the need to carefully review the tool you are using and explore the user guide and functionality. 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ## Activity overview
+
+
+Since we have covered ORA with `gprofiler`, we will perform a GSEA with `clusterProfiler` using `gseKEGG`.  
 
 1. Explore the functions of `clusterProfiler` including which FEA functions support which organisms and which namespaces
 2. Load input dataset (a gene matrix with adjusted P values and log2 fold change values) 

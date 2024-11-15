@@ -568,7 +568,7 @@ print(ggplot(comparison_data_long, aes(x = term_name, y = -log10(p_value), fill 
 
 Great! We know we applied the same parameters, and used the same input gene lists. The identical results must mean that gprofiler2 is using the same database version as g:Profiler web. 
 
-# Saving versions and session details 
+# 9. Save versions and session details 
 
 Let's check: yesterday when you ran ORA on the web, hopefully you saved your 'query parameters' as well as your results. 
 
@@ -623,7 +623,7 @@ rstudio_version_text
 
 ```
 
-## Knit workbook to HTML
+# 10.  Knit workbook to HTML
 
 The last task is to knit the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work.
 

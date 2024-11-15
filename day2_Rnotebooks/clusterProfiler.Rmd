@@ -1,6 +1,8 @@
 ---
 title: "Enrichment with clusterProfiler"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r Load R packages, include=FALSE}
@@ -13,64 +15,29 @@ library(dplyr)
 library(ggupset)
 ```
 
-Review the contents page of the [clusterProfiler user guide](https://bioconductor.org/packages/devel/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf). 
 
-`clusterProfiler` has a number of GSEA and ORA functions specifically designed to perform GSEA on key databases without having to manually import the database. 
+Ensure the 'workshop' directory is your current working directory:
 
-For GSEA, these are:
-
-- `gseGo`
-  - Database: GO
-  - Supported organisms: 
-- `gseKEGG`
-  - Database: KEGG
-  - Supported organisms: all KEGG organisms (thousands) 
-- `gseMKEGG`
-  - Database: KEGG Modules
-  - Supported organisms: 
-- `gsePC`
-  - Database: Pathway Commons
-  - Supported organisms: 
-- `gseWP`
-  - Database: WikiPathways
-  - Supported organisms: 
-  
-  
-For ORA, the same 5 databases are supported, eg function `enrichGO` for ORA of GO, with the addition of `enrichDAVID`. 
-
-Note that each of the in-built database functions has different supported organisms, and this is to do with the database itself. There are also limitations on which namespaces a database accepts, so you need to check the compatible namespace for the function you want to run, and perform gene ID conversion if required. `clusterProfiler` has the function `bitr` to do this; another popular choice is `biomaRt`. 
-
-
-`clusterProfiler` also has generic functions to perform ORA (`enricher`) or GSEA (`gsea`) with custom gene sets. These enable you to perform ORA or GSEA with your own annotations, with a little work on your part in preparing the required database files. 
-
-
-
+```{r check notebook workdir}
+getwd()
+```
 
 # 1. Load input data and extract ranked gene list
 
-We will use the same Pezzini RNAseq dataset as earlier. First, confirm your working directory is the `Functional_enrichment_workshop_2024/day_2` folder. 
-
-```{r setup, include=FALSE}
-# Set the root directory for all notebook chunks
-knitr::opts_knit$set(root.dir = "C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
-
-# To set the working directory for the console, run this in the console itself:
-setwd("C:/Users/cwil2281/OneDrive - The University of Sydney (Staff)/Documents/PIPE-5119-enrichment-workshop/day_2")
-
-
-getwd()
-
-```
-
-
-Please ask for assistance if this step does not show the day_2 folder path! 
-
-Once your working directory is set, load the dataset and extract the gene lists.
+We will once again load the Pezzini RNAseq dataset.
 
 ```{r load input data}
 
-# Full dataset
 data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
+head(data)
+```
+
+
+This time, instead of filtering for DEGs, we will extract all genes, and sort them by fold change largest to smallest. The R object type for `gseKEGG` needs to be a 'vector'. Unfortunately, this detail is under the `enrichKEGG` function, not the `gseKEGG` function! For `enrichKEGG`, the parameter `gene` is described as requiring "a vector of entrez gene id", yet for `gseKEGG, the description for `geneList` is "order ranked geneList". There is a little bit of sleuthing required at times! 
+
+
+
+```{r extract ranked list}
 
 # Ranked gene list vector for GSEA
 ranked <- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.ID[order(-data$Log2FC)])
@@ -81,332 +48,62 @@ tail(ranked)
 ```
 
 
-# 2. Perform GSEA of GO terms with `gseGO` function 
+# 2. Check `gseKEGG` function arguments and requirements
 
-Since we have covered ORA with `gprofiler`. 
+Let's start by reviewing the function arguments. Once you run the below code chunk, the user guide for the function will open in the `Help` pane of RStudio (lower right) 
 
-We will run GSEA over the GO database. If we choose `ALL` for the `ont` (ontology) parameter,  we can run over MF, BP and CC in one run. However for simplicity, let's choose just `MF`.  
-
-## Species
-
-For this function, we need an [annotation database from Bioconductor](https://bioconductor.org/packages/3.20/data/annotation/). The package `org.Hs.eg.db` has been installed and loaded for you. 
-
-
-## Namespace
-
-We can use any gene namespace supported by the annotation package:
-
-```{r org hs namespaces}
-keytypes(org.Hs.eg.db)
-```
-We already have ENSEMBL gene IDs in our input data, so we don't need to do a gene ID conversion. 
-
-For the rest of the parameters, we will use the defaults, except for `seed` that we should set to a specific value for reproducibility, and
-add 10,000 permutations to make the analysis more robust and reliable by providing a better estimation of p-values for the enrichment scores, especially for cases with smaller gene sets or less significant differences.
-
-## Run the enrichment
-
-```{r gseGO}
-gsea_GO <- gseGO( 
-  ranked, 
-  ont = "ALL", 
-  OrgDb = "org.Hs.eg.db",
-  keyType = "ENSEMBL", 
-  exponent = 1, 
-  minGSSize = 10, 
-  maxGSSize = 500, 
-  eps = 1e-10, 
-  pvalueCutoff = 0.05, 
-  pAdjustMethod = "BH", 
-  verbose = TRUE, 
-  seed = 1234, 
-  by = "fgsea",
-  nPermSimple = 10000
-)
-
+```{r help gsekegg}
+?gseKEGG
 ```
 
 
-```{r gseGO MF }
-gsea_GO_MF <- gseGO( 
-  ranked, 
-  ont = "MF", 
-  OrgDb = "org.Hs.eg.db",
-  keyType = "ENSEMBL", 
-  exponent = 1, 
-  minGSSize = 10, 
-  maxGSSize = 500, 
-  eps = 1e-10, 
-  pvalueCutoff = 0.05, 
-  pAdjustMethod = "BH", 
-  verbose = TRUE, 
-  seed = 1234, 
-  by = "fgsea",
-  nPermSimple = 10000
-)
+Most of those defaults look suitable to start. 
 
-```
+We have human so the default "hsa" for argument `organism` is correct. If you were working with a species other than human, you first need to obtain your organism code. You can derive this from [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html) or using the `clusterProfiler` function `search_kegg_organism`.
 
 
-#3. Visualise  GSEA GO results 
-
-Next we will visualise the GSEA results.
-
-## As a table
-
-Simple view: 89 enriched terms for GO: MF
+Pick your favourite species and search for the KEGG organism code by editing the variable 'organism' then executing the code chunk:
 
 ```{r}
-print(gsea_GO_MF)
+fave <- "horse"
 
-```
-
-Extract results to a TSV: this will print the significant enrichments, sorted by adjusted P value. 
-
-```{r GSEA GO MF results table }
-
-write.table(clsuterProfiler_gsea_GO_MF, file = "gsea_GO_MF_results.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
-
-
-```
-
-- view the table, can put in ecel for cusotm filters, get genes etc
-
-## Dotplot 
-
-this function is part of `lcusterProfiler` as well as `enrichPlot`. 
-
-An easy to interpret visualisation, but  loses the details of the source `CC`, `MF`, `BP`. 
-
-
-```{r GSEA GO dotplot }
-
-# Create plot with dynamic title
-p <- dotplot(
-  gsea_GO,
-  x = "geneRatio",
-  color = "p.adjust",
-  orderBy = "x",
-  showCategory = 15,
-  font.size = 8
-  ) +
-  ggtitle("GSEA GO")
-    
-
-
-print(p)
-
-```
-
-```{r GSEA GO MF dotplot }
-
-# Create plot with dynamic title
-p <- dotplot(
-  gsea_GO_MF,
-  x = "geneRatio",
-  color = "p.adjust",
-  orderBy = "x",
-  showCategory = 15,
-  font.size = 8
-  ) +
-  ggtitle("GSEA GO: Molecular function")
-    
-
-
-print(p)
-
+# search by commn_name or scientific_name 
+search_kegg_organism(fave, by = "common_name")
 ```
 
 
-## Upset plot
+Now back to the paramters - the defaults for P value correction and filtering, and gene set size limits are acceptable. We don't want to use internal data (ie, we want to search agaisntthe latest KEGG online) so `FALSE` is apt here, and we do want to use `fgsea` algorithm for analysis. 
 
-Shows the shared genes among the enriched terms (since a gene can belong to multiple terms or pathways).
+For the `seed` parameter, we should provide a value, to ensure results are the same each time the command. By setting a seed, you fix the sequence of random numbers generated within the GSEA algorithm.
 
-For ORA, upsetplot will calculate the overlaps among different gene sets. 
+We also need to check the `keyType` (gene namespace) against the input data that we have. From the help page, we can see the supported namespaces for the KEGG database are one of 'kegg', 'ncbi-geneid', 'ncib-proteinid' or 'uniprot'.
 
-For GSEA, it will plot the fold change distributions of different categories (e.g. unique to pathway, overlaps among different pathways).
+Going  back to where we loaded the input data and ran `head` to view the first few rows, we can see our input has ENSEMBL gene IDs as well as official gene symbols. ENSEMBL gene IDs are generally preferable for bioinformatics analyses because they are more unique and stable compared to gene symbol.
 
-`n` controls the number of terms plotted - her we have restricted to 10 for ease of viewing. Plot view is quite small within a notebook, but if wanted to plot more terms, you could print to an A4 size for enhanced clarity. 
+Since our input data does not match any of the valid namespaces, we need to convert gene IDs! `clusterProfiler` has the `bitr` function to do this. `BiomaRt` is also a popular R package for this task. 
 
 
+# 3. Convert gene IDs 
 
-```{r GSEA GO upset plot}
+Check the usage for the `bitr` function:
 
-# n = the number of top enrichments to plot
-p<- upsetplot(gsea_GO, n = 10)
-print(p)
-
+```{r}
+?bitr
 ```
 
+We need to understand what are the valid `fromType` and `toType`, and it turns out we need an Org.db! This is a Bioconductor annotation package, of which there are currently only 20. So while the `gseKEGG` function supports all organisms in KEGG, performing gene ID conversion within `clusterProfiler may not be possible for non-model species and you would need to seek a different method.  
 
-```{r GSEA GO MF upset plot}
+We have already loaded the `org.Hs.eg.db` annotation library. We can use this to search `keytypes`:
 
-# n = the number of top enrichments to plot
-p<- upsetplot(gsea_GO_MF, n = 10)
-print(p)
-
+```{r}
+keytypes(org.Hs.eg.db)
 ```
 
+Converting to ENTREZ will be compatible with `kegg`. So our `fromType` is `ENSEMBL` and `toType` is `ENTREZID`. Note that these are case sensitive! 
 
-```{r GSEA GO upset plot print PDF }
-# Make the plot, save to plot object 
-p<- upsetplot(gsea_GO, n = 30)
+The below code performs the reformatting and handles duplicates by keeping only the first occurrence of duplicate Entrez IDs within the input. Note that this is not ideal and for a real experiment you should print out a list of duplcaites, carefully review these and choose which and how to retain based on your biological context.
 
-# Open PDF in A4 landscape size in inches
-pdf("GSEA_GO_upsetplot.pdf", width = 11.69, height = 8.27)  
-
-# Print the plot to the device
-print(p)
-
-# Close the device (this saves the plot)
-dev.off()
-```
-
-
-- Personally, i dislike upset plots, although they seem popular... 
-
-
-# Enrichment map
-
-Encrichment map with `emapplot` function from `clsuterProfiler`/`enrichPlot`: organizes enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
-
-
-```{r GSEA GO emapplot }
-# calculate pairwise similarities between the enriched terms
-gsea_GO <- pairwise_termsim(gsea_GO)
-
-# plot
-p<-emapplot(gsea_GO, showCategory = 15)
-print(p)
-
-```
-
-```{r GSEA GO MF emapplot }
-# calculate pairwise similarities between the enriched terms
-gsea_GO_MF <- pairwise_termsim(gsea_GO_MF)
-
-# plot
-p<-emapplot(gsea_GO_MF, showCategory = 15)
-print(p)
-
-```
-
-
-
-# cnet plot
-
-From here: https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html 
-
-"Both the barplot() and dotplot() only displayed most significant or selected enriched terms, while users may want to know which genes are involved in these significant terms. In order to consider the potentially biological complexities in which a gene may belong to multiple annotation categories and provide information of numeric changes if available, we developed the cnetplot() function to extract the complex association. The cnetplot() depicts the linkages of genes and biological concepts (e.g. GO terms or KEGG pathways) as a network. GSEA result is also supported with only core enriched genes displayed."
-
-cnetplot: https://rdrr.io/bioc/enrichplot/man/cnetplot.html
-
-
-```{r GSEA GO cnetplot}
-# cex_label_gene to reduce the font size for gene ID
-# colorEdge adds the coloured legend and network bars 
-
-cnetplot(gsea_GO, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE)
-```
-
-
-```{r GSEA GO MF cnetplot}
-
-cnetplot( gsea_GO_MF, 
-  showCategory = 15, 
-  node_label = "category", 
-)
-```
-
-
-- These look hideous and nothing like the last time I ran them on different dataset... 
-
-
-## circular cnetplot 
-
- = no longer available in latest pacakge! damn they were so nice 
-
-## treeplot
-
-Functional grouping tree diagram (enrichPlot) 
-
-```{r treeplot gSEA GO MF}
-p<- treeplot(gsea_GO_MF, showCategory = 15, color = "p.adjust")
-
-print(p)
-```
-
-## heatplot
-
-```{r heatplot GSEA GO MF }
-heatplot(gsea_GO_MF, showCategory = 15)
-```
-- Absolutely terrible, just no! 
-
-
-# ridgeplot
-
-This function is specific for GSEA (does not apply to ORA, since it plots NES) 
-
-The height of the ridge in the ridge plot represents the density of genes from the gene set at different points in the ranked list.
-
-The area under the curve represents the distribution of these genes across the ranked list. 
-
-Higher peaks and more concentrated areas under the curve at the top of the list indicate stronger enrichment.
-
-
-```{r ridgeplot  gsea GO MF, fig.height=10, fig.width=7}
-ridgeplot(gsea_GO_MF, 
-  showCategory = 30, 
-  fill = "p.adjust", 
-  core_enrichment = TRUE, 
-  label_format = 30, 
-  orderBy = "NES", 
-  decreasing = FALSE )
-```
-
-## gseaplot
-
-Another GSEA-specific plot. This will provide the GSEA plot for one term.
-
-```{r gseaplot GSEA GO MF }
-
-gene_set_id <- "GO:0008094"
-
-p<- gseaplot( gsea_GO_MF,
-  gene_set_id, 
-  by = "all", 
-  title = paste("GSEA result:", gene_set_id),
-  color = "black", 
-  color.line = "green", 
-  color.vline = "#FA5860"
-)
-
-print(p)
-```
-
-
-
-
-
-#4. Perform GSEA on KEGG database with `gseKEGG` function 
-
-Now we will run GSEA over another in-built database. Navigate to the page of the `clsuterProfiler` user guide where the `gseKEGG` function is described. 
-
-## Species
-
-Note that the default organism is human (`hsa`). 
-
-If you were working with a species other than human, you first need to obtain your organism code. You can derive this from [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html) or using the `clusterProfiler` function `search_kegg_organism`, for example `search_kegg_organism("horse", by = "common_name")`. 
-
-Unlike `gseGO` that requires a Bioconductor annotation package, the `gseKEGG` function supports many more organisms. 
-
-## Namespace
-
-Required `key type` is one of `kegg`, `ncbi-geneid`, `ncib-proteinid` and `uniprot`. Our gene IDs are ENSEMBL. 
-
-We can convert with `clusterProfiler` function `bitr`. Converting to ENTREZ will be compatible with `kegg`. 
-
+First, convert map the ENSEMBL gene IDs from our 'ranked' list to ENTREZ gene IDs: 
 
 ```{r convert gene IDs}
 # Convert the Ensembl IDs to Entrez IDs, dropping NAs
@@ -415,8 +112,16 @@ converted_ids <- bitr(names(ranked),
                       toType = "ENTREZID", 
                       OrgDb = org.Hs.eg.db, 
                       drop = TRUE)
+```
+<1% failing ot map is pretty good. 
 
-# Handle any `1:many mapping` (ENSEMBL ID matches >1 ENTREZID) by keeping only the first Entrez ID for each Ensembl ID
+The 1:many mappings warning means that some of our gene IDs matched more than 1 ENTREZ ID. We need to ensure that the final list we provide to GSEA does not contain duplicates. This needs to happen at two stages: first of all, ensuring that each ENSEMBL ID is mapped to only one ENTREZ ID, and then once the final converted vector has been created, check it for duplicated ENTREZ IDs, which could occur when two different ENSEMBL IDs from our input map to the the same ENTREZ ID. 
+
+The below code does this by selecting the first of each set of duplicates. This is not ideal. In a real experiment, you should print out the duplicates and directly manage how to handle them by reviewing the gene IDs involved and deciding whether it is valid to select one ID over another, or at times you may choose to merge the values for duplcaie genes.   
+
+```{r filter converted ids }
+
+# Handle any `1:many mapping` (ENSEMBL ID matches >1 ENTREZID) by keeping only the first Entrez ID for each Ensembl ID (not ideal, see note above)
 converted_ids <- converted_ids[!duplicated(converted_ids$ENSEMBL), ]
 
 # Keep only the rows with valid Entrez IDs
@@ -428,21 +133,18 @@ ranked_entrez <- ranked[names(ranked) %in% converted_ids$ENSEMBL]
 # Replace the Ensembl IDs with the corresponding Entrez IDs in the ranked vector
 names(ranked_entrez) <- converted_ids$ENTREZID[match(names(ranked_entrez), converted_ids$ENSEMBL)]
 
-# Remove duplicates (keep only first occurrence of Entrez IDs)
-## Note: this is not ideal and for a real experiment you should carefully review duplicates and choose which and how to retain based on your biological context 
+# Remove duplicates from the vector by keeping only the first occurrence of each Entrez IDs (not ideal, see note above) 
 ranked_entrez <- ranked_entrez[!duplicated(names(ranked_entrez))]
 
-cat("\n")
-
-# Check: 
 head(ranked_entrez)
 tail(ranked_entrez)
 
 ```
+Looks good! Now we are ready to enrich!
 
-## Run the enrichment
+# 4. Run GSEA over KEGG database
 
-Now run GSEA over the KEGG database with `gseKEGG` function: 
+Now run GSEA over the KEGG database with `gseKEGG` function, setting a `seed` value and `kegg` as our gene ID type. this may take a minute or two to run. 
 
 
 ```{r gseKEGG}
@@ -459,47 +161,73 @@ gsea_kegg <- gseKEGG(
   verbose = TRUE, 
   use_internal_data = FALSE, 
   seed = FALSE, 
-  by = "fgsea",
-  nPermSimple = 10000
+  by = "fgsea"
 )
 
 
 ```
 
+We have 3 warnings, one about ties in the ranked list, which we could resolve manually by reviewing the raw data, or just ignore as its only 0.01% of the list.
 
-#5. Visualise  GSEA KEGG results 
+The second warning may be resolved by following the suggestion to set `nPermSimple = 10000)`. How frustrating that this parameter is not described withint he `gseKEGG` help menu, nor the `clusterProfiler` PDF at all!  
 
-First let's extract the tabular results: 
+Let's rerun following both suggestions, to use permutations and set `eps` to zero.
+
+```{r gseKEGG perms}
+gsea_kegg <- gseKEGG( 
+  ranked_entrez, 
+  organism = "hsa", 
+  keyType = "kegg", 
+  exponent = 1, 
+  minGSSize = 10, 
+  maxGSSize = 500, 
+  eps = 0, 
+  pvalueCutoff = 0.05, 
+  pAdjustMethod = "BH",
+  verbose = TRUE, 
+  use_internal_data = FALSE, 
+  seed = FALSE, 
+  by = "fgsea",
+  nPermSimple = 10000
+)
+
+```
+Great, those last 2 warnings have resolved and we only have the expected one about tied rankings. 
 
 
-## As a table
+# 5. Visualise GSEA KEGG results 
 
-40 enriched terms 
 
-```{r}
+## Tabular results 
+
+First let's preview the results. We can see 41 significant enrichments. 
+
+
+```{r preview gsea results}
 print(gsea_kegg)
 
 ```
 
-Extract results to a TSV: this will print the significant enrichments, sorted by adjusted P value. 
+Extract results to a TSV file. This will print the significant enrichments, sorted by adjusted P value. 
 
-```{r GSEA GO MF results table }
+```{r print GSEA results table }
 
-write.table(gsea_kegg, file = "gsea_KEGG_results.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
-
+write.table(gsea_kegg, file = "clusterProfiler_gseKEGG_results.tsv", sep = "\t", quote = FALSE, row.names = FALSE)
 
 ```
 
+You can view the table in the `editor` pane by clicking on it from the `Files` pane.  
 
 
 ## Dotplot 
 
+A dotplot is an easy to interpret plot. The size of the dot is proportional to the number of genes (count) in that term. A higher GeneRatio indicates that a larger portion of the gene set is significantly altered or associated with the observed changes in gene expression. 
 
+We can change the number of top terms that are plotted with the `showCategory` parameter. 
 
 ```{r GSEA KEGG dotplot }
 
-# Create plot with dynamic title
-p <- dotplot(
+clusterProfiler::dotplot(
   gsea_kegg,
   x = "geneRatio",
   color = "p.adjust",
@@ -508,9 +236,6 @@ p <- dotplot(
   font.size = 8
   ) +
   ggtitle("GSEA KEGG")
-    
-
-print(p)
 
 ```
 
@@ -518,88 +243,143 @@ print(p)
 
 ## Upset plot
 
-Shows the shared genes among the enriched terms (since a gene can belong to multiple terms or pathways).
+The upset plot shows the pattern of shared genes among the enriched terms (since a gene can belong to multiple terms or pathways).
 
 For ORA, upsetplot will calculate the overlaps among different gene sets. 
 
 For GSEA, it will plot the fold change distributions of different categories (e.g. unique to pathway, overlaps among different pathways).
 
-`n` controls the number of terms plotted - her we have restricted to 10 for ease of viewing. Plot view is quite small within a notebook, but if wanted to plot more terms, you could print to an A4 size for enhanced clarity. 
+`n` controls the number of terms plotted - here we have restricted to 10 for ease of viewing. Plot view is quite small within a notebook, but if you wanted to plot more terms, you could print to an A4 size output file for enhanced clarity. 
 
 
 
 ```{r GSEA KEGG upset plot}
 
 # n = the number of top enrichments to plot
-p<- upsetplot(gsea_kegg, n = 10)
-print(p)
+enrichplot::upsetplot(gsea_kegg, n = 10)
 
 ```
 
 
 
-# Enrichment map
+## Enrichment map
 
-Encrichment map with `emapplot` function from `clsuterProfiler`/`enrichPlot`: organizes enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
+The enrichment map organises enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
+
+It is required to run the function `pairwise_termsim` before producing the plot. 
 
 
-```{r GSEA KEGG emapplot }
+```{r GSEA KEGG emapplot}
 # calculate pairwise similarities between the enriched terms
-gsea_kegg <- pairwise_termsim(gsea_kegg)
+gsea_kegg <- enrichplot::pairwise_termsim(gsea_kegg)
 
 # plot
-p<-emapplot(gsea_kegg, showCategory = 15)
-print(p)
+enrichplot::emapplot(gsea_kegg, showCategory = 15)
 
 ```
-
-
-
-# cnet plot
-
-From here: https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html 
-
-"Both the barplot() and dotplot() only displayed most significant or selected enriched terms, while users may want to know which genes are involved in these significant terms. In order to consider the potentially biological complexities in which a gene may belong to multiple annotation categories and provide information of numeric changes if available, we developed the cnetplot() function to extract the complex association. The cnetplot() depicts the linkages of genes and biological concepts (e.g. GO terms or KEGG pathways) as a network. GSEA result is also supported with only core enriched genes displayed."
-
-cnetplot: https://rdrr.io/bioc/enrichplot/man/cnetplot.html
-
-
-```{r GSEA KEGG cnetplot}
-# cex_label_gene to reduce the font size for gene ID
-# colorEdge adds the coloured legend and network bars 
-
-cnetplot(gsea_kegg, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "category")
-
-# node_label = one of ’all’, ’none’, ’category’ and ’item’
-# cnetplot(gsea_kegg, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "item")
-#cnetplot(gsea_kegg, showCategory = 15, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "category")
-
-```
-
-
-- These look hideous and nothing like the last time I ran them on different dataset... 
-
-
 
 ## treeplot
 
- - need to research more on what this tree does - consider cull if not clear  
+The treeplot provides the same information as the emapplot but in a different visualisation. 
 
-Functional grouping tree diagram (enrichPlot) 
+Each node is a term, and the number of genes associated with the term is shown by the dot size, with P values by dot colour. 
 
-```{r treeplot GSEA KEGG}
-p<- treeplot(gsea_kegg, showCategory = 15, color = "p.adjust")
+Terms that share more genes or biological functions will be closer together in the tree structure. Clades are colour coded and 'cluster tags' assigned. You can control the number of words in the tag (default is 4). The user guide describes the argument `nWords` however running that will throw an error (it says 'warning' but its fatal so to me that's an eror!):
 
-print(p)
+"Warning: Use 'cluster.params = list(label_words_n = your_value)' instead of 'nWords'.
+ The nWords parameter will be removed in the next version."
+
+This plot also requires the pairwise similarity matrix calculation that emapplot does. Since we have already run it, it is hashed out in the code chunk below. 
+
+Plot view within the notebook affects the clarity of the cluster tags, however printing this plot to a file would resolve that. 
+
+```{r treeplot GSEA KEGG, fig.width=12}
+# calculate pairwise similarities between the enriched terms
+#gsea_kegg <- enrichplot::pairwise_termsim(gsea_kegg)
+
+enrichplot::treeplot(gsea_kegg, showCategory = 15, color = "p.adjust", cluster.params = list(label_words_n = 5))
 ```
 
-## heatplot = BAD, DELETED
+## cnet plot
+
+The cnetplot is helpful to understanding which genes are involved in the enriched terms, details that are not available in the plots generated so far. It depicts the linkages of genes and terms as a network. 
+
+For GSEA, where all genes (not jsut DEGs) are used, only the 'core' enriched genes (ie the subset of genes that are most strongly associated with a specific term) are used to create the network plot. 
+
+There are a few parameters to play around with here to get a readable plot. 
+
+Try changing the number of terms plotted (`showCategory`) and the `node_label` which controls whether labels are put on terms, genes (`item`), or `all`. 
+
+Since the information that is attempted to be plotted is complex, having a large number of terms and attempting to label everything won't look very informative! If you want to plot both gene IDs and term names, you will need to plot a small number of categories. 
+
+
+```{r GSEA KEGG cnetplot}
+
+# cex_label_gene to reduce the font size for gene ID
+# node_label = one of ’all’, ’none’, ’category’ and ’item’
+# showCategory = number of terms to plot
+
+enrichplot::cnetplot(gsea_kegg, showCategory = 8, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "category")
+
+
+
+
+```
+
+
+You can also plot the interaction between specific terms. This is helpful to obtain gene ID level resolution for term interactions of interest. 
+
+The 3 terms listed below are for 'IL-17 signaling pathway', 'Viral protein interaction with cytokine and cytokine receptor' and 'Chemokine signaling pathway' which are top 10 enrichments with a relationship of shared genes, evident from the plot above. 
+
+Run the code below or select a handful of terms of your choosing from the results table we printed earlier. We need the KEGG ID (column 1). T
+
+```{r cnetplot custom terms}
+# Select terms of interest 
+select_terms <- c("hsa04657", "hsa04061", "hsa04062") 
+
+# Filter the gseaResult object based on the term IDs
+# must keep it as a gsea result type and not as a dataframe when filtering
+gsea_kegg_select <- gsea_kegg
+gsea_kegg_select@result <- gsea_kegg@result[gsea_kegg@result$ID %in% select_terms, ]
+
+# Plot with cnetplot
+enrichplot::cnetplot(gsea_kegg_select, cex_label_gene = 0.5, cex_label_category = 0.8, colorEdge = TRUE, node_label = "all")
+
+
+```
+
+Now we can clearly see the gene IDs for this network. 
+
+
+
+
+
+## heatplot
+
+Like the upset plot, the heatplot shows shared genes across enriched terms. When there are a lot of genes, it can be poorly readable, especially within the notebook. This function does not restrict to 'core' genes like the `cnetplot` or `ridgeplot`. 
+
+Here is a discussion of the topic: https://support.bioconductor.org/p/9148486/
+
+```{r heatplot GSEA KEGG }
+
+
+enrichplot::heatplot(gsea_kegg, showCategory = 3)
+```
+Saving to a file doesn't help much either. 
+
+
+```{r}
+pdf("clusterprofiler_gseKEGG_heatplot.pdf", width = 11.7, height = 8.3)
+enrichplot::heatplot(gsea_kegg, showCategory = 3)
+dev.off()
+
+```
 
 
 
 # ridgeplot
 
-This function is specific for GSEA (does not apply to ORA, since it plots NES) 
+This function is specific for GSEA. It does not apply to ORA, since it plots NES.  
 
 The height of the ridge in the ridge plot represents the density of genes from the gene set at different points in the ranked list.
 
@@ -608,9 +388,9 @@ The area under the curve represents the distribution of these genes across the r
 Higher peaks and more concentrated areas under the curve at the top of the list indicate stronger enrichment.
 
 
-```{r ridgeplot  gsea KEGG, fig.height=10, fig.width=7}
-ridgeplot(gsea_kegg, 
-  showCategory = 30, 
+```{r ridgeplot  gsea KEGG, fig.height=7, fig.width=7}
+enrichplot::ridgeplot(gsea_kegg, 
+  showCategory = 15, 
   fill = "p.adjust", 
   core_enrichment = TRUE, 
   label_format = 30, 
@@ -620,13 +400,18 @@ ridgeplot(gsea_kegg,
 
 ## gseaplot
 
-Another GSEA-specific plot. This will provide the GSEA plot for one term.
+Another GSEA-specific plot, which shows the contribution to the normalised enrichment score (NES) of genes across the gene list.
 
-```{r gseaplot GSEA GO MF }
+The gseaplot can plot one term at a time. 
 
-gene_set_id <- "hsa04110"
+The term 'hsa04020' (Calcium signaling pathway) has a positive NES, an adjusted P value of 0.00046 and a set size of 279. 
 
-p<- gseaplot( gsea_kegg,
+
+```{r gseaplot GSEA KEGG upreg, fig.width=10 }
+
+gene_set_id <- "hsa04020"
+
+enrichplot::gseaplot( gsea_kegg,
   gene_set_id, 
   by = "all", 
   title = paste("GSEA result:", gene_set_id),
@@ -635,27 +420,100 @@ p<- gseaplot( gsea_kegg,
   color.vline = "#FA5860"
 )
 
-print(p)
+```
+
+The term 'hsa04062' (Chemokine signaling pathway) has a negative NE, a highyl significant adjusted P value of 1.11E-06 and a set size of 129. 
+
+```{r gseaplot GSEA KEGG downreg, fig.width=10 }
+
+gene_set_id <- "hsa04062"
+
+enrichplot::gseaplot( gsea_kegg,
+  gene_set_id, 
+  by = "all", 
+  title = paste("GSEA result:", gene_set_id),
+  color = "black", 
+  color.line = "green", 
+  color.vline = "#FA5860"
+)
+
+
+```
+
+
+The term 'hsa05163' has a slightly negative NES and a borderline adjusted P value of 0.046.
+
+```{r gseaplot GSEA KEGG nonsignif, fig.width=10 }
+
+gene_set_id <- "hsa05163"
+
+enrichplot::gseaplot( gsea_kegg,
+  gene_set_id, 
+  by = "all", 
+  title = paste("GSEA result:", gene_set_id),
+  color = "black", 
+  color.line = "green", 
+  color.vline = "#FA5860"
+)
+
+
 ```
 
 
 
-# 6. Additional database support with `enricher` and `GSEA` functions
+# 6. Save versions and session details 
 
-One of the great features of `clusterProfiler` is the ability to run ORA or GSEA over any gene set or database that isn't natively supported with the `gse<DB>` or `enrich<DB>` functions. This is through the use of the generic ORA and GSEA fnctions `enricher` and `GSEA`. The database and annotation details are provided to the functions through the `TERM2GENE` and `TERM2NAME` arguments. These are custom files that map your gene IDs to database terms. 
+R version and package versions:
 
-This enables extensive database support, as well as the option to analyse novel genomes. 
+```{r info }
+sessionInfo()
+```
 
-The `TERM2GENE` file is a 2-column list of gene IDs against database/gene set term IDs. There is one gene per line, and a gene can be on many lines ie be mapped to more than one term.
-
-The `TERM2NAME` file will contain the ID of the term from the database, alongside its description, eg  `GO:0003676	nucleic acid binding`. 
-
-So the `TERM2GENE` file is species-specific, while the `TERM2NAME` is generic, but subset to only include the terms that are present in the `TERM2GENE` file. 
+And RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
 
 
- *** MAYBE THIS WILL BE INCLUDED IN NOTEBOOK 4 FOR NOVEL SPECIES - UNDECIDED WHETHER TO DO CLUSTERPROFILER, WEBGESTALTR, OR BOTH ***
- *** WEBGESTALTR IS AMAZING BUT I HAVE NOT YET TRIED ITS NON MODEL DB FILES ***
- *** IF IT WORKS, I WILL PROBABLY USE IT OVER CP. MAYBE CAN INCLUDE EXAMPEL CODE FOR BOTH SOMEWHERE *** 
+```{r rstudio version - not run during knit, eval=FALSE}
+# Get RStudio version information
+rstudio_info <- RStudio.Version()
+
+# Convert the version information to a string
+rstudio_version_str <- paste(
+  "RStudio Version Information:\n",
+  "Version: ", rstudio_info$version, "\n",
+  "Release Name: ", rstudio_info$release_name, "\n",
+  "Long Version: ", rstudio_info$long_version, "\n",
+  "Mode: ", rstudio_info$mode, "\n",
+  "Citation: ", rstudio_info$citation,
+  sep = ""
+)
+
+# Write the output to a text file
+writeLines(rstudio_version_str, "rstudio_version.txt")
+
+```
+
+```{r rstudio version saved from text}
+
+# Read the saved version information from the file
+rstudio_version_text <- readLines("rstudio_version.txt")
+
+# Print the version information to the document
+rstudio_version_text
+
+```
+
+
+# 7.  Knit workbook to HTML
+
+The last task is to knit the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work.
+
+On the editor pane toolbar, under Preview, select Knit to HTML.
+
+If you have already run Preview, you will see Knit instead of Preview.
+
+The HTML file will be saved in the same directory as the notebook, and with the same filename, but the .Rmd prefix will be replaced by .html. The knit HTML will typically open automatically once complete. If you receive a popup blocker error, click cancel, and in the Files pane of RStudio, single click the gprofiler.html file and select View in Web Browser.
+
+Note that the notebook will only successfully knit if there are no errors in the code. You can 'preview' HTML with code errors.
 
 
 
