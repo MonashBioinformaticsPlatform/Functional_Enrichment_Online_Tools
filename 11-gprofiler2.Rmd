@@ -45,9 +45,10 @@ Since we are doing ORA, we will need a filtered gene list, and a background gene
 - We have verified that `gprofiler2` results match the results from `g:Profiler` web
 - We have captured all version details relevant to the session within the R notebook
 
+<p>&nbsp;</p>  <!-- insert blank line -->
+
 The last task is to `knit` the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work. 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
 
 &#x27A4; Knit the notebook to HTML 
 
@@ -55,7 +56,13 @@ On the `editor` pane toolbar, under `Preview`, select `Knit to HTML`.
 
 If you have already run `Preview`, you will see `Knit` instead of `Preview`. 
 
-Note that the notebook will only knit if there are <span style="color: red;">no errors</span> in the code. You can 'preview' HTML with code errors. 
+The HTML file will be saved in the same directory as the notebook, and with the same filename, but the `.Rmd` prefix will be replaced by `.html`. The knit HTML will typically open automatically once complete. If you receive a popup blocker error, click `cancel`, and in the `Files` pane of RStudio, single click the `gprofiler.html` file and select `View in Web Browser`. 
+
+<img src="images/open-html-rstudio.png" style="border: none; box-shadow: none; background: none; ">
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+Note that the notebook will only successsfully knit if there are <span style="color: red;">no errors</span> in the code. You can 'preview' HTML with code errors. 
 
 ✋ **If your knit fails, please ask for assistance resolving the errors**  
 

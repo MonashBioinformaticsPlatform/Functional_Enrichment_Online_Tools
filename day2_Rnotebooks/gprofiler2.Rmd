@@ -447,28 +447,51 @@ To access the tabular results separately, they need to be split, as the default 
 
 ***NOT WORKING***
 
+
+
 ```{r}
-filename <- "publish-gosttable-multi.pdf"
-publish_gosttable( ora_multi, highlight_terms = NULL, use_colors = TRUE, show_columns = c("source", "term_name", "term_size", "intersection_size"), filename, ggplot = TRUE )
+
+NR <- nrow(ora$result)
+NS <- ifelse(NR < 10, NR, 10)
+termSource <- sample(nrow(ora$result), NS)
+VEC <- ora$result[termSource, "term_id"]
+
+publish_gosttable(ora,
+  highlight_terms = VEC,
+  use_colors = TRUE,
+  show_columns = c("source", "term_name", "term_size", "intersection_size"),
+  filename = NULL)
+
+
 ```
+Head ora multi in notebook: 
 
-
-```{r view multiquery rsult table}
+```{r}
 head(ora_multi$result)
 ```
 
+
 ```{r}
-# Save ora_multi$result as a TSV file
-#write.table(ora_multi$result, "gprofiler_multiquery_results.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
 
+NR <- nrow(ora_multi$result)
+NS <- ifelse(NR < 10, NR, 10)
+termSource <- sample(nrow(ora_multi$result), NS)
+VEC <- ora_multi$result[termSource, "term_id"]
 
-ora_multi_reordered <- ora_multi$result[, c("source", "term_name", "term_id", "p_value", "term_size", "query_size", "intersection_size", "effective_domain_size")]
+filename <- "publish-gosttable-multi.pdf"
 
-head(ora_multi_reordered)
+publish_gosttable(ora,
+  highlight_terms = VEC,
+  use_colors = TRUE,
+  show_columns = c("source", "term_name", "term_size", "intersection_size", "p_values", "significant"),
+  filename)
 
-write.csv(ora_multi_reordered, "gprofiler_ORA_results.csv", row.names = FALSE)
 
 ```
+
+
+
+
 
 ***END NOT WORKING***
 
@@ -565,23 +588,52 @@ We can also capture the version of R and other session details including all loa
 ```{r info }
 sessionInfo()
 ```
-And finally, the RStudio verson: 
 
-```{r rstudio v}
-RStudio.Version()
+And finally, the RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
+
+
+
+```{r rstudio version - not run during knit, eval=FALSE}
+# Get RStudio version information
+rstudio_info <- RStudio.Version()
+
+# Convert the version information to a string
+rstudio_version_str <- paste(
+  "RStudio Version Information:\n",
+  "Version: ", rstudio_info$version, "\n",
+  "Release Name: ", rstudio_info$release_name, "\n",
+  "Long Version: ", rstudio_info$long_version, "\n",
+  "Mode: ", rstudio_info$mode, "\n",
+  "Citation: ", rstudio_info$citation,
+  sep = ""
+)
+
+# Write the output to a text file
+writeLines(rstudio_version_str, "rstudio_version.txt")
+
 ```
+
+```{r rstudio version saved from text}
+
+# Read the saved version information from the file
+rstudio_version_text <- readLines("rstudio_version.txt")
+
+# Print the version information to the document
+rstudio_version_text
+
+```
+
 ## Knit workbook to HTML
 
-The last task is to `knit` the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work. 
+The last task is to knit the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work.
 
-On the editor pane toolbar, under 'Preview', select 'Knit to HTML'.
+On the editor pane toolbar, under Preview, select Knit to HTML.
 
-If you have already run 'Preview', you will see 'Knit' instead of 'Preview'.  
+If you have already run Preview, you will see Knit instead of Preview.
 
+The HTML file will be saved in the same directory as the notebook, and with the same filename, but the .Rmd prefix will be replaced by .html. The knit HTML will typically open automatically once complete. If you receive a popup blocker error, click cancel, and in the Files pane of RStudio, single click the gprofiler.html file and select View in Web Browser.
 
-
-
-
+Note that the notebook will only successfully knit if there are no errors in the code. You can 'preview' HTML with code errors.
 
 
 
