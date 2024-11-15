@@ -49,8 +49,14 @@ The last task is to `knit` the notebook. Our notebook is editable, and can be ch
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; Knit the notebook to HTML
+&#x27A4; Knit the notebook to HTML 
 
-Note that the notebook will only knit if there are no errors in the code. If your knit fails, please ask for assistance resolving the errors ✋ 
+On the `editor` pane toolbar, under `Preview`, select `Knit to HTML`.
+
+If you have already run `Preview`, you will see `Knit` instead of `Preview`. 
+
+Note that the notebook will only knit if there are <span style="color: red;">no errors</span> in the code. You can 'preview' HTML with code errors. 
+
+✋ **If your knit fails, please ask for assistance resolving the errors**  
 
 
