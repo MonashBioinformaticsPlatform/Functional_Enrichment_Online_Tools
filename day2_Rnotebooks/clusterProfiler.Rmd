@@ -1,5 +1,5 @@
 ---
-title: "Enrichment with clusterProfiler"
+title: "Enrichment with clusterProfiler and visualisation with enrichplot"
 output:
   html_document:
     df_print: paged
@@ -13,6 +13,7 @@ library(biomaRt)
 library(org.Hs.eg.db)
 library(dplyr)
 library(ggupset)
+library(ggplot2)
 ```
 
 
@@ -91,7 +92,7 @@ Check the usage for the `bitr` function:
 ?bitr
 ```
 
-We need to understand what are the valid `fromType` and `toType`, and it turns out we need an Org.db! This is a Bioconductor annotation package, of which there are currently only 20. So while the `gseKEGG` function supports all organisms in KEGG, performing gene ID conversion within `clusterProfiler may not be possible for non-model species and you would need to seek a different method.  
+We need to understand what are the valid `fromType` and `toType`, and it turns out we need an Org.db to use `bitr`! This is a Bioconductor annotation package, of which there are currently only 20. So while the `gseKEGG` function supports all organisms in KEGG, performing gene ID conversion within `clusterProfiler may not be possible for non-model species and you would need to seek a different method.  
 
 We have already loaded the `org.Hs.eg.db` annotation library. We can use this to search `keytypes`:
 
@@ -101,7 +102,9 @@ keytypes(org.Hs.eg.db)
 
 Converting to ENTREZ will be compatible with `kegg`. So our `fromType` is `ENSEMBL` and `toType` is `ENTREZID`. Note that these are case sensitive! 
 
-The below code performs the reformatting and handles duplicates by keeping only the first occurrence of duplicate Entrez IDs within the input. Note that this is not ideal and for a real experiment you should print out a list of duplcaites, carefully review these and choose which and how to retain based on your biological context.
+If we were to run `enrichGO` or `gseaGO` that require a Bioconductor Org.db package, we would not need to do a conversion, as both of the gene ID types within our input data (`ENSEMBL` and `SYMBOL`) are natively supported. 
+
+The below code performs the reformatting and handles duplicates by keeping only the first occurrence of duplicate Entrez IDs within the input. Note that this is not ideal and for a real experiment you should print out a list of duplicates, carefully review these and choose which and how to retain based on your biological context.
 
 First, convert map the ENSEMBL gene IDs from our 'ranked' list to ENTREZ gene IDs: 
 
@@ -219,7 +222,7 @@ write.table(gsea_kegg, file = "clusterProfiler_gseKEGG_results.tsv", sep = "\t",
 You can view the table in the `editor` pane by clicking on it from the `Files` pane.  
 
 
-## Dotplot 
+## dotplot 
 
 A dotplot is an easy to interpret plot. The size of the dot is proportional to the number of genes (count) in that term. A higher GeneRatio indicates that a larger portion of the gene set is significantly altered or associated with the observed changes in gene expression. 
 
@@ -241,7 +244,7 @@ clusterProfiler::dotplot(
 
 
 
-## Upset plot
+## upsetplot
 
 The upset plot shows the pattern of shared genes among the enriched terms (since a gene can belong to multiple terms or pathways).
 
@@ -262,9 +265,9 @@ enrichplot::upsetplot(gsea_kegg, n = 10)
 
 
 
-## Enrichment map
+## emapplot
 
-The enrichment map organises enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
+The enrichment map plot organises enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
 
 It is required to run the function `pairwise_termsim` before producing the plot. 
 
@@ -300,11 +303,11 @@ Plot view within the notebook affects the clarity of the cluster tags, however p
 enrichplot::treeplot(gsea_kegg, showCategory = 15, color = "p.adjust", cluster.params = list(label_words_n = 5))
 ```
 
-## cnet plot
+## cnetplot
 
 The cnetplot is helpful to understanding which genes are involved in the enriched terms, details that are not available in the plots generated so far. It depicts the linkages of genes and terms as a network. 
 
-For GSEA, where all genes (not jsut DEGs) are used, only the 'core' enriched genes (ie the subset of genes that are most strongly associated with a specific term) are used to create the network plot. 
+For GSEA, where all genes (not jsut DEGs) are used, only the 'core' enriched genes are used to create the network plot. These are the 'leading edge genes', those genes up to the point where the Enrichment Score (ES) gets maximised from the base zero. In other words, the subset of genes that are most strongly associated with a specific term. 
 
 There are a few parameters to play around with here to get a readable plot. 
 
@@ -356,28 +359,45 @@ Now we can clearly see the gene IDs for this network.
 
 ## heatplot
 
-Like the upset plot, the heatplot shows shared genes across enriched terms. When there are a lot of genes, it can be poorly readable, especially within the notebook. This function does not restrict to 'core' genes like the `cnetplot` or `ridgeplot`. 
+Like the upset plot, the heatplot shows shared genes across enriched terms. When there are a lot of genes, it can be poorly readable, especially within the notebook. This function does not include a parameter to restrict to 'core' genes like the `cnetplot` or `ridgeplot` so even when plotting a very small number of enriched terms, the X-axis is too cramped to be readable.
 
-Here is a discussion of the topic: https://support.bioconductor.org/p/9148486/
+
 
 ```{r heatplot GSEA KEGG }
-
-
 enrichplot::heatplot(gsea_kegg, showCategory = 3)
 ```
-Saving to a file doesn't help much either. 
+The gseKEGG result contains a data column containing the core/leading edge genes: 
 
+```{r show GES result columns}
+colnames(gsea_kegg@result)
+```
+
+So we can extract those and provide these to the heatmap to try to improve clarity. The downside of course is that we then lose some of the information about which genes are shared across terms.
+
+
+```{r heatplot GSEA KEGG core genes}
+
+# create an object that contains the core genes grouped by term and their fold change values 
+ranked_core_genes <- ranked[names(ranked) %in% gsea_kegg$core_enrichment]
+
+# Plot with just core genes
+enrichplot::heatplot(gsea_kegg, foldChange = ranked_core_genes, showCategory = 3)
+
+```
+
+Saving to a file only improve things slightly. 
 
 ```{r}
-pdf("clusterprofiler_gseKEGG_heatplot.pdf", width = 11.7, height = 8.3)
-enrichplot::heatplot(gsea_kegg, showCategory = 3)
+png("clusterprofiler_gseKEGG_heatplot.png", width = 11.7, height = 8.3, units = "in", res = 300)
+#enrichplot::heatplot(gsea_kegg, showCategory = 3)
+enrichplot::heatplot(gsea_kegg, foldChange = ranked_core_genes, showCategory = 3)
 dev.off()
 
 ```
 
 
 
-# ridgeplot
+## ridgeplot
 
 This function is specific for GSEA. It does not apply to ORA, since it plots NES.  
 
@@ -414,7 +434,7 @@ gene_set_id <- "hsa04020"
 enrichplot::gseaplot( gsea_kegg,
   gene_set_id, 
   by = "all", 
-  title = paste("GSEA result:", gene_set_id),
+  title = paste("GSEA KEGG result:", gene_set_id),
   color = "black", 
   color.line = "green", 
   color.vline = "#FA5860"
@@ -431,7 +451,7 @@ gene_set_id <- "hsa04062"
 enrichplot::gseaplot( gsea_kegg,
   gene_set_id, 
   by = "all", 
-  title = paste("GSEA result:", gene_set_id),
+  title = paste("GSEA KEGG result:", gene_set_id),
   color = "black", 
   color.line = "green", 
   color.vline = "#FA5860"
@@ -450,7 +470,7 @@ gene_set_id <- "hsa05163"
 enrichplot::gseaplot( gsea_kegg,
   gene_set_id, 
   by = "all", 
-  title = paste("GSEA result:", gene_set_id),
+  title = paste("GSEA KEGG result:", gene_set_id),
   color = "black", 
   color.line = "green", 
   color.vline = "#FA5860"
@@ -459,6 +479,33 @@ enrichplot::gseaplot( gsea_kegg,
 
 ```
 
+## volcano plot
+
+The `volplot` function within `enrichplot` does not support GSEA result, but we can use `ggplot2` for this. 
+
+The volcano plot has the advantage of showing whether the genes in the enriched terms were predominantly from the top (upregulated) or bottom (downregulated) end of the list. 
+
+
+```{r}
+ggplot2::ggplot(gsea_kegg@result, aes(x = enrichmentScore, y = -log10(p.adjust), color = p.adjust)) +
+  geom_point(alpha = 0.7, size = 2) +  # Adjust point size
+  scale_color_gradient(low = "blue", high = "red") +  # Color by p.adjust values
+  theme_minimal() +
+  labs(title = "GSEA KEGG",
+       x = "Enrichment Score (NES)",
+       y = "-log10(Adjusted P-value)",
+       color = "Adjusted P-value") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels for readability
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +  # Add vertical line at x=0
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "black") +  # Add horizontal line at p=0.05 cutoff
+  geom_text(aes(label = Description),
+            hjust = 0.5,
+            vjust = -0.5,  # Move labels higher off the points
+            size = 3,
+            check_overlap = TRUE,
+            alpha = 0.7)  # Add labels for each pathway term
+
+```
 
 
 # 6. Save versions and session details 
