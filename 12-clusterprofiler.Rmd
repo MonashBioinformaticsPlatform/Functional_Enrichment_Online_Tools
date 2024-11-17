@@ -57,7 +57,11 @@ Let's head over to RStudio now and try out some functions! 🏃
 
 
 
-&#x27A4; Open the `clusterProfiler.Rmd` notebook using `File` &rarr; `Open file`, or use the keyboard shortcut `ctrl + o`. 
+&#x27A4; Open the `clusterProfiler.Rmd` notebook
+
+&#x27A4; Load the notebook `gprofiler2.Rmd` notebook by clicking on it in the `Files` pane
+
+You could also open the file by selecting `File` &rarr; `Open file`, or use the keyboard shortcut `ctrl + o`. 
 
 **<span style="color: #006400;">Instructions for the analysis will continue from the R notebook.</span>**
 
