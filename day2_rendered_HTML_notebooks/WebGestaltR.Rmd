@@ -8,113 +8,77 @@ output: html_notebook
 library(WebGestaltR)
 library(readr)
 library(dplyr)
-
+library(enrichplot)
 
 #library(ReactomePA)
 #library(clusterProfiler)
 ```
 
+# 0. Working directory
 
+```{r check notebook workdir}
+getwd()
+```
 
+`WebGestaltR` outputs results to a folder containing multiple files. Make a parent directory for the results of this tool:
 
-
-
-
-
-
-
-
-Focus on GO hierarchy and redundant terms: 
-Run GO_MF regular vs GO_MF_nonRedudnant
-
-Highlight the  differences - check the number of significant terms (either from R CLI or HTML report or both - plot venn, print out the unique terms
-
-Focus on one of the unique terms, show what has been dropped from the non-redundant analysis and the parent-child hierarchy on GO. 
-
-This neat feature of WebGestatlR saves using topGO or rrvgo
-Drops the generic higher order parent terms so we have fewer more specific terms to focus on
-
-~~~
-
-# [WebgestaltR](https://cran.r-project.org/web/packages/WebGestaltR/WebGestaltR.pdf)
-
-enrichMethod organism Enrichment methods: ORA, GSEA or NTA.
-NTA = network topology analysis
-
-
-LIST OF AMAZING THINGS ABOUT WEBGESTALTR:
-- makes great html reports with interactive plots and links to external dbs
-- saves the results to disk when running, no need to export stuf and save files manually 
-- many dbs and gene lists supported (n = 70) 
-- supports metabolomics, with 15 different ID types, see new paper https://academic.oup.com/nar/article/52/W1/W415/7684598#google_vignette 
-- can be used for novel species, but i havent tried it yet... 
-- does ORA, GSEA, and NTA. I wonder if the NTA works at all for novel species???! 
-- super easy to run. many supported namespaces (n = 73), does not require conversions for different functions like clusterProfiler, can even have different napesapce for ORA gene list and background list 
-- "Multiple databases in a vector are supported for ORA and GSEA" 
-
-**Must add GO vs GO Slim!**
-
-WebGestaltR supports 12 species directly, however, you can import your own database files to perform ORA and GSEA for novel species :-) 
-
-From the user guide: "Users can also input 'others' to perform the enrichment analysis for other organisms not supported by WebGestaltR. For other organisms, users need to provide the functional categories, interesting list and reference list (for ORA method). Because WebGestaltR does not perform the ID mapping for the other organisms, the above data should have the same ID type" 
-
-```{r view organisms }
-listOrganism()
+```{r create output dir}
+dir.create("WebGestaltR_results")
 ```
 
 
 
-```{r list available namespace options}
+# 1. Explore natively supported organisms, namespaces and databases 
 
+WebGestaltR supports 12 species directly, however, you can import your own database files to perform ORA and GSEA for novel species :-) We will do that in the next session. 
+
+The next two commands have a default setting of  `organism = "hsapiens"` (hint: check with `?listOrganism` and `?listIdType`).
+
+Let's view the list of supported organisms. We don't have to specify any arguments to the function as the defaults do what we need. We do however need the empty brackets. Without them will print the function source code. 
+
+```{r list organisms }
+listOrganism()
+```
+
+View databases for human. Use the black arrow on the right of the table to view the other 2 columns, and use the numbers below the table (or 'next') to view the next 10 rows.
+
+```{r list databases}
+listGeneSet()
+```
+
+And the supported human namespaces: 
+
+```{r list namespaces}
 listIdType()
 
 ```
 
-```{r}
-listIdType( organism = "cfamiliaris")
+Pick your favourite species from the list of 12, using the same spelling as shown in the `listOrganism()` function, and investigate which namespaces and databases are available: 
+
+```{r favourite species}
+fave <- "cfamiliaris"
 ```
-```{r}
+
+
+```{r favourite species ids}
+listIdType( organism = fave)
+```
+
+
+```{r favourite species databases}
 listGeneSet(organism = "cfamiliaris")
 ```
 
 
-WebGestaltR supports 70 databases!
-
-Use ight arr wot vo view other columsn - there is also description and ID type 
-
-```{r}
-#enrichDatabase : The functional categories for the enrichment analysis. Users can use the function listGeneSet to check the available functional databases for the selected organism. Multiple databases in a vector are supported for ORA and GSEA
-listGeneSet()
-
-```
-
-```{r}
-# Get the list of gene sets
-gene_sets_df <- listGeneSet()
-
-# Extract the description for the desired gene set
-description <- gene_sets_df$description[gene_sets_df$name == "geneontology_Molecular_Function_noRedundant"]
-
-# Print the description
-print(description)
-```
 
 
-# 1. Load input data and extract ranked gene list
-
-We will use the same Pezzini RNAseq dataset as earlier. First, confirm your working directory is the `Functional_enrichment_workshop_2024/day_2` folder.
-
-```{r setup, include=FALSE}
-# Set the root directory for all notebook chunks
-
-getwd()
-
-```
 
 
-Please ask for assistance if this step does not show the day_2 folder path!
+# 2. Load input data and extract gene lists
 
-Once your working directory is set, load the dataset and extract the gene lists.
+We will use the same Pezzini RNAseq dataset as earlier. Since we have previously saved our ranked list, DEGs and background genes to the `workshop` folder, we could import those. However, clarity of how the gene list inputs were made is retained within the notebook, and this enhances reproducibility. Gene lists are quick and simple to extract from the input data. If the process was slow and compute-intensive, we would instead document the source and methods behind the gene lists in the notebook comments instead of re-creating them!
+
+Load and check the input dataset:
 
 ```{r load input data}
 
@@ -124,23 +88,27 @@ head(data)
 ```
 
 
-```{r extract gene lists}
+Before we extract the gene lists, we need to understand what class of object is required by the enrichment function. For this package, the single enrichment function shares the package name.  
 
-# Ranked gene list vector for GSEA - VECTOR - required for clsuterProfiler
-# ranked <- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.ID[order(-data$Log2FC)])
+Bring up the help menu for the `WebGestaltR` function and spend a few minutes reviewing the parameters. 
 
-# dataframe - required for webgestaltr 
-ranked <- data %>%
-  arrange(desc(Log2FC)) %>%
-  dplyr::select(Gene.ID, Log2FC)
+There are quite a few! For many of them (eg gene set size filters, multiple testing correction method, P value cutoff) the default settings are suitable. 
+
+In particular, look for the arguments that control:
+
+- whether ORA, GSEA or NTA is performed
+- which database/s to run enrichment on
+- what is the namespace for the gene list query 
+- how to specify the input gene list/s
+
+Hopefully you've discovered that the `WebGestaltR` function can intake either gene lists from files (as long as the right column format and file suffix is provided) or R objects! 
+
+Since we have decided to extract the gene lists from the DE matrix to R objects, we need to provide the gene list object to `interestGene` parameter (and `referenceGene` for ORA background). For ORA, the gene lists need to be vectors, and for GSEA, a 2-column dataframe (unlike `clusterProfiler`, which requires a GSEA vector).
+
+Our input matrix contains ENSEMBL IDs as well as official gene symbols, so we could use "ensembl_gene_id" or "genesymbol" for the parameter `interestGeneType`. Let's extract the ENSEMBL IDs since they are more specific than symbol. 
 
 
-head(ranked)
-tail(ranked)
-```
-
-```{r get vectors for ORA }
-
+```{r extract ora gene list vectors}
 # Filter genes with adjusted p-value < 0.01 and absolute log2 fold change > 2
 DEGs <- data %>%
   filter(FDR < 0.01, abs(Log2FC) > 2) %>%
@@ -150,273 +118,208 @@ DEGs <- data %>%
 background <- data %>%
   pull(Gene.ID)
 
-
-```
-
-```{r}
-
-length(DEGs)
-length(background)
-```
-
-```{r}
-dir.create("WebGestaltR")
+# Check: 
+cat("Number of DEGS:", length(DEGs), "\n")
+cat("Number of background genes:", length(background), "\n")
+cat("First 6 DEGs:", head(DEGs), "\n")
+cat("Fist 6 background genes:", head(background), "\n")
 ```
 
 
-```{r ORA GO MF nonredundant}
+```{r extract ranked gene list dataframe}
+# extract ranked dataframe
+ranked <- data %>%
+  arrange(desc(Log2FC)) %>%
+  dplyr::select(Gene.ID, Log2FC)
 
-outputDirectory <- "WebGestaltR" 
-project <- "ora_GO-MF_non-redundant"
-database  <- "geneontology_Molecular_Function_noRedundant"
+# check
+head(ranked)
+tail(ranked)
+```
 
-{ ora_gomf_nr <- WebGestaltR(
-    organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
+
+# 3. Run ORA over multiple databases
+
+`WebGestaltR` makes it simple to enrich over many databases at once in one run command. To do this, we just need to provide the arguments to the `enrichDatabase` parameter as a list of database names instead of a single database name. 
+
+For this task, let's focus on the pathway gene sets. From skimming the output of `listGeneSet()` there were a few. We could manually locate these and copy them in to our list, or take advantage of the fact that the `WebGestaltR` developers have been systematic in the gene set naming, so that they are all prefixed with their type, ie `geneontology_`, `pathway_`, `network_`, plus a few others. 
+
+```{r select pathway databases}
+# Save the list of databases for human
+databases <- listGeneSet()
+
+# Extract the the pathways from the 'name' column that start with 'pathway'
+pathway_dbs <- subset(databases, grepl("^pathway", name))
+
+# Save the pathway names to a list
+pathway_names <- pathway_dbs$name
+
+# Check the list
+print(pathway_names)
+```
+
+This gives us the same result as `pathway_names <- c("pathway_Reactome", "pathway_KEGG", "pathway_Panther", "pathway_Wikipathway", ""pathway_Wikipathway_cancer")` but with less typing :-) 
+
+
+Since these VMs have 8 cores, let's set `nThreads` to 6. For ORA, this will make very little difference, as the analysis is very fast, yet for GSEA, it can speed up the analysis a lot. 
+
+In testing, running GSEA over these 5 pathway databases with our ranked query and the default of 1,000 GSEA permutations required 24.1 minutes without threading, and 6.8 minutes with `nThreads = 6`. 
+
+There is also a function `WebGestaltRBatch` and this is for processing multiple input query lists. With this function, you can also set `isParallel = TRUE` along with `nThreads = N` to run your batch of query lists with multiple threads and in parallel rather than sequentially for much faster run times, assuming you had the compute resources to do so. 
+
+Since we don't want to wait 7 minutes for a result, let's run this multi-database query with ORA.  
+
+
+
+```{r ORA pathways}
+# Specify output directory (must exist) 
+outdir <- "WebGestaltR_results"
+
+# Specify project name
+project = "ORA_pathways"
+
+WebGestaltR(
+    organism = "hsapiens",                   # Species
     enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
-    interestGene = DEGs,                # Your gene list
+    interestGene = DEGs,                # Query gene list
+    interestGeneType = "ensembl_gene_id",         # Gene ID type for gene list
+    referenceGene = background,                    # Background gene list
+    referenceGeneType = "ensembl_gene_id",        # Gene ID type for background
+    enrichDatabase = pathway_names,  # Database name or list of databases to enrich over
+    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    fdrMethod = "BH",                        # Multiple testing correction method (BH = Benjamini-Hochberg)
+    sigMethod = "fdr",                       # Significance method ('fdr' = false discover rate)
+    fdrThr = 0.05,                           # FDR significance threshold
+    minNum = 10,                              # Minimum number of genes in a gene set to include
+    maxNum = 500,                             # Maximum number of genes in a gene set to include
+    outputDirectory = outdir,
+    projectName = project,
+    nThreads = 6
+)
+```
+
+The results are saved within a new folder inside our new folder `WebGestaltR_results/ORA_pathways`. There are a number of results files, the one we will focus on is the interactive HTML summary file. 
+
+In the `Files` pane, open the folder `WebGestaltR_results/ORA_pathways` then click on the `Report_ORA_pathways.html` file. Select `View in Web Browser`.
+
+Some things to note:
+
+- The reports contain a [GO Slim](https://geneontology.org/docs/go-subset-guide/) summary, which provides a high level summary of the enriched terms by grouping them into broader categories or "slims." 
+
+- You can change the 'Enrichment Results' view from table to baar chart or volcano plot 
+
+- You can increase the default view of 20 rows to 'All' for the enrichment table, but this does not necessarily show all significant enrichments! Check the output file `enrichment_results_ORA_pathways.txt` and you can see 85 significant terms, yet 'All' view with default of 20 rows shows 30 something. To increase the number of rows included in the HTML report, use the parameter `reportNum`. 
+
+- You can run algorithms to reduce the number of terms through clustering, in order to make the results more manageable. This is discussed in the WebGestalt 2019 update publication [Liao et al 2019](https://academic.oup.com/nar/article/47/W1/W199/5494758). The authors maintain that "important biological themes are all covered with these selected gene sets". 
+
+- Selecting a term from the 'Enrichment Results' table updates the term under 'Select an enriched analyte set', where more detailed results are shown, including the genes from your gene list present within the gene set for that term. 
+
+- At 'Analyte set: <TERM ID>' you can click the link to open the database page for that term in a new browser tab
+
+
+
+# 4. Explore the 'noRedundant' gene ontology databases
+
+It's well known that the GO hierarchy, by definition, includes redundancy. When performing enrichment, higher-order terms in the hierarchy are often significant yet not particularly informative. 
+
+Tools such as [topGO](https://bioconductor.org/packages/release/bioc/html/topGO.html) and [REVIGO](http://revigo.irb.hr/) are dedicated to removing redundancy from the Gene Ontology. Add to that list `WebGestaltR` and (WebGestalt web of course!) 
+
+This tool runs its own redundancy filter over the GO databases to produce refined database versions:
+
+- geneontology_Cellular_Component_noRedundant
+- geneontology_Cellular_Component_noRedundant
+- geneontology_Molecular_Function_noRedundant
+
+We can read about their approach in the 'description' column of the database:
+
+```{r go-mf-nr description}
+databases$description[databases$name == "geneontology_Molecular_Function_noRedundant"]
+```
+
+
+
+Let's run enrichment over the full and the non-redundant version of the GO MF databases, and compare the results. We expect to see more specific terms highlighted in the "noRedundant" version, since the highly significant yet non-informative higher-order terms have been removed. 
+
+Let's use GSEA since we have already tried the ORA with this package. GSEA is slower and GO is large, so even with 7 threads these commands will take a few minutes (longer for redundant than non-redundant, of course). Feel free to use the compute time to ask questions on slack or explore the ORA pathways output some more!
+
+```{r GSEA GO MF with redundant}
+
+outputDirectory <- "WebGestaltR_results" 
+project <- "GSEA_GO-MF_with-redundant"
+database  <- "geneontology_Molecular_Function"
+
+gomf <- WebGestaltR(
+    organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
+    enrichMethod = "GSEA",                    # Perform ORA, GSEA or NTA
+    interestGene = ranked,                # Your gene list
     interestGeneType = "ensembl_gene_id",         # Specify the gene ID type
-    referenceGene = background,                    # Use the default background or provide your own
-    referenceGeneType = "ensembl_gene_id",        # Background gene ID type 
     enrichDatabase = database,  # The database for enrichment analysis
     isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
     fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
     sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
     fdrThr = 0.05,                           # FDR significance threshold
-    minNum = 5,                              # Minimum number of genes per category
+    minNum = 10,                              # Minimum number of genes per category
     maxNum = 500,                             # Maximum number of genes per category
     boxplot = TRUE,
     outputDirectory = outputDirectory,
-    projectName = project
+    projectName = project,
+    nThreads = 7
 )
 
-}
 ```
+
 
 ```{r GSEA GO MF nonredundant}
 
-outputDirectory <- "WebGestaltR" 
-project <- "gsea_GO-MF_non-redundant"
+outputDirectory <- "WebGestaltR_results" 
+project <- "GSEA_GO-MF_non-redundant"
 database  <- "geneontology_Molecular_Function_noRedundant"
 
-{ gsea_gomf_nr <- WebGestaltR(
+gomf_nr <- WebGestaltR(
     organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
-    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
-    interestGene = DEGs,                # Your gene list
+    enrichMethod = "GSEA",                    # Perform ORA, GSEA or NTA
+    interestGene = ranked,                # Your gene list
     interestGeneType = "ensembl_gene_id",         # Specify the gene ID type
-    referenceGene = background,                    # Use the default background or provide your own
-    referenceGeneType = "ensembl_gene_id",        # Background gene ID type 
     enrichDatabase = database,  # The database for enrichment analysis
     isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
     fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
     sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
     fdrThr = 0.05,                           # FDR significance threshold
-    minNum = 5,                              # Minimum number of genes per category
+    minNum = 10,                              # Minimum number of genes per category
     maxNum = 500,                             # Maximum number of genes per category
     boxplot = TRUE,
     outputDirectory = outputDirectory,
-    projectName = project
-)
-
-}
-```
-
-
-```{r nta}
-
-network_gene_sets <- grep("^network", listGeneSet(), value = TRUE)
-####### NTA example ######### 
-
-outputDirectory <- "WebGestaltR" 
-project <- "gsea_GO-MF_non-redundant"
-database  <- "network_PPI_BIOGRID"
-
-
-WebGestaltR(enrichMethod="NTA",
-  organism="hsapiens",
-  enrichDatabase=database,
-  interestGene=DEGs,
-  interestGeneType="ensembl_gene_id",
-  sigMethod="top",
-  topThr=10,
-  outputDirectory=getwd(),
-  highlightSeedNum=10,
-  networkConstructionMethod="Network_Retrieval_Prioritization")
-
-
-
-```
-
-
-. 
-
-
-```{r GSEA Reactome }
-
-#rankFile <- system.file("extdata", "GeneRankList.rnk", package="WebGestaltR")
-
-outputDirectory <- "../testing_WebGestaltR" 
-
-#gsea_vector <- setNames(gsea_gene_list$Log2FC, gsea_gene_list$Gene.ID)
-
-enrichResult <- WebGestaltR(enrichMethod="GSEA", 
-  organism="hsapiens",
-  enrichDatabase="pathway_Reactome",
-  interestGene=ranked,
-  interestGeneType="ensembl_gene_id",
-  sigMethod="top",
-  topThr=10,
-  minNum=5,
-  outputDirectory=outputDirectory)
-
-```
-Beautiful!! Output in folder named "Project_1731238499/" - is there a way to change the default naming??
-
-From the HTML report, user can click on the Reactome link for any of the enrichments, and be taken to the Reactome site page for that pathway. 
-
-
-
-
-```{r ORA Reactome }
-
-outputDirectory <- "../testing_WebGestaltR" 
-project <- "ora_reactome"
-
-system.time({ wgr_ora_reactome <- WebGestaltR(
-    organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
-    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
-    interestGene = DEGs,                # Your gene list
-    interestGeneType = "ensembl_gene_id",         # Specify the gene ID type
-    referenceGene = background,                    # Use the default background or provide your own
-    referenceGeneType = "ensembl_gene_id",        # Background gene ID type (if using a custom background)
-    enrichDatabase = "pathway_Reactome",  # The database for enrichment analysis
-    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
-    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
-    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
-    fdrThr = 0.05,                           # FDR significance threshold
-    minNum = 5,                              # Minimum number of genes per category
-    maxNum = 500,                             # Maximum number of genes per category
-    boxplot = TRUE,
-    outputDirectory = outputDirectory,
-    projectName = project
-)
-
-})
-```
-Run WebGestaltR over many databases at once: 
-
-Holy moly its so good 
- 
-```{r ORA Reactome MANY DBS}
-databases <- c("pathway_Reactome", "pathway_KEGG", "pathway_Panther", "pathway_Wikipathway")
-
-outputDirectory <- "../testing_WebGestaltR" 
-project <- "ora_reactome_PATHWAYS"
-
-WebGestaltR(
-    organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
-    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
-    interestGene = DEGs,                # Your gene list
-    interestGeneType = "ensembl_gene_id",         # Specify the gene ID type
-    referenceGene = background,                    # Use the default background or provide your own
-    referenceGeneType = "ensembl_gene_id",        # Background gene ID type (if using a custom background)
-    enrichDatabase = databases,  # The database for enrichment analysis
-    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
-    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
-    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
-    fdrThr = 0.05,                           # FDR significance threshold
-    minNum = 5,                              # Minimum number of genes per category
-    maxNum = 500,                             # Maximum number of genes per category
-    boxplot = TRUE,
-    outputDirectory = outputDirectory,
-    projectName = project
+    projectName = project,
+    nThreads = 7
 )
 
 ```
 
 
+Note that the HTML for GSEA also includes the GSEA plot. There is a sub-folder within the 'Project' output folder with every GSEA plot saved. 
 
 
-#### get reactome db version from web and save to notebook 
+** THIS PART IS WIP**
 
+Now that we have both results saved in R objects, we can compare the enriched terms. 
 
+Visualise the number of unique and shared terms: 
 
+```{r Count signif terms}
 
+nr_terms <- gomf_nr$geneSet
+r_terms <- gomf$geneSet
 
-
-
-
-```{r webgestalt ORA GO MF }
-
-outputDirectory <- getwd() 
-project <- "webgestaltR_GOMF"
-
-wg_ora_go_mf <- WebGestaltR(
-    organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
-    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
-    interestGene = ora_gene_list,                # Your gene list
-    interestGeneType = "ensembl_gene_id",         # Specify the gene ID type
-    referenceGene = background_gene_list,                    # Use the default background or provide your own
-    referenceGeneType = "ensembl_gene_id",        # Background gene ID type (if using a custom background)
-    enrichDatabase = "geneontology_Molecular_Function",  # The database for enrichment analysis
-    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
-    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
-    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
-    fdrThr = 0.05,                           # FDR significance threshold
-    minNum = 5,                              # Minimum number of genes per category
-    maxNum = 500,                             # Maximum number of genes per category
-    boxplot = TRUE,
-    outputDirectory = outputDirectory,
-    projectName = project
-)
-
+cat("Number of significant 'nonredundant' GO MF terms:", length(nr_terms), "\n")
+cat("Number of significant 'with redundant' GO MF terms:", length(r_terms), "\n")
 ```
 
+Clearly we have refined the results using the WebGestaltR reduced GO MF database. 
+
+What terms become apparent with the 
 
 
-
-
-```{r webgestalt ORA GO MF non-redundant }
-
-outputDirectory <- getwd() 
-project <- "webgestaltR_GOMF_noRedundant"
-
-wg_ora_go_mf_nr <- WebGestaltR(
-    organism = "hsapiens",                   # Use your species (e.g., "hsapiens" for humans)
-    enrichMethod = "ORA",                    # Perform ORA, GSEA or NTA
-    interestGene = ora_gene_list,                # Your gene list
-    interestGeneType = "ensembl_gene_id",         # Specify the gene ID type
-    referenceGene = background_gene_list,                    # Use the default background or provide your own
-    referenceGeneType = "ensembl_gene_id",        # Background gene ID type (if using a custom background)
-    enrichDatabase = "geneontology_Molecular_Function_noRedundant",  # The database for enrichment analysis
-    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
-    fdrMethod = "BH",                        # Correction method (e.g., Benjamini-Hochberg)
-    sigMethod = "fdr",                       # Significance method ('fdr' or 'top')
-    fdrThr = 0.05,                           # FDR significance threshold
-    minNum = 5,                              # Minimum number of genes per category
-    maxNum = 500,                             # Maximum number of genes per category
-    boxplot = TRUE,
-    outputDirectory = outputDirectory,
-    projectName = project
-)
-
-```
-
-
-Maybe a good activity for activity 2: use list organism to work out how to change to mouse, run the 'noRedundant vs redundant'. and compare. show how can minimise false positives. 
-
-Did this for Pezzini ORA GO MF: eg "binding" - there were 85 from the GO MF db and 34 from the GO MF noRedundant set. 
-
-Use R to filter which ones were dropped, and then show the GO hierarchy for one example parent term, show how the signiicant child term remaisn in the "no redundant" - helps to isoalt emore important results 
-
-Compare the enriched terms:
-
-Visulaise the number of unique and shared terms: 
-
-```{r Compare redundant v non-redundant}
-
-nr_terms <- wg_ora_go_mf_nr$geneSet
-r_terms <- wg_ora_go_mf$geneSet
-
+```{r}
 # Find unique terms
 unique_nr_terms <- setdiff(nr_terms, r_terms)
 unique_r_terms <- setdiff(r_terms, nr_terms)
@@ -424,7 +327,9 @@ unique_r_terms <- setdiff(r_terms, nr_terms)
 # Display the count of unique terms
 cat("Number of unique NR terms:", length(unique_nr_terms), "\n")
 cat("Number of unique R terms:", length(unique_r_terms), "\n")
+```
 
+```{r Show unique signif}
 # Display the unique terms themselves
 cat("Unique NR terms:\n", unique_nr_terms, "\n")
 cat("Unique R terms:\n", unique_r_terms, "\n")
@@ -499,44 +404,65 @@ grid.draw(venn.plot)
 Can we check the differences against the GO hierarchy to see what ahs been dropped/collapsed/popped out as unique? 
 
 
-```{r GSEA example }
+** END WIP**
 
-#rankFile <- system.file("extdata", "GeneRankList.rnk", package="WebGestaltR")
 
-outputDirectory <- getwd() 
+# 5. Save versions and session details 
 
-#gsea_vector <- setNames(gsea_gene_list$Log2FC, gsea_gene_list$Gene.ID)
+R version and package versions:
 
-enrichResult <- WebGestaltR(enrichMethod="GSEA", 
-  organism="hsapiens",
-  enrichDatabase="pathway_KEGG",
-  interestGene=gsea_gene_list,
-  interestGeneType="ensembl_gene_id",
-  sigMethod="top",
-  topThr=10,
-  minNum=5,
-  outputDirectory=outputDirectory)
+```{r info }
+sessionInfo()
+```
+
+
+
+
+And RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
+
+
+```{r rstudio version - not run during knit, eval=FALSE}
+# Get RStudio version information
+rstudio_info <- RStudio.Version()
+
+# Convert the version information to a string
+rstudio_version_str <- paste(
+  "RStudio Version Information:\n",
+  "Version: ", rstudio_info$version, "\n",
+  "Release Name: ", rstudio_info$release_name, "\n",
+  "Long Version: ", rstudio_info$long_version, "\n",
+  "Mode: ", rstudio_info$mode, "\n",
+  "Citation: ", rstudio_info$citation,
+  sep = ""
+)
+
+# Write the output to a text file
+writeLines(rstudio_version_str, "rstudio_version.txt")
+
+```
+
+```{r rstudio version saved from text}
+
+# Read the saved version information from the file
+rstudio_version_text <- readLines("rstudio_version.txt")
+
+# Print the version information to the document
+rstudio_version_text
 
 ```
 
 
 
-``` {r NTA example }
+# 6.  Knit workbook to HTML
 
-####### NTA example ######### 
-enrichResult <- WebGestaltR(enrichMethod="NTA",
-  organism="hsapiens",
-  enrichDatabase="network_PPI_BIOGRID",
-  interestGene=ora_gene_list,
-  interestGeneType="ensembl_gene_id",
-  sigMethod="top",
-  topThr=10,
-  outputDirectory=getwd(),
-  highlightSeedNum=10,
-  networkConstructionMethod="Network_Retrieval_Prioritization")
+The last task is to knit the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work.
 
+On the editor pane toolbar, under Preview, select Knit to HTML.
 
+If you have already run Preview, you will see Knit instead of Preview.
 
-```
+The HTML file will be saved in the same directory as the notebook, and with the same filename, but the .Rmd prefix will be replaced by .html. The knit HTML will typically open automatically once complete. If you receive a popup blocker error, click cancel, and in the Files pane of RStudio, single click the gprofiler.html file and select View in Web Browser.
+
+Note that the notebook will only successfully knit if there are no errors in the code. You can 'preview' HTML with code errors.
 
 

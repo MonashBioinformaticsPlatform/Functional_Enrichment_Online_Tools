@@ -7,14 +7,15 @@ This tool (both the web and R versions) has many features and advantages:
 - Simple to run 
 - Runs ORA, GSEA, and NTA (network topology analysis)
 - Natively supports 12 organisms
-- Can be used for novel species
-- Supports many namespaces (73) 
+- Can be used for novel species (we will do this in the final session)
+- Supports many namespaces (n = 73 for human) 
 - Does not require namespace conversion between the databases like  `clusterProfiler` does, and even allows different namespaces between query gene list and ORA background gene list 
-- Supports many databases/gene sets (70) including 'nonredundant' versions of GO
+- Supports many databases/gene sets (n = 70 for human) including 'nonredundant' versions of GO
 - Supports metabolomics, with 15 different ID types, described in [Elizarraras et al 2024](https://academic.oup.com/nar/article/52/W1/W415/7684598)
 - Can run query against multiple databases simultaneously by providing database names as a list to the enrichment function
 - Saves all results files to disk when running, no need to save  individual files manually
 - Creates interactive HTML reports with various plots and filter options and with term links to external databases
+- Supports multi-threading, parallelisation, and batch processing of multiple queries 
  
 
 
@@ -25,7 +26,6 @@ This tool (both the web and R versions) has many features and advantages:
 1. Explore the organisms, databases/gene sets and namespaces supported natively
 2. Run GSEA over KEGG database and explore the HTML output
 3. Run ORA over multiple databases simultaneously 
-4. Customise visualisation of WebGestaltR results with `enrichplot`
 4. Explore the impact of using the 'non-redundant' GO database to the full GO database 
 
 
