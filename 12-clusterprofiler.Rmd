@@ -79,3 +79,9 @@ Let's head over to RStudio now and try out some functions! 🏃
 
 This may be the one you found most informative, easiest to interpret, most eye-catching... 
 
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+<img src="images/poll-favourite-plot-type.jpg " style="border: none; box-shadow: none; background: none; width: 100%;">
+
+
+
