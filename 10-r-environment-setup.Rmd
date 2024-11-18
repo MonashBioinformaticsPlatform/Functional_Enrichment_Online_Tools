@@ -175,6 +175,8 @@ Next we will open the R notebook for the first analysis activity.  It's ideal to
 
 Saving the workspace image saves all objects from the session such as your variables and dataframes. This can save time if you need to close an analysis part way through and continue later. However, this can have drawbacks such as library and function name clashes, unexpected objects present in the environment, large objects and relic objects cluttering the workspace, old objects conflicting with new ones, etc. Since we will be performing discrete analysis tasks today, and not continuing on a growing body of work, selecting `Dont save` will be the most appropriate. 
 
+👀 You may notice there is also a `Clear Workspace` option under `Session`. This will remove all R objects from your environment, but it won't remove loaded libraries. You can of course unload these with R code, but refreshing the session is easier 😊 Some libraries share function names. If you are being very correct, you can prefix the R package before the function, to ensure the exact function you want is being called to avoid any potential function clashes. I admit to being guilty of not doing that enough! 🤭
+
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ## Download input data
