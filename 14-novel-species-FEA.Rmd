@@ -4,7 +4,7 @@ FEA can be easily performed for many non-model species with user friendly web to
 
 Since many non-model species are supported by some FEA tools, today I am using the term **novel species** to describe a species that is not currently supported by any FEA tool. 
 
-Novel species FEA is possible with `clusterProfiler` or `WebGestaltR` in R, or with `STRING`. The requirements for this are a predicted proteome fasta. If you do not have a predicted proteome for your species, you would need to perform gene prediction, for which there are a number of *in silico* tools available. It must be kept in mind that *in silico* predicted proteomes can vary greatly in quality. Those that include multiple data sources such as polished genome assemblies generated with both short and long read shotgun sequencing and gene prediction that includes RNAseq data are likely to produce better gene predictions than those that are based only on for example short read sequencing. 
+Novel species FEA is possible with `clusterProfiler` or `WebGestaltR` in R, or using web tools `WebGestalt` or `STRING`. The requirements for each tool are slightly different, however at minimum a predicted proteome fasta is necessary. If you do not have a predicted proteome for your species, you would need to perform gene prediction, for which there are a number of *in silico* tools available. It must be kept in mind that *in silico* predicted proteomes can vary greatly in quality. Those that include multiple data sources such as polished genome assemblies generated with both short and long read shotgun sequencing and gene prediction that includes RNAseq data are likely to produce better gene predictions than those that are based only on for example short read sequencing. 
 
 **Workflow overview of novel species annotation**
 
@@ -37,7 +37,7 @@ Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles
 - [Reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz)
 - [GTF file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz)
 - [Raw fastq](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA300706)
-- [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obohea)
+- [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obo)
 - [KEGG Pathways file](https://www.pathway.jp/en/academic.html)
 
 <p>&nbsp;</p>  <!-- insert blank line -->
@@ -46,7 +46,7 @@ Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles
 
 #### Annotation files 
 
-The [reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz) and [GTF gene prediction file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz) were downloaded from www.axolotl-omics.org. A proteome was created by extracting the predicted peptide seqeunces from the GTF then retaining the longest isoform per gene with `AGAT` v 1.4.0. The predicated proteome was then annotated with `eggNOG emapper` v 2.1.12.
+The [reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz) and [GTF gene prediction file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz) were downloaded from www.axolotl-omics.org. A proteome was created by extracting the predicted peptide sequences from the GTF then retaining the longest isoform per gene with `AGAT` v 1.4.0. The predicated proteome was then annotated with `eggNOG emapper` v 2.1.12.
 
 The annotation output file has been provided to you, and we will import this into R and use the `dplyr` package v 1.1.4 to extract GO and KEGG IDs into the required format for R-based FEA with `clsuterProfiler` and `WebGestaltR`.
 
@@ -64,14 +64,17 @@ The DE results file has been provided to you, and we will import this into R to 
 ## Activity overview
 
 1. Import `emapper` axolotl annotation file, GO ontology file and KEGG Pathways file
-2. Reformat these to create the axolotl database files required by `clusterProfiler` and `WebGestaltR` for GO and KEGG FEA analysis
 2. Import axolotl DE results file and extract gene lists for ORA and GSEA
-3. Run `clusterProfiler` universal FEA functions `enricher` and `GSEA` using custom database files
-4. Visualise `clusterProfiler` results with R plots
-5. Run ORA and GSEA with `WebGestaltR` package (function name is also `WebGestaltR`) 
-6. Visualise `WebGestaltR` results in the saved output HTML report
+3. Reformat annotation files for `clusterProfiler` GO and KEGG analysis
+4. Run `clusterProfiler` universal FEA functions `enricher` and `GSEA` and visualise results with `enichPlot`
+5. Reformat annotation files for `WebGestaltR` GO and KEGG analysis
+6. Run `WebGestaltR` ORA and GSEA and visualise results in the interactive HTML report
 7. Run ORA with `STRING` online using custom axolotl annotation
 8. Compare `STRING` ORA web results to those generated using the `emapper` annotations in R 
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+Before heading over to RStudio, we will briefly review the annotation requirements for the R tools. At the end of the R-based analysis, we will return here for the web-based analysis with `STRING`.  
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -98,6 +101,8 @@ These are then provided to the universal enrichment functions `GSEA` and `enrich
 
 In RStudio, we will extract these file formats from the `emapper` annotations file for axolotl and proceed with FEA. 
 
+We are using GO and KEGG today, however you can use any database, provided you first annotate your proteome to the database in order to obtain the term to name mappings. 
+
 Acknowledgement to [Armin Dadras](https://github.com/dadrasarmin) for sharing his [code](https://github.com/dadrasarmin/enrichment_analysis_for_non_model_organism]) to extract `TERM2GENE` and `TERM2NAME` from `emapper` output. 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
@@ -106,27 +111,26 @@ Acknowledgement to [Armin Dadras](https://github.com/dadrasarmin) for sharing hi
 
 This tool can perform ORA or GSEA for any organism with the provision of custom `GMT` and `description` files. 
 
-The `GMT` file format is slightly different than the typical `gene set matrix transposed file format` you may have seen before. For `WebGestaltR`, the tab-delimited GMT file with `.gmt` suffix has these columns:
+The `GMT` file format is slightly different than the typical `gene set matrix transposed file format` you may have seen before, which typically has the gene set description in the second column. For `WebGestaltR`, the description is in a separate file, and the tab-delimited GMT file with `.gmt` suffix has these 3 columns:
 
 1. Gene set ID
 2. Web link for gene set
-3. Third and sunsequent columns are genes belonging to the gene set
+3. Third and subsequent columns are genes belonging to the gene set
 
-A typical `GMT` file has the gene set description in the second column. For `WebGestaltR`, the tab delimited `description` file with `.des` suffix has these columns:
+**Example .gmt format:** 
+
+<img src="images/webgr-gmt-file.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+The `WebGestaltR` tab delimited `description` file with `.des` suffix has these columns:
 
 1. Gene set ID
 2. Gene set description
 
-- **TBA:** - webgr file format images 
+**Example .des format:**
 
-**Example .gmt format:** 
-
-![webgr-gmt](images/webgr-gmt.png)
-
-
-**Example TERM2NAME format:** 
-
-![webgr-des](images/webgr-des.png)
+![webgr-gmt](images/webgr-des-file.png)
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -143,6 +147,16 @@ The `.gmt` file is provided to the parameter `enrichDatabaseFile` and the `.des`
 &#x27A4; Return to RStudio and open the notebook `novel_species.Rmd`.
 
 **We will now continue with the activity in RStudio, before returning here to finish up with STRING web-based analysis.**
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+💫 You have  now explored two tools performing FEA in R for your novel species, and we have observed that both methods require the same starting files (annotation of novel species genes to databases, database term IDs to term descriptions) and give very similar results. Which you use depends on your personal preferences. 
+
+- Do you enjoy the flexibility of plot options offered with `clusterProfiler` and `enrichplot`?
+- Do you love the ease of use and interactive HTML provided by `WebGestaltR`? 
+
+We will now take a quick look at novel species FEA online with `STRING`. 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -187,23 +201,73 @@ Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; In the RStudio `Files` pane, locate your saved ORA gene list from earlier - `axolotl_DEGs.txt`. Click the file to view it in RStudio, then copy paste the list into the STRING `List of Names` search field, then select `SEARCH`. 
+&#x27A4; In the RStudio `Files` pane, locate your saved ORA gene list from earlier - `workshop/Axolotl_DEGs.txt`. Click the file to view it in RStudio, then copy paste the list into the STRING `List of Names` search field, then select `SEARCH`. 
 
-Click `CONTINUE` at the gene ID review page, and then <span style="color: green;">explore the results!</span>
+- Note that there is no option at this query page (even under `Advanced Settings`) to provide a custom background gene list. This can be done after the initial search has been run. 
 
-Clicking on the `Analysis` tab will show the enichment tables with results for GO, STRING, KEGG, Reactome, TISSUES and UniProt.
+- Click `CONTINUE` at the gene ID review page
 
-Below the tables, under `Functional enrichment visualization` you can change `Category` to alter which databases results are plotted. 
+- Then scroll ALL the way to the bottom of the page to the subheading `Statistical background`
+    - If you did not have a relevant saved background gene list, you would select `Add background`
+    - In this case, there is a saved background list for this annotation called `axolotl-blastema-background` (**FRED is this showing for you?**), so you can select the background from the dropdown menu then click `UPDATE`. This will re-cmpute the enrichment. 
+
+
+<img src="images/string-add-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+<img src="images/string-update-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+**Note**: you may need to login! If you do not have a `STRING` login, you can watch along
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+**If you need to add a custom background:**
+- Select `ADD BACKGROUND`
+- You will be prompted to login if you are not already
+- Under `1) name your new set` provide a descriptive name for your background gene list. I chose `axolotl-blastema-background`
+- At `2) identify your organism` this will be pre-filled with our custom axolotl annotation
+- For `3) provide identifiers` return to `RStudio`, copy the list of genes from the file `workshop/Axolotl_background.txt` and paste them into the `list of gene/protein names` field
+- Ensure that `enable usage as a statistical background` is checked at `4) set additional options...`
+
+<img src="images/string-set-novel-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+
+- Then click `CONTINUE`
+
+The gene list will be mapped to the STRING database. This may take several minutes.  
+
+`STRING` saves your custom datasets under `My Data`:
+
+<img src="images/string-set-novel-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+
+Despite this, there is not (yet) an option to run the initial analysis with a pre-saved background gene list! Hopefully this feature will be added in the future. 
+
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+**<span style="color: green;">Now let's explore the results!</span>**
+
+Some suggestions:
+
+- Select a node on the network, and then `Show this node's terms in the analysis table` to highlight the terms the gene was present in 
+- Select the coloured lines connecting nodes to show evidence suggesting a functional link (all putative of course!)
+- Clicking on the `Analysis` tab will show the enrichment tables with results for GO, STRING, KEGG, Reactome, TISSUES and UniProt
+- Below the tables, under `Functional enrichment visualization` you can change `Category` to alter which database results are plotted
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ### How do the STRING results compare to those we generated in R? 
 
-- **TBA:** - side by side plot comparison for STRING v R one of the ORA (CP GO, CO KEGG, WGR GO, or WGR KEGG)
+We expect a large difference in the results because of the differing proteome annotation methods. 
 
-We expect quite a bit of difference in the results because of the vast difference in annotation method. 
+The `eggNOG emapper` annotations we used in `R` rely on orthology-based predictions, employing extensive similarity searches to map genes to their closest evolutionary counterparts across diverse species. This results in a more comprehensive catalog of functional terms, even if they are inferred rather than directly evidenced.
 
-`emapper` appears more stringent than STRING in its similarity matches between the axolotl putative proteins and annotated homologs. The table below compares the number of annotations yielded from the 47,196 putative axolotl proteins from both tools: 
+In contrast, `STRING’s` custom species annotations are based on high-confidence protein-protein interaction networks and empirical data, which can narrow down the set of enriched pathways. We expect species bias to have a considerable effect when attempting to use this platform for novel species. 
+
+
+First of all we see a difference in the number of genes annotated to terms: 
 
 
 |   Method    | GO      | KEGG Pathways | All     |
@@ -213,4 +277,10 @@ We expect quite a bit of difference in the results because of the vast differenc
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-This suggests that the `emapper` results may be more specific, while the `STRING` results may be more sensitive. Using both methods for your novel species FEA may help validate and focus your FEA findings 💪    
+And a clear lack of overlap in number of enriched terms and term IDs between `STRING` and the `R` tools:
+
+<img src="images/string-novel-ora-compare.png" style="border: none; box-shadow: none; background: none; ">
+
+These GO terms from `STRING` may be parent terms of more specific child terms prevalent in the R output. For a real world analysis, it would be optimal to compare, and deduce whether both methods could provide valuable and complimentary insights, or whether the results from one annotation approach or the other were more suited to your novel species. 
+
+Whichever you choose, strength to you! This is not an easy space to work in 💪 
