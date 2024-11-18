@@ -13,6 +13,7 @@ This tool (both the web and R versions) has many features and advantages:
 - Supports many databases/gene sets (n = 70 for human) including 'nonredundant' versions of GO
 - Supports metabolomics, with 15 different ID types, described in [Elizarraras et al 2024](https://academic.oup.com/nar/article/52/W1/W415/7684598)
 - Can run query against multiple databases simultaneously by providing database names as a list to the enrichment function
+- Has term redundancy filters including 3 custom non-redundant GO databases and two clustering algorithms
 - Saves all results files to disk when running, no need to save  individual files manually
 - Creates interactive HTML reports with various plots and filter options and with term links to external databases
 - Supports multi-threading, parallelisation, and batch processing of multiple queries 
@@ -24,13 +25,8 @@ This tool (both the web and R versions) has many features and advantages:
 ## Activity overview
 
 1. Explore the organisms, databases/gene sets and namespaces supported natively
-2. Run GSEA over KEGG database and explore the HTML output
-3. Run ORA over multiple databases simultaneously 
-4. Explore the impact of using the 'non-redundant' GO database to the full GO database 
-
-
-** add the use of enrichplot with these results!
-
+2. Run ORA over pathway databases and explore the HTML output
+3. Run GSEA over the GO 'non-redundant' and full database and compare the results
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -51,3 +47,9 @@ You could also open the file by selecting `File` &rarr; `Open file`, or use the 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ## End of activity summary
+
+- We have reviewed the organisms and databases that are natively supported by this easy to use tool 
+- We have run both ORA and GSEA and explored the interactive HTML results summary  
+- We have touched on the redundancy filters available within this tool, for GO as well as two external algorithms applied automatically to any enrichment performed
+- We have learnt about an R package that can create compatability between `WebGestaltR` (and other FEA tools) with `enichplot` for visualisation options
+- In the next session, we will use `WebGestaltR` with novel species
