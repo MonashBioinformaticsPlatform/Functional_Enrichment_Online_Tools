@@ -84,7 +84,10 @@ How can one perform Under Representation Analysis in gProfiler?
 <span style="color:orange;">- Run Query:</span> Same as above.
 
 #### **Challenge:** GSEA with gProfiler {- .challenge}
-Download the Hallmark gene sets ([h.all.v2024.1.Hs.symbols.gmt](https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2024.1.Hs/h.all.v2024.1.Hs.symbols.gmt)) from MSigDB and use it as Custom GMT.
+Download the Hallmark gene sets ([h.all.v2024.1.Hs.symbols.gmt](https://www.gsea-msigdb.org/)) from MSigDB and use it as Custom GMT.
+
+<!-- Full path to h.all.v2024.1.Hs.symbols.gmt -->
+<!-- [h.all.v2024.1.Hs.symbols.gmt](https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/msigdb/release/2024.1.Hs/h.all.v2024.1.Hs.symbols.gmt) -->
 
 #### **Question ** {- .rationale}
 
@@ -194,6 +197,9 @@ Clusters can be downloaded in `.tsv` format.
 
 #### **Question** {- .rationale}
 What was the overlap in enrichment terms between gProfiler and STRING at FDR ≤ 0.05?
+
+<!-- ### Steps to Perform GSEA in STRING: -->
+<!-- https://version-12-0.string-db.org/cgi/globalenrichment?networkId=bKhJ4fXp6sna -->
 
 <!-- ## FEA in [GenePattern](https://www.genepattern.org/#gsc.tab=0) -->
 ## FEA in GenePattern <a href="https://www.genepattern.org/#gsc.tab=0" target="_blank"><img src="images/GenePattern-logo.png" alt="GenePattern Logo" style="height:35px; vertical-align:middle;"></a>
@@ -446,4 +452,5 @@ When running FEA in Reactome, how do you prefer the analysis methods?
 ####  {-}
 
 
+<!-- ## Evaluation Metrics for FEA Methods -->
 
