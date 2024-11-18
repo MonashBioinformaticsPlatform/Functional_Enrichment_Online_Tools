@@ -34,7 +34,7 @@ head(data)
 ```
 
 
-This time, instead of filtering for DEGs, we will extract all genes, and sort them by fold change largest to smallest. The R object type for `gseKEGG` needs to be a 'vector'. Unfortunately, this detail is under the `enrichKEGG` function, not the `gseKEGG` function! For `enrichKEGG`, the parameter `gene` is described as requiring "a vector of entrez gene id", yet for `gseKEGG, the description for `geneList` is "order ranked geneList". There is a little bit of sleuthing required at times! 
+This time, instead of filtering for DEGs, we will extract all genes, and sort them by fold change (largest to smallest). The R object type for `gseKEGG` needs to be a 'vector'. Unfortunately, this detail is under the `enrichKEGG` function, not the `gseKEGG` function! For `enrichKEGG`, the parameter `gene` is described as requiring "a vector of entrez gene id", yet for `gseKEGG`, the description for `geneList` is "order ranked geneList". There is a little bit of sleuthing required at times! 
 
 
 
@@ -43,6 +43,7 @@ This time, instead of filtering for DEGs, we will extract all genes, and sort th
 # Ranked gene list vector for GSEA
 ranked <- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.ID[order(-data$Log2FC)])
 
+# Inspect the vector
 head(ranked)
 tail(ranked)
 
@@ -60,7 +61,7 @@ Let's start by reviewing the function arguments. Once you run the below code chu
 
 Most of those defaults look suitable to start. 
 
-We have human so the default "hsa" for argument `organism` is correct. If you were working with a species other than human, you first need to obtain your organism code. You can derive this from [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html) or using the `clusterProfiler` function `search_kegg_organism`.
+We have human so the default `organism = "hsa"` argument is correct. If you were working with a species other than human, you first need to obtain your organism code. You can derive this from [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html) or using the `clusterProfiler` function `search_kegg_organism`.
 
 
 Pick your favourite species and search for the KEGG organism code by editing the variable 'organism' then executing the code chunk:
@@ -68,18 +69,18 @@ Pick your favourite species and search for the KEGG organism code by editing the
 ```{r}
 fave <- "horse"
 
-# search by commn_name or scientific_name 
+# search by common_name or scientific_name 
 search_kegg_organism(fave, by = "common_name")
 ```
 
 
-Now back to the paramters - the defaults for P value correction and filtering, and gene set size limits are acceptable. We don't want to use internal data (ie, we want to search agaisntthe latest KEGG online) so `FALSE` is apt here, and we do want to use `fgsea` algorithm for analysis. 
+Now back to the parameters - the defaults for P value correction and filtering, and gene set size limits are acceptable. We don't want to use internal data (i.e. we want to search against the latest KEGG online) so `FALSE` is apt here, and we do want to use the `fgsea` algorithm for analysis. 
 
-For the `seed` parameter, we should provide a value, to ensure results are the same each time the command. By setting a seed, you fix the sequence of random numbers generated within the GSEA algorithm.
+For the `seed` parameter, we should provide a value, to ensure results are the same each time the command is run. By setting a seed, you fix the sequence of random numbers generated within the GSEA algorithm.
 
 We also need to check the `keyType` (gene namespace) against the input data that we have. From the help page, we can see the supported namespaces for the KEGG database are one of 'kegg', 'ncbi-geneid', 'ncib-proteinid' or 'uniprot'.
 
-Going  back to where we loaded the input data and ran `head` to view the first few rows, we can see our input has ENSEMBL gene IDs as well as official gene symbols. ENSEMBL gene IDs are generally preferable for bioinformatics analyses because they are more unique and stable compared to gene symbol.
+Going back to where we loaded the input data and ran `head` to view the first few rows, we can see our input has ENSEMBL gene IDs as well as official gene symbols. ENSEMBL gene IDs are generally preferable for bioinformatics analyses because they are more unique and stable compared to gene symbol.
 
 Since our input data does not match any of the valid namespaces, we need to convert gene IDs! `clusterProfiler` has the `bitr` function to do this. `BiomaRt` is also a popular R package for this task. 
 
@@ -92,7 +93,7 @@ Check the usage for the `bitr` function:
 ?bitr
 ```
 
-We need to understand what are the valid `fromType` and `toType`, and it turns out we need an Org.db to use `bitr`! This is a Bioconductor annotation package, of which there are currently only 20. So while the `gseKEGG` function supports all organisms in KEGG, performing gene ID conversion within `clusterProfiler may not be possible for non-model species and you would need to seek a different method.  
+We need to understand what the valid `fromType` and `toType` values are, and it turns out we need an Org.db to use `bitr`! This is a Bioconductor annotation package, of which there are currently only 20. So while the `gseKEGG` function supports all organisms in KEGG, performing gene ID conversion within ``clusterProfiler` may not be possible for non-model species and you would need to seek a different method.  
 
 We have already loaded the `org.Hs.eg.db` annotation library. We can use this to search `keytypes`:
 
@@ -116,11 +117,11 @@ converted_ids <- bitr(names(ranked),
                       OrgDb = org.Hs.eg.db, 
                       drop = TRUE)
 ```
-<1% failing ot map is pretty good. 
+<1% failing to map is pretty good. 
 
 The 1:many mappings warning means that some of our gene IDs matched more than 1 ENTREZ ID. We need to ensure that the final list we provide to GSEA does not contain duplicates. This needs to happen at two stages: first of all, ensuring that each ENSEMBL ID is mapped to only one ENTREZ ID, and then once the final converted vector has been created, check it for duplicated ENTREZ IDs, which could occur when two different ENSEMBL IDs from our input map to the the same ENTREZ ID. 
 
-The below code does this by selecting the first of each set of duplicates. This is not ideal. In a real experiment, you should print out the duplicates and directly manage how to handle them by reviewing the gene IDs involved and deciding whether it is valid to select one ID over another, or at times you may choose to merge the values for duplcaie genes.   
+The below code does this by selecting the first of each set of duplicates. This is not ideal. In a real experiment, you should print out the duplicates and directly manage how to handle them by reviewing the gene IDs involved and deciding whether it is valid to select one ID over another, or at times you may choose to merge the values for duplicate genes.   
 
 ```{r filter converted ids }
 
@@ -139,6 +140,7 @@ names(ranked_entrez) <- converted_ids$ENTREZID[match(names(ranked_entrez), conve
 # Remove duplicates from the vector by keeping only the first occurrence of each Entrez IDs (not ideal, see note above) 
 ranked_entrez <- ranked_entrez[!duplicated(names(ranked_entrez))]
 
+# Inspect the vector
 head(ranked_entrez)
 tail(ranked_entrez)
 
@@ -170,11 +172,11 @@ gsea_kegg <- gseKEGG(
 
 ```
 
-We have 3 warnings, one about ties in the ranked list, which we could resolve manually by reviewing the raw data, or just ignore as its only 0.01% of the list.
+We have 3 warnings, one about ties in the ranked list, which we could resolve manually by reviewing the raw data, or just ignore it as it is only 0.01% of the list.
 
-The second warning may be resolved by following the suggestion to set `nPermSimple = 10000)`. How frustrating that this parameter is not described withint he `gseKEGG` help menu, nor the `clusterProfiler` PDF at all!  
+The second warning may be resolved by following the suggestion to set `nPermSimple = 10000`. How frustrating that this parameter is not described within the `gseKEGG` help menu, nor the `clusterProfiler` PDF at all!  
 
-Let's rerun following both suggestions, to use permutations and set `eps` to zero.
+Let's rerun following both suggestions, to use permutations (`nPermSimple`) and set `eps = 0`. We will keep the rest of the arguments the same as before.    
 
 ```{r gseKEGG perms}
 gsea_kegg <- gseKEGG( 
@@ -203,13 +205,15 @@ Great, those last 2 warnings have resolved and we only have the expected one abo
 
 ## Tabular results 
 
-First let's preview the results. We can see 41 significant enrichments. 
+First, let's preview the results.  
 
 
 ```{r preview gsea results}
 print(gsea_kegg)
 
 ```
+
+We can see 41 significant enrichments.   
 
 Extract results to a TSV file. This will print the significant enrichments, sorted by adjusted P value. 
 
@@ -287,10 +291,12 @@ The treeplot provides the same information as the emapplot but in a different vi
 
 Each node is a term, and the number of genes associated with the term is shown by the dot size, with P values by dot colour. 
 
-Terms that share more genes or biological functions will be closer together in the tree structure. Clades are colour coded and 'cluster tags' assigned. You can control the number of words in the tag (default is 4). The user guide describes the argument `nWords` however running that will throw an error (it says 'warning' but its fatal so to me that's an eror!):
+Terms that share more genes or biological functions will be closer together in the tree structure. Clades are colour coded and 'cluster tags' assigned. You can control the number of words in the tag (default is 4). The user guide describes the argument `nWords` however running that will throw an error (it says 'warning' but its fatal so to me that's an error!):
 
+```
 "Warning: Use 'cluster.params = list(label_words_n = your_value)' instead of 'nWords'.
  The nWords parameter will be removed in the next version."
+```
 
 This plot also requires the pairwise similarity matrix calculation that emapplot does. Since we have already run it, it is hashed out in the code chunk below. 
 
@@ -307,7 +313,7 @@ enrichplot::treeplot(gsea_kegg, showCategory = 15, color = "p.adjust", cluster.p
 
 The cnetplot is helpful to understanding which genes are involved in the enriched terms, details that are not available in the plots generated so far. It depicts the linkages of genes and terms as a network. 
 
-For GSEA, where all genes (not jsut DEGs) are used, only the 'core' enriched genes are used to create the network plot. These are the 'leading edge genes', those genes up to the point where the Enrichment Score (ES) gets maximised from the base zero. In other words, the subset of genes that are most strongly associated with a specific term. 
+For GSEA, where all genes (not just DEGs) are used, only the 'core' enriched genes are used to create the network plot. These are the 'leading edge genes', those genes up to the point where the Enrichment Score (ES) gets maximised from the base zero. In other words, the subset of genes that are most strongly associated with a specific term. 
 
 There are a few parameters to play around with here to get a readable plot. 
 
@@ -334,7 +340,7 @@ You can also plot the interaction between specific terms. This is helpful to obt
 
 The 3 terms listed below are for 'IL-17 signaling pathway', 'Viral protein interaction with cytokine and cytokine receptor' and 'Chemokine signaling pathway' which are top 10 enrichments with a relationship of shared genes, evident from the plot above. 
 
-Run the code below or select a handful of terms of your choosing from the results table we printed earlier. We need the KEGG ID (column 1). T
+Run the code below or select a handful of terms of your choosing from the results table we printed earlier. We need the KEGG ID (column 1).  
 
 ```{r cnetplot custom terms}
 # Select terms of interest 
@@ -385,7 +391,7 @@ enrichplot::heatplot(gsea_kegg, foldChange = ranked_core_genes, showCategory = 3
 
 ```
 
-Saving to a file only improve things slightly. 
+Saving to a file only improves things slightly. 
 
 ```{r}
 png("clusterprofiler_gseKEGG_heatplot.png", width = 11.7, height = 8.3, units = "in", res = 300)
