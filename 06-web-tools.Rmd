@@ -493,18 +493,18 @@ When running FEA in Reactome, how do you prefer the analysis methods?
 
 ## Uncertainties of a functional enrichment analsysis
 
-This section summarises the [Wünsch et al., 2023](https://wires.onlinelibrary.wiley.com/doi/full/10.1002/wics.1643) paper, which addresses uncertainties in atypical functional enrichment analysis.
+This section provides a summary of the paper by [Wünsch et al. (2023)](https://wires.onlinelibrary.wiley.com/doi/full/10.1002/wics.1643), which explores uncertainties inherent in functional enrichment analysis. The study critically examines the sources of variability and challenges in this analytical approach, offering insights into improving its reliability and robustness.
 
 ```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="From RNA sequencing measurements to the final results: A practical guide to navigating the choices and uncertainties of gene set analysis"} 
 knitr::include_graphics("images/Wunsch_et_al_2023.png")
 ```
 
 
-### Types of FEA
+### <span style="color:red;">Types of FEA</span>
 
 Functional enrichment analysis (FEA) typically involves one of over representation analysis (ORA), gene set enrichment analysis (GSEA) also known as functional class scoring (FCS), and Pathway Topology (PT).
 
-1. ORA
+1. **ORA**
 
   \- ORA methods are the least complex among the three approaches of FEA. 
 
@@ -514,17 +514,17 @@ Functional enrichment analysis (FEA) typically involves one of over representati
 
   \- A contingency table is created and the null distribution is modeled using the hypergeometric distribution.
 
-2. FCS 
+2. **FCS**
 
   \- FCS methods aim to aggregate the values of the gene-level statistics (ranks) into gene set-level statistic (enrichment score, ES).
 
   \- FCS can be classified as one of FCS I, those that take the expression data as input or FCS II that take a pre-ranked list of genes as input. With the latter, the information of the conditions (phenotypes) of the samples is lost, as such phenotype permutation cannot be performed leaving the choice of null hypothesis to gene set permutation.
 
-3. PT
+3. **PT**
 
   \- PT additionally models interactions between the genes. This approach generally scores considerably lower in terms of popularity in the reference database.
 
-### Key considerations
+### <span style="color:red;">Considerations</span>
 
   \- Pre-filter expression data: Exclude lowly expressed genes to improve statistical power.
 
@@ -540,7 +540,7 @@ Functional enrichment analysis (FEA) typically involves one of over representati
 
   \- Choose gene set databases based on biological context: Ensure that the database aligns with the research question and the experimental system.
 
-### Recommendation
+### <span style="color:red;">Recommendation</span>
 
  - Awareness of Uncertainties:
 
