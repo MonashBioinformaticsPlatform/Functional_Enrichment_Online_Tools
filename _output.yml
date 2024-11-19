@@ -2,18 +2,6 @@ bookdown::bs4_book:
   include:
     before_body: title.html
   css: style.css
-  config:
-    toc:
-      after: |
-          <a href="https://www.example.com/">
-            <img src="Sydney_informatics_hub_logo.png" width="280" alt="Logo">
-          </a>
-          <li><a href="./">An example Resource</a></li>
-  # includes:
-  #   in_header: custom-header.html
-  # before_body: custom.js
-  # includes:
-  #   in_header: custom.js
   theme:
     primary: "green"
   repo: https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_BioCommons_2024
@@ -25,12 +13,3 @@ bookdown::pdf_book:
   citation_package: natbib
   keep_tex: yes
 bookdown::epub_book: default
-bookdown::gitbook:
-  css: style.css
-  config:
-    toc:
-      after: |
-          <a href="https://www.example.com/">
-            <img src="Sydney_informatics_hub_logo.png" width="280" alt="Logo">
-          </a>
-          <li><a href="./">An example Resource</a></li>

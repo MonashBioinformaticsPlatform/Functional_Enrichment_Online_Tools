@@ -4,13 +4,6 @@ author: "Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomic
 date: "Compiled: `r format(Sys.Date(), '%B %d, %Y')`"
 site: bookdown::bookdown_site
 output: bookdown::bs4_book
-    config:
-      toc:
-        after: |
-            <a href="https://www.example.com/">
-              <img src="Sydney_informatics_hub_logo.png" width="280" alt="Logo">
-            </a>
-            <li><a href="./">An example Resource</a></li>
 documentclass: book
 bibliography: [book.bib, packages.bib]
 description: |
