@@ -3,7 +3,7 @@ title: "Functional Enrichment Workshop"
 author: 'Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP)'
 date: |
     "November 20, 2024" 
-    <img src="logos.png" width="200" alt="Logo"><br>
+    <img src="logos.png" width="300" alt="Logo"><br>
 site: bookdown::bookdown_site
 output: bookdown::bs4_book
 documentclass: book
