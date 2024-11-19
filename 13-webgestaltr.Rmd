@@ -25,7 +25,7 @@ This tool (both the web and R versions) has many features and advantages:
 ## Activity overview
 
 1. Explore the organisms, databases/gene sets and namespaces supported natively
-2. Run ORA over pathway databases and explore the HTML output
+2. Run ORA over pathway databases and explore the interactive HTML output
 3. Run GSEA over the GO 'non-redundant' and full database and compare the results
 
 <p>&nbsp;</p>  <!-- insert blank line -->

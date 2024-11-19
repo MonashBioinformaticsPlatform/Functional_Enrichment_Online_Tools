@@ -16,10 +16,10 @@ In day 2 of this workshop, we will focus on FEA with R-based tools.
 
 1. R environment setup including VM login
 2. ORA with `gprofiler2` including multi-query of up and down regulated genes
-3. GSEA over KEGG database with `clusterProfiler` and an exploration of the numerous tool functions and their varying input requirements
-4. ORA and GSEA with `WebGestaltR` and a comparison of GO enrichments with and without redundant terms removed 
+3. GSEA over KEGG database with `clusterProfiler` and multiple enrichmnet visualisations with `enrichplot`
+4. ORA and GSEA with `WebGestaltR`, interactive HTML reports, and exploration of term redundancy options 
 5. Novel species FEA with `cluterProfiler`, `WebGestaltR` and `STRING` (web) 
-6. Discussion of reproducibility in FEA
+6. End of workshop summary
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
