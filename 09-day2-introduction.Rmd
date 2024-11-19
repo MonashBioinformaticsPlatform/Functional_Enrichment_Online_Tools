@@ -1,12 +1,14 @@
-# Making sense of gene and protein lists with functional enrichment analysis: Day 2
+# Introduction
 
 ## Day 1 recap
 
-- We explored a handful of web-based analysis tools and databases for FEA 
-- We explored the impact of gene set size and background list on the ORA statistical test
-- We explored the impact of the gene list filtering and the background gene list ('statistical domain scope') on ORA results
-- We explored the impact of ranking metric when performing GSEA
-- We discussed the impact of database choice on FEA results  
+- We explored several web-based tools and databases for performing Functional Enrichment Analysis (FEA)
+- Two types of FEA, Over-Representation Analysis (ORA) and Gene Set Enrichment Analysis (GSEA), were introduced and their differences discussed
+- We examined how filtering the input gene list and selecting the background gene list (the "statistical domain scope") influence ORA results
+- We explored how the choice of ranking metric affects GSEA outcomes
+- The impact of database selection on FEA results was evaluated
+- Differences in outputs between various tools were compared and discussed
+- Uncertainties, implications, and recommendations were highlighted to address challenges in gene set analysis
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 

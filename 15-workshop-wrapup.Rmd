@@ -1,0 +1,58 @@
+# Workshop wrap-up
+
+Over the last two days, as well as the webinar in October, we've explored the statistical background, key considerations, and practical implementation of functional enrichment analysis, with hands-on experience with multiple web-based and R tools. 
+
+## Summary of key messages
+
+**<span style="color: green;">ORA and GSEA are different statistical analyses, and their inputs differ</span>**
+GSEA: Kolmogorov-Smirnov test, requires a ranked yet unfiltered gene list
+ORA: Hypergeometric or Fisher’s Exact test, requires a filtered unranked gene list and experimental background gene list
+
+**<span style="color: green;">Always correct for multiple testing</span>**
+Never use unadjusted P values, as this will introduce many false positives. Different tools offer different multiple testing correction such as FDR or the more stringent BH. Always report your chosen method and the significance threshold applied to terms.  
+
+**<span style="color: green;">Different analysis methods will return different results</span>**
+This is expected, due to underlying differences in database, algorithm, P value methods etc. As long as your methods are robust, sensible and reproducible, you can have confidence that your methods will stand up to scrutiny under peer review.
+
+**<span style="color: green;">Ensure reproducibility</span>** 
+Lack of reproducibility through under-reporting methods is a common issue in this field (see Wijesooriya et al, linked below). Ensure to record all methodological details while you are working, including all the parameters and arguments applied, how the gene lists were generated, versions of databases and tools etc. If using R, specify a seed for constant random number generation in GSEA. 
+
+**<span style="color: green;">Interpret your results in their biological context</span>**
+Functional categories are often broad and redundant. Use the FEA results as a guide, not the end point. Use visualisations and explore term redundancy methods to help focus results. Validate through aditional means according to the nature of your experiment, with the gold standard being wet-lab rather than *in silico* validation methods.
+
+**<span style="color: green;">There are many databases and tool choices available</span>**
+Suitability to your experiment depends on many factors, including:
+- Your species, and what tools support it 
+- What databases and gene sets are relevant to your experiment, from the general (eg GO) to the specific (eg cancer pathways)
+- Any privacy restrictions imposed on your data 
+- What is your skill level in R or desire to implement R code
+- How much flexibility you want or require with visualisation
+
+
+## Interesting papers for further reading
+
+*Informative and instructional*
+
+
+- [Interpreting omics data with pathway enrichment analysis](https://www.sciencedirect.com/science/article/abs/pii/S0168952523000185)
+
+*Things to watch out for*
+
+- [Urgent need for consistent standards in functional enrichment analysis](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1009935)
+
+- [Systematic assessment of pathway databases, based on a diverse collection of user-submitted experiments](https://academic.oup.com/bib/article/23/5/bbac355/6695266)
+
+- [Multiple sources of bias confound functional enrichment analysis of global -omics data](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0761-7)
+
+- [The Impact of Pathway Database Choice on Statistical Enrichment Analysis and Predictive Modeling](https://pmc.ncbi.nlm.nih.gov/articles/PMC6883970/#:~:text=Pathway%2Dcentric%20approaches%20are%20widely,the%20context%20of%20precision%20medicine)
+
+
+- [Two subtle problems with overrepresentation analysis](https://academic.oup.com/bioinformaticsadvances/article/4/1/vbae159/7829164?login=false)
+
+## Audience poll
+
+There is of course no correct answer here, we are just interested to hear your thoughts!
+
+
+
+**<span style="color: green;">"If you were to run FEA on your own data tomorrow, would you choose web or R tools?"</span>** :thinking:

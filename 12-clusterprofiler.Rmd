@@ -1,4 +1,4 @@
-# GSEA with clusterProfiler and visualisation with enrichplot
+# clusterProfiler and enrichplot
 
 
 [clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) is a comprehensive suite of enrichment tools. It has functions to run ORA or GSEA over commonly used databases (GO, KEGG, KEGG Modules, DAVID, Pathway Commons, WikiPathways) as well as universal enrichment functions to perform ORA or GSEA with custom gene sets. We will use these universal tools in the final activity of this workshop, focusing on the supported organisms and datbases for the present activity. 

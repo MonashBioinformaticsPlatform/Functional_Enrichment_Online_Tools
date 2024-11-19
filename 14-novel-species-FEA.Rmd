@@ -1,4 +1,4 @@
-# Novel species functional enrichment analysis
+# Novel species FEA
 
 FEA can be easily performed for many non-model species with user friendly web tools or R packages. [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) web currently supports 984 species, and [STRING](https://string-db.org/) currently supports over 12 thousand species. 
 
