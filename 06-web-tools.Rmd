@@ -49,7 +49,7 @@ gProfiler is known for its integration of numerous species and databases. It sup
   The Gene Ontology (GO) context is divided into three main categories: Biological Process (BP), Molecular Function (MF), and Cellular Component (CC). The analysis identifies which GO terms are significantly enriched, offering insights into the broader biological implications of the gene set. This helps in pinpointing processes such as cellular responses, metabolic pathways, and molecular interactions.
 
 - **Query Info**:
-  This section includes specifics about the input data, including the total number of queried genes and any identifiers not recognized or mapped. It also details the statistical background used, the chosen organism, and other analysis settings, ensuring transparency and reproducibility of the results.
+  This section includes specifics about the input data, including the total number of queried genes and any identifiers not recognised or mapped. It also details the statistical background used, the chosen organism, and other analysis settings, ensuring transparency and reproducibility of the results.
 
 
 ####  {-}
@@ -154,7 +154,7 @@ The first number indicates how many proteins in your network are annotated with 
 Log10(observed / expected). This measure describes how large the enrichment effect is. It’s the ratio between i) the number of proteins in your network that are annotated with a term and ii) the number of proteins that we expect to be annotated with this term in a random network of the same size.
 
 <span style="color:orange;">- Signal:</span>
-The signal is defined as a weighted harmonic mean between the observed/expected ratio and -log(FDR). FDR tends to emphasize larger terms due to their potential for achieving lower p-values, while the observed/expected ratio highlights smaller terms, which have a high foreground to background ratio but cannot achieve low FDR values due to their size. The signal measure seeks to balance both metrics for a more intuittive ordering of enriched terms.
+The signal is defined as a weighted harmonic mean between the observed/expected ratio and -log(FDR). FDR tends to emphasise larger terms due to their potential for achieving lower p-values, while the observed/expected ratio highlights smaller terms, which have a high foreground to background ratio but cannot achieve low FDR values due to their size. The signal measure seeks to balance both metrics for a more intuittive ordering of enriched terms.
 
 <span style="color:orange;">- False Discovery Rate:</span>
 This measure describes how significant the enrichment is. Shown are p-values corrected for multiple testing within each category using the Benjamini–Hochberg procedure.
@@ -491,5 +491,79 @@ When running FEA in Reactome, how do you prefer the analysis methods?
 ####  {-}
 
 
-<!-- ## Evaluation Metrics for FEA Methods -->
+## Uncertainties of a functional enrichment analsysis
 
+This section summarises the [Wünsch et al., 2023](https://wires.onlinelibrary.wiley.com/doi/full/10.1002/wics.1643) paper, which addresses uncertainties in atypical functional enrichment analysis.
+
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="From RNA sequencing measurements to the final results: A practical guide to navigating the choices and uncertainties of gene set analysis"} 
+knitr::include_graphics("images/Wünsch_et_al_2023.png")
+```
+
+
+### Types of FEA
+
+Functional enrichment analysis (FEA) typically involves one of over representation analysis (ORA), gene set enrichment analysis (GSEA) also known as functional class scoring (FCS), and Pathway Topology (PT).
+
+1. ORA
+
+  \- ORA methods are the least complex among the three approaches of FEA. 
+
+  \- ORA methods requires a list of differentially expressed genes that are already analysed in differential expression analysis.
+
+  \- The background population, the universe, can be a more general set of gene like those in human genome or more specific from thos observed in an experiment.
+
+  \- A contingency table is created and the null distribution is modeled using the hypergeometric distribution.
+
+2. FCS 
+
+  \- FCS methods aim to aggregate the values of the gene-level statistics (ranks) into gene set-level statistic (enrichment score, ES).
+
+  \- FCS can be classified as one of FCS I, those that take the expression data as input or FCS II that take a pre-ranked list of genes as input. With the latter, the information of the conditions (phenotypes) of the samples is lost, as such phenotype permutation cannot be performed leaving the choice of null hypothesis to gene set permutation.
+
+3. PT
+
+  \- PT additionally models interactions between the genes. This approach generally scores considerably lower in terms of popularity in the reference database.
+
+### Key considerations
+
+  \- Pre-filter expression data: Exclude lowly expressed genes to improve statistical power.
+
+  \- Handle gene IDs carefully: Convert gene IDs to the required format and remove any duplicates.
+
+  \- Normalise expression data: Address sample-specific biases to enable fair comparisons between samples.
+
+  \- Use appropriate methods for differential expression analysis: Recommended methods include limma (voom), DESeq2, and edgeR.
+
+  \- Select suitable gene-level statistics: For FCS II, choose metrics like moderated t-statistic to rank genes meaningfully.
+
+  \- Adjust for multiple testing: Ensure your analysis includes a correction for multiple hypothesis testing. Some methods require manual adjustments.
+
+  \- Choose gene set databases based on biological context: Ensure that the database aligns with the research question and the experimental system.
+
+### Recommendation
+
+ - Awareness of Uncertainties:
+
+    \- Recognise uncertainties in methods, parameter choices, and data preprocessing when conducting Gene Set Analysis (GSA).
+
+    \- Understand that the method's name alone does not capture the full analysis pipeline.
+
+- Clearly document all analysis choices, including methods, parameters, and preprocessing steps.
+
+- Select methods, parameters, and preprocessing steps before starting the analysis to minimise bias.
+
+- Set Technical Parameters:
+
+    \- Fix technical parameters like the random seed and number of permutations before running the analysis to ensure reproducibility.
+  
+    \- Avoid adjusting these parameters to obtain favorable results.
+
+- Avoid Cherry-picking:
+
+    \- Refrain from selectively reporting results based on favorable outcomes, as this can lead to over-optimistic and non-reproducible findings.
+
+    \- Avoid excessive tweaking of the analysis strategy to fit the data post hoc.
+
+- Use different pipelines or parameter configurations as part of sensitivity analysis to check the consistency of results.
+
+- Share complete analysis workflows, including code and documentation, to allow others to replicate the findings accurately.
