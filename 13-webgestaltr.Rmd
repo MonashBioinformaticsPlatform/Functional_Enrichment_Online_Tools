@@ -26,7 +26,7 @@ This tool (both the web and R versions) has many features and advantages:
 
 1. Explore the organisms, databases/gene sets and namespaces supported natively
 2. Run ORA over pathway databases and explore the interactive HTML output
-3. Run GSEA over the GO 'non-redundant' and full database and compare the results
+3. Run GSEA over the `WebGestalt` `GO noRedundant` and full database and compare the results
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -51,5 +51,4 @@ You could also open the file by selecting `File` &rarr; `Open file`, or use the 
 - We have reviewed the organisms and databases that are natively supported by this easy to use tool 
 - We have run both ORA and GSEA and explored the interactive HTML results summary  
 - We have touched on the redundancy filters available within this tool, for GO as well as two external algorithms applied automatically to any enrichment performed
-- We have learnt about an R package that can create compatability between `WebGestaltR` (and other FEA tools) with `enichplot` for visualisation options
 - In the next session, we will use `WebGestaltR` with novel species

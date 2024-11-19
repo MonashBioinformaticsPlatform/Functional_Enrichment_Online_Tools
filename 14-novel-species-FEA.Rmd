@@ -30,6 +30,18 @@ Despite the lack of quality resources, there is much 'omics work conducted in ax
 
 Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5419050/#SD7) from axolotl, comparing gene expression in the blastema after proximal (at the shoulder) and distal (at the hand) limb amputation. The blastema is a collection of undifferentiated progenitor cells that give rise to the regenerated limb. Maybe our functional enrichment analysis of differentially expressed genes can help us understand processes that cause the blastema to grow into a full limb or just a hand! 
 
+## Caveat!
+
+This is not a real experiment! It was tricky to find a novel species that had 
+
+a) a reference genome
+b) a GTF
+c) was not natively supported by any FEA tool
+d) had publicly available RNAseq data
+e) FEA described in a peer-reviewed study 
+
+This axolotl data ticked A through D yet not E (RNA from various tissues were sequenced to aid a genome assembly project rather than for a valid biological experiment). Please keep this in mind when reviewing the results of the FEA we perform 😉 The goal of the session is not *really* to uncover how a blastema differentiates into a hand or an arm, but to demonstrate to you how you can apply this method to your own novel species. 
+
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ### Raw data sources
@@ -130,7 +142,7 @@ The `WebGestaltR` tab delimited `description` file with `.des` suffix has these 
 
 **Example .des format:**
 
-![webgr-gmt](images/webgr-des-file.png)
+<img src="images/webgr-des-file.png" style="border: none; box-shadow: none; background: none; ">
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -141,6 +153,27 @@ The `.gmt` file is provided to the parameter `enrichDatabaseFile` and the `.des`
 <img src="images/webgestaltr-others-organisms.png" style="border: none; box-shadow: none; background: none; width: 100%;">
 
 <p>&nbsp;</p>  <!-- insert blank line -->
+
+
+### Mapping database terms to descriptions
+
+Annotating a proteome with a tool such as `emapper` provides a connection between your novel species gene IDs and term IDs. To add the term description, we need a database file. In this analysis, we will use the [GO 'core' ontology file](https://purl.obolibrary.org/obo/go.obo) and the [KEGG Pathways file](https://www.pathway.jp/en/academic.html). These files were downloaded to the `workshop` folder of the VMs during our setup session. 
+
+The GO `go.obo` is a text file (>600K lines) with details for all terms in GO at the time of download. The second line of the file contains the GO database version, in this case: `data-version: releases/2024-06-17`. 
+
+**go.obo term information is structured like this:**
+
+<img src="images/go-obo-example.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+
+
+The KEGG Pathways file is identical in format to what is required for both the `clusterProfiler` `TERM2NAME` and `WebGestaltR` `.des` files:
+
+**KEGG Patwhays file format:**
+
+<img src="images/webgr-des-file.png" style="border: none; box-shadow: none; background: none; ">
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
 
 ## RNotebook novel species FEA
 
@@ -160,7 +193,7 @@ We will now take a quick look at novel species FEA online with `STRING`.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-## STRING novel species FEA
+## STRING (web) novel species FEA
 
 The axolotl putative proteome was previosuly uploaded to STRING and custom annotation performed. This completed using the STRING servers, with compute time less than one day. 
 
@@ -201,31 +234,33 @@ Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`.
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; In the RStudio `Files` pane, locate your saved ORA gene list from earlier - `workshop/Axolotl_DEGs.txt`. Click the file to view it in RStudio, then copy paste the list into the STRING `List of Names` search field, then select `SEARCH`. 
+&#x27A4; In the RStudio `Files` pane, locate your saved ORA gene list from earlier - `workshop/Axolotl_DEGs.txt`. Click the file to view it in RStudio, then copy paste the list into the STRING `List of Names` search field, then select `SEARCH`
 
-- Note that there is no option at this query page (even under `Advanced Settings`) to provide a custom background gene list. This can be done after the initial search has been run. 
+&#x27A4; Click `CONTINUE` at the gene ID review page
 
-- Click `CONTINUE` at the gene ID review page
+Before we explore the results, note that we have performed ORA without a background gene list! 😮
 
-- Then scroll ALL the way to the bottom of the page to the subheading `Statistical background`
-    - If you did not have a relevant saved background gene list, you would select `Add background`
-    - In this case, there is a saved background list for this annotation called `axolotl-blastema-background` (**FRED is this showing for you?**), so you can select the background from the dropdown menu then click `UPDATE`. This will re-cmpute the enrichment. 
+There is no option at the query page (even under `Advanced Settings`) to provide a custom background gene list. This must be done *after* the initial search has been run. Hopefully this will change in future versions. 
 
+**To add a custom background to STRING ORA:**
 
-<img src="images/string-add-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+In order to perform this part, you need a `STRING` login. If you have one, feel free to follow these instructions, otherwise, view along. 
+
+1. Click on the `ANALYSIS` tab
+2. Scroll ALL the way to the bottom of the page to the subheading `Statistical background`
+    - If you do not have a relevant saved background gene list in your `STRING` saved datasets, you would select `Add background`. See next sub-heading for details 
+    - If you do have a relevant background saved, change `Whole Genome` to select the relevant gene background list from your saved datasets
+3. Once you have selected the background, click `UPDATE` and the ORA will be re-computed using the custom statistical background 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 <img src="images/string-update-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
 
-<p>&nbsp;</p>  <!-- insert blank line -->
-
-**Note**: you may need to login! If you do not have a `STRING` login, you can watch along
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-**If you need to add a custom background:**
-- Select `ADD BACKGROUND`
+**Load axolotl background gene list to your STRING profile**
+- Under `ANALYSIS` tab of ORA results page, at `Statistical background`, select `ADD BACKGROUND`
 - You will be prompted to login if you are not already
 - Under `1) name your new set` provide a descriptive name for your background gene list. I chose `axolotl-blastema-background`
 - At `2) identify your organism` this will be pre-filled with our custom axolotl annotation
@@ -238,16 +273,17 @@ Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`.
 
 The gene list will be mapped to the STRING database. This may take several minutes.  
 
+<p>&nbsp;</p>  <!-- insert blank line -->
+
 `STRING` saves your custom datasets under `My Data`:
 
 <img src="images/string-set-novel-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
-
-Despite this, there is not (yet) an option to run the initial analysis with a pre-saved background gene list! Hopefully this feature will be added in the future. 
 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 **<span style="color: green;">Now let's explore the results!</span>**
+
 
 Some suggestions:
 
@@ -260,7 +296,7 @@ Some suggestions:
 
 ### How do the STRING results compare to those we generated in R? 
 
-We expect a large difference in the results because of the differing proteome annotation methods. 
+**We expect a large difference in the results because of the differing proteome annotation methods - both the annotation tool and the databases that were annotated against.**  
 
 The `eggNOG emapper` annotations we used in `R` rely on orthology-based predictions, employing extensive similarity searches to map genes to their closest evolutionary counterparts across diverse species. This results in a more comprehensive catalog of functional terms, even if they are inferred rather than directly evidenced.
 
@@ -281,6 +317,6 @@ And a clear lack of overlap in number of enriched terms and term IDs between `ST
 
 <img src="images/string-novel-ora-compare.png" style="border: none; box-shadow: none; background: none; ">
 
-These GO terms from `STRING` may be parent terms of more specific child terms prevalent in the R output. For a real world analysis, it would be optimal to compare, and deduce whether both methods could provide valuable and complimentary insights, or whether the results from one annotation approach or the other were more suited to your novel species. 
+These GO terms from `STRING` may be parent terms of more specific child terms prevalent in the `R` output. For a real world analysis, it would be optimal to compare, and deduce whether both methods could provide valuable and complimentary insights, or whether the results from one annotation approach or the other were more suited to your novel species. 
 
 Whichever you choose, strength to you! This is not an easy space to work in 💪 

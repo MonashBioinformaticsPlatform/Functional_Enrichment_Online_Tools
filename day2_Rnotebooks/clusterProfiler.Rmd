@@ -17,6 +17,8 @@ library(ggplot2)
 ```
 
 
+# 0. Working directory
+
 Ensure the 'workshop' directory is your current working directory:
 
 ```{r check notebook workdir}
@@ -43,7 +45,7 @@ This time, instead of filtering for DEGs, we will extract all genes, and sort th
 # Ranked gene list vector for GSEA
 ranked <- setNames(data$Log2FC[order(-data$Log2FC)], data$Gene.ID[order(-data$Log2FC)])
 
-# Inspect the vector
+# Inspect the vector				
 head(ranked)
 tail(ranked)
 
@@ -63,7 +65,6 @@ Most of those defaults look suitable to start.
 
 We have human so the default `organism = "hsa"` argument is correct. If you were working with a species other than human, you first need to obtain your organism code. You can derive this from [KEGG Organisms](https://www.genome.jp/kegg/tables/br08606.html) or using the `clusterProfiler` function `search_kegg_organism`.
 
-
 Pick your favourite species and search for the KEGG organism code by editing the variable 'organism' then executing the code chunk:
 
 ```{r}
@@ -73,8 +74,8 @@ fave <- "horse"
 search_kegg_organism(fave, by = "common_name")
 ```
 
-
 Now back to the parameters - the defaults for P value correction and filtering, and gene set size limits are acceptable. We don't want to use internal data (i.e. we want to search against the latest KEGG online) so `FALSE` is apt here, and we do want to use the `fgsea` algorithm for analysis. 
+
 
 For the `seed` parameter, we should provide a value, to ensure results are the same each time the command is run. By setting a seed, you fix the sequence of random numbers generated within the GSEA algorithm.
 
@@ -140,7 +141,7 @@ names(ranked_entrez) <- converted_ids$ENTREZID[match(names(ranked_entrez), conve
 # Remove duplicates from the vector by keeping only the first occurrence of each Entrez IDs (not ideal, see note above) 
 ranked_entrez <- ranked_entrez[!duplicated(names(ranked_entrez))]
 
-# Inspect the vector
+# Inspect the vector					
 head(ranked_entrez)
 tail(ranked_entrez)
 
@@ -165,7 +166,7 @@ gsea_kegg <- gseKEGG(
   pAdjustMethod = "BH",
   verbose = TRUE, 
   use_internal_data = FALSE, 
-  seed = FALSE, 
+  seed = 123, 
   by = "fgsea"
 )
 
@@ -191,7 +192,7 @@ gsea_kegg <- gseKEGG(
   pAdjustMethod = "BH",
   verbose = TRUE, 
   use_internal_data = FALSE, 
-  seed = FALSE, 
+  seed = 123, 
   by = "fgsea",
   nPermSimple = 10000
 )
@@ -205,7 +206,7 @@ Great, those last 2 warnings have resolved and we only have the expected one abo
 
 ## Tabular results 
 
-First, let's preview the results.  
+First, let's preview the results. 
 
 
 ```{r preview gsea results}
@@ -213,7 +214,9 @@ print(gsea_kegg)
 
 ```
 
-We can see 41 significant enrichments.   
+
+At the line `## 'data.frame':    43 obs. of  11 variables`, 43 is the number of significant enriched terms, and 11 is the number of columns in the output dataframe. 
+
 
 Extract results to a TSV file. This will print the significant enrichments, sorted by adjusted P value. 
 
@@ -225,8 +228,47 @@ write.table(gsea_kegg, file = "clusterProfiler_gseKEGG_results.tsv", sep = "\t",
 
 You can view the table in the `editor` pane by clicking on it from the `Files` pane.  
 
+## Plots
 
-## dotplot 
+One of the key advantages of using R over web tools is flexibility with visualisations. Next we will produce a range of plot types from the `enrichplot` package, developed by the same authors as `clusterProfiler`. 
+
+In this package, some of the plots can be used to plot ORA or GSEA, and others only for one type or the other. 
+
+To determine which plot functions are compatible with which FEA results type, you can check the help menu. If you see `## S4 method for signature 'enrichResult'` this plot is compatible with ORA results object.  If you see `## S4 method for signature 'gseaResult'` this plot is compatible with GSEA results object.
+
+Review the help menu for the `dotplot` function, which can plot both ORA and GSEA:
+
+```{r dotplot help}
+?enrichplot::dotplot
+
+```
+
+
+And review the help menu for `ridgeplot` which can only plot GSEA results:
+
+```{r ridgeplot help}
+?enrichplot::ridgeplot
+
+```
+
+Unfortunately, `enrichplot` is only compatible with the enrichment results from the packages produced by this development team, although the desire to use `enrichplot` with the output of other tools is widespread. The R package `multienrichjam` has a function `enrichDF2enrichResult` that converts ORA dataframe results from other FEA tools to the format required for `enrichplot`. 
+ 
+ `multienrichjam` has a lot of dependencies and has not been installed on these VMs so we will not be performing this today. However, this functionality and flexibility is pretty cool, so if you wanted to install this on your own computer outside the workshop, below is the code for installing :-) 
+ 
+ 
+```{r install multienrichjam}
+# github remotes package required:
+#install.packages("remotes")
+#library(remotes)
+
+# install multienrichjam:
+#remotes::install_github("jmw86069/multienrichjam", dependencies=TRUE)
+#library(multienrichjam)
+
+```
+
+
+### dotplot 
 
 A dotplot is an easy to interpret plot. The size of the dot is proportional to the number of genes (count) in that term. A higher GeneRatio indicates that a larger portion of the gene set is significantly altered or associated with the observed changes in gene expression. 
 
@@ -248,7 +290,7 @@ clusterProfiler::dotplot(
 
 
 
-## upsetplot
+### upsetplot
 
 The upset plot shows the pattern of shared genes among the enriched terms (since a gene can belong to multiple terms or pathways).
 
@@ -269,11 +311,13 @@ enrichplot::upsetplot(gsea_kegg, n = 10)
 
 
 
-## emapplot
+### emapplot
 
 The enrichment map plot organises enriched terms into a network with edges connecting overlapping gene sets. Overlapping gene sets cluster together.
 
 It is required to run the function `pairwise_termsim` before producing the plot. 
+
+When running `pairwise_termsim`, we don't need to save the output to a new object, because the information is added to the object and does not change any other attributes. 
 
 
 ```{r GSEA KEGG emapplot}
@@ -285,18 +329,16 @@ enrichplot::emapplot(gsea_kegg, showCategory = 15)
 
 ```
 
-## treeplot
+### treeplot
 
 The treeplot provides the same information as the emapplot but in a different visualisation. 
 
 Each node is a term, and the number of genes associated with the term is shown by the dot size, with P values by dot colour. 
 
-Terms that share more genes or biological functions will be closer together in the tree structure. Clades are colour coded and 'cluster tags' assigned. You can control the number of words in the tag (default is 4). The user guide describes the argument `nWords` however running that will throw an error (it says 'warning' but its fatal so to me that's an error!):
+Terms that share more genes or biological functions will be closer together in the tree structure. Clades are colour coded and 'cluster tags' assigned. You can control the number of words in the tag (default is 4). The user guide describes the argument `nWords` however running that will throw an error (it says 'warning' but it is fatal so to me that's an error!):
 
-```
 "Warning: Use 'cluster.params = list(label_words_n = your_value)' instead of 'nWords'.
  The nWords parameter will be removed in the next version."
-```
 
 This plot also requires the pairwise similarity matrix calculation that emapplot does. Since we have already run it, it is hashed out in the code chunk below. 
 
@@ -309,7 +351,7 @@ Plot view within the notebook affects the clarity of the cluster tags, however p
 enrichplot::treeplot(gsea_kegg, showCategory = 15, color = "p.adjust", cluster.params = list(label_words_n = 5))
 ```
 
-## cnetplot
+### cnetplot
 
 The cnetplot is helpful to understanding which genes are involved in the enriched terms, details that are not available in the plots generated so far. It depicts the linkages of genes and terms as a network. 
 
@@ -363,7 +405,7 @@ Now we can clearly see the gene IDs for this network.
 
 
 
-## heatplot
+### heatplot
 
 Like the upset plot, the heatplot shows shared genes across enriched terms. When there are a lot of genes, it can be poorly readable, especially within the notebook. This function does not include a parameter to restrict to 'core' genes like the `cnetplot` or `ridgeplot` so even when plotting a very small number of enriched terms, the X-axis is too cramped to be readable.
 
@@ -403,7 +445,7 @@ dev.off()
 
 
 
-## ridgeplot
+### ridgeplot
 
 This function is specific for GSEA. It does not apply to ORA, since it plots NES.  
 
@@ -424,7 +466,7 @@ enrichplot::ridgeplot(gsea_kegg,
   decreasing = FALSE )
 ```
 
-## gseaplot
+### gseaplot
 
 Another GSEA-specific plot, which shows the contribution to the normalised enrichment score (NES) of genes across the gene list.
 
@@ -485,9 +527,11 @@ enrichplot::gseaplot( gsea_kegg,
 
 ```
 
-## volcano plot
+### volcano plot
 
-The `volplot` function within `enrichplot` does not support GSEA result, but we can use `ggplot2` for this. 
+The `volplot` function within `enrichplot` does not support GSEA result objects, but we can use `ggplot2` for this. 
+
+`ggplot2` is a highly flexible R package for visualisations, and unlike `enrichplot` is not constrained to a specific plot type. 
 
 The volcano plot has the advantage of showing whether the genes in the enriched terms were predominantly from the top (upregulated) or bottom (downregulated) end of the list. 
 
@@ -516,13 +560,27 @@ ggplot2::ggplot(gsea_kegg@result, aes(x = enrichmentScore, y = -log10(p.adjust),
 
 # 6. Save versions and session details 
 
-R version and package versions:
+## Database query dates
+
+Unlike `gprofiler`, `clusterProfiler` does not have a function to list the version of the queried databases. 
+
+For this reason, we will save the analysis date to our rendered notebook, so the external database version could be back-calculated from the date if required:
+
+```{r date}
+cat("Date of analysis:\n")
+print(Sys.Date())
+
+```
+
+## R version and R package versions
 
 ```{r info }
 sessionInfo()
 ```
 
-And RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
+## RStudio version
+
+Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
 
 
 ```{r rstudio version - not run during knit, eval=FALSE}

@@ -3,6 +3,7 @@ title: "ORA with gprofiler2"
 output:
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
 ```{r Load R packages, include=FALSE}
@@ -13,6 +14,10 @@ library(ggplot2)
 library(tidyr)
 
 ```
+
+# 0. Working directory
+
+Ensure the 'workshop' directory is your current working directory:
 
 ```{r check notebook workdir}
 getwd()
@@ -89,8 +94,9 @@ cat("Table saved to", title, "\n")
 
 Before running the below code chunk, review the parameters for the `gost` ORA function. We can do this easily by bringing up the help page for the function in the `Help` pane of RStudio. This is the same information that is displayed in the [gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/gprofiler2.pdf) user guide. 
 
+
 ```{r gost help}
-?gost
+?gprofiler2::gost
 ```
 
 
@@ -616,6 +622,8 @@ Great! We know we applied the same parameters, and used the same input gene list
 
 # 9. Save versions and session details 
 
+## gProfiler database version
+
 Let's check: yesterday when you ran ORA on the web, hopefully you saved your 'query parameters' as well as your results. 
 
 From my run, I can see version as 'e111_eg58_p18_f463989d'. 
@@ -629,13 +637,17 @@ paste0("gprofiler2 package version: ", packageVersion("gprofiler2"))
 
 ```
 
+## R version and R package versions 
+
 We can also capture the version of R and other session details including all loaded packages and versions with the `sessionInfo()` function: 
 
 ```{r info }
 sessionInfo()
 ```
 
-And finally, the RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
+## RStudio version
+
+Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
 
 
 

@@ -15,6 +15,8 @@ library(enrichplot)
 
 # 0. Working directory
 
+Ensure the 'workshop' directory is your current working directory:
+
 ```{r check notebook workdir}
 getwd()
 ```
@@ -216,7 +218,7 @@ Some things to note:
 
 - You can increase the default view of 20 rows to 'All' for the enrichment table, but this does not necessarily show all significant enrichments! Check the output file `enrichment_results_ORA_pathways.txt` and you can see 85 significant terms, yet 'All' view with default of 20 rows shows 30 something. To increase the number of rows included in the HTML report, use the parameter `reportNum` 
 
-- You can run algorithms to reduce the number of terms through clustering, in order to make the results more manageable. This is discussed in the WebGestalt 2019 update publication [Liao et al 2019](https://academic.oup.com/nar/article/47/W1/W199/5494758). The authors maintain that "important biological themes are all covered with these selected gene sets" 
+- You can run algorithms to reduce the number of terms through clustering, in order to make the results more manageable. This is discussed in the WebGestalt 2019 update publication [Liao et al 2019](https://academic.oup.com/nar/article/47/W1/W199/5494758). The authors maintain that "important biological themes are all covered with these selected gene sets". Built-in redundancy handling/term clustering is a feature of `WebGestaltR` (and the web version). To what extent this is appropriate for the database you are using is up to you to determine. For example, in the next analysis we will perform GSEA over the `noRedundant` GO MF database. Applying a double layer of redundancy filters over a database seems quite dubious to me..  
 
 - Selecting a term from the 'Enrichment Results' table updates the term under 'Select an enriched analyte set', where more detailed results are shown, including the genes from your gene list present within the gene set for that term 
 
@@ -250,6 +252,16 @@ Let's run enrichment over the full and the non-redundant version of the GO MF da
 
 Let's use GSEA since we have already tried ORA with this package. GSEA is slower and GO is large, so even with 7 threads these commands will take a few minutes (longer for redundant than non-redundant, of course). Feel free to use the compute time to ask questions on slack or explore the ORA pathways output some more!
 
+There is no `seed` parameter for `WebGestaltR` GSEA as there is for `clusterProfiler`. We can set it in R instead with `set.seed()`. 
+
+```{r set seed}
+set.seed(123)
+```
+
+A note from testing: without setting the seed in R, a slightly different number of enriched terms were returned over 3 runs. With setting the seed, the same number and IDs of terms were significant among the replicate runs, BUT the NES and the FDR were slightly different! The unadjusted ES and P values were the same. 
+
+
+
 ```{r GSEA GO MF with redundant}
 
 outputDirectory <- "WebGestaltR_results" 
@@ -279,7 +291,6 @@ suppressWarnings({ gomf <- WebGestaltR(
 
 
 ```{r GSEA GO MF nonredundant}
-
 outputDirectory <- "WebGestaltR_results" 
 project <- "GSEA_GO-MF_non-redundant"
 database  <- "geneontology_Molecular_Function_noRedundant"
@@ -367,36 +378,11 @@ By grouping so many similar terms with the non-redundant analyses, the overall n
 For your own research, you could explore the relationships between these terms by viewing the neighborhood of GO terms on AmiGO: https://amigo.geneontology.org/amigo, or using NaviGO https://kiharalab.org/navigo/views/goset.php
 
 
+# 5. Save versions and session details
 
-# 5 Plot `WebGestaltR` results with `enichplot` 
+## Database query dates
 
- A key advantage of R is flexibility with data manipulation and visualisation. In the previous exercise, we have explored the many plot options of `enrichplot`. This package was designed to work with an `enrichResult` object from `clusterProfler` and a handful of other packages written by the same team. The desire to use `enrichplot` with the output of other tools is widespread. 
- 
-The R package `multienrichjam` has a function `enrichDF2enrichResult` that converts dataframe type results from other FEA tools to the format required for `enrichplot`!  
- 
- `multienrichjam` has a lot of dependencies and has not been installed on these VMs so we will not be performing this today. However, this functionality and flexibility is pretty cool, so if you wanted to install this on your own computer outside the workshop, below is the code for installing :-)  
-
-
-```{r install multienrichjam}
-# github remotes package required:
-#library(remotes)
-
-# install multienrichjam:
-remotes::install_github("jmw86069/multienrichjam", dependencies=TRUE)
-
-# load library: 
-#library(multienrichjam)
-
-# check function help menu: 
-#?enrichDF2enrichResult
-```
-
-
-
-
-# 6. Save versions and session details
-
-Unlike `gprofiler`, `WebGestaltR` does not have a function to list the version of the queried database. 
+Unlike `gprofiler`, `WebGestaltR` does not have a function to list the version of the queried databases. 
 
 For this reason, we will save the analysis date to our rendered notebook, so the external database version could be back-calculated from the date if required:
 
@@ -406,8 +392,7 @@ print(Sys.Date())
 
 ```
 
-
-R version and package versions:
+## R version and R package versions
 
 ```{r info }
 sessionInfo()
@@ -415,7 +400,9 @@ sessionInfo()
 
 
 
-And RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
+## RStudio version
+
+Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
 
 
 ```{r rstudio version - not run during knit, eval=FALSE}
@@ -450,7 +437,7 @@ rstudio_version_text
 
 
 
-# 7.  Knit workbook to HTML
+# 6.  Knit workbook to HTML
 
 The last task is to knit the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work.
 

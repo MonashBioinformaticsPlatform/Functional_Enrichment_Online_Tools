@@ -25,6 +25,8 @@ library(enrichplot)
 
 # 0. Working directory
 
+Ensure the 'workshop' directory is your current working directory:
+
 ```{r check notebook workdir}
 getwd()
 ```
@@ -62,7 +64,7 @@ The raw annotation file provides us with 'term ID to gene ID' mappings for our s
 
 For GO, we will use the GO 'core' ontology file, downloaded from https://purl.obolibrary.org/obo/go.obo and included in the data files you downloaded to `workshop` directory earlier. 
 
-We will use the `ontologyIndex` package to retrieve ontologi info and save to an object named `ontology` for later use creating the required custom database files for `clusterProfiler` and `WebGestaltR`.  
+We will use the `ontologyIndex` package to retrieve ontology info and save to an object named `ontology` for later use creating the required custom database files for `clusterProfiler` and `WebGestaltR`.  
 
 
 ```{r Extract GO ontology}
@@ -197,10 +199,9 @@ We need `GOs` and `KEGG_Pathway` columns.
 
 ### 3.1.1 GO TERM2GENE
 
+Next, we will extract the GO IDs from the `emapper` annotation file, and wrangle into the correct format for `clusterProfiler` `TERM2GENE`. There are several steps to this - comments have been included to outline what each step is doing.
+
 ```{r GO TERM2GENE}
-
-# Extract GO IDs from eggNOG annotation file to correct format for clusterProfiler
-
 go_term2gene <- eggnog_anno %>%
     dplyr::select(GOs, `#query`) %>% # select the GO column and the query column (axolotl gene ID) 
     dplyr::filter(GOs != "-") %>% # filter out rows where the GO ID is "-" ie no GO annotation for this gene
@@ -232,7 +233,7 @@ head(go_term2gene)
 
 ### 3.1.2 KEGG TERM2GENE
 
-Here we use the same process as above, just with a different column name. 
+Here we use the same process as we did above for GO (colum name `GOs`), selecting a different column name for KEGG (`KEGG_Pathway`). 
 
 ```{r KEGG TERM2GENE}
 kegg_term2gene <- eggnog_anno %>%
@@ -266,7 +267,7 @@ head(kegg_term2gene)
 
 ### 3.2.1 GO
 
-The GO Core Ontology file (we have saved in our `workshop` folder and labeleld the filename as R object `go_core`) will enable us to assign term descriptions to term IDs and create our `TERM2NAME` files. 
+The GO Core Ontology file (we have saved in our `workshop` folder and labelled the filename as R object `go_core`) will enable us to assign term descriptions to term IDs and create our `TERM2NAME` files. 
 
 
 This may take a few moments to run. It will use the `ontology` object we created earlier. 
@@ -475,7 +476,7 @@ Let's review the help page:
 ?clusterProfiler::GSEA
 ```
 
-Recall from our `clusterProfiler` session with human data that we needed to add `nPermSimple = 10000` to avoid a warning about "unbalanced (positive and negative) gene-level statistic value" and reduce `eps` to zero to avoid a warning about obtaining better P value estiamtes . Let's do this from the start.
+Recall from our `clusterProfiler` session with human data that we needed to add `nPermSimple = 10000` to avoid a warning about "unbalanced (positive and negative) gene-level statistic value" and reduce `eps` to zero to avoid a warning about obtaining better P value estimates . Let's do this from the start.
 
 ```{r CP KEGG GSEA}
 cp_kegg_gsea <- GSEA(
@@ -488,7 +489,7 @@ cp_kegg_gsea <- GSEA(
   pAdjustMethod = "BH",
   TERM2GENE = kegg_term2gene, 
   TERM2NAME = kegg_term2name, 
-  seed = 1234, 
+  seed = 123, 
   by = "fgsea",
   nPermSimple = 10000
 )
@@ -764,7 +765,14 @@ Confirm that our GMT file correctly included the term link by selecting a term a
 
 ## 6.2 WebGestaltR GSEA of KEGG Pathways 
 
-This will take slightly longer than ORA. We will set threads to 7
+This will take slightly longer than ORA. We will set threads to 7 to speed it up as much as we can.  
+
+There is no `seed` parameter for `WebGestaltR` GSEA as there is for `clusterProfiler`. We can set it in R instead with `set.seed()`. 
+
+```{r set seed}
+set.seed(123)
+```
+
 
 ```{r WGR GSEA KEGG }
 
@@ -794,28 +802,39 @@ Open the HTML report `WebGestaltR_results/Project_Axolotl_GSEA_KEGG/Report_Axolo
 
 Expand 'Job summary' to read that "22 positive related categories and no negative related categories" are significant in this analysis. This is in contrast to the one negative category we observed when running KEGG GSEA with `clusterProfiler`. We expect some differences between these tools.
 
-Compare the tablar results in this report to the treeplot we produced under code chunk `treeplot CP KEGG GSEA`. There are a lot of shared terms, and this is reassuring. 
+Compare the tabular results in this report to the treeplot we produced under code chunk `treeplot CP KEGG GSEA`. There are a lot of shared terms, and this is reassuring. 
 
 # 7. Save versions and session details
 
-Both `clusterProfiler` and `WebGestaltR` query the latest versions of the databases, with no function to list the database version. 
+## GO database version 
 
-For this reason, we will save the analysis date to our rendered notebook, so the external database version could be back-calculated from the date if required:
+Print the database version of GO Core Ontology used:
 
-```{r date}
-cat("Date of analysis:\n")
-print(Sys.Date())
+```{r print GO core ontology file version}
+# Read go.obo lines
+lines <- readLines("go.obo")
+
+# Use grep to pull "data-version"
+version <- grep("data-version", lines, value = TRUE)
+
+# Print version
+cat("GO version from go.obo file:", version, "\n")
 
 ```
 
+## KEGG Pathways database version 
 
-R version and package versions:
+The KEGG pathways file does not contain any version details within the file contents, but does have the date saved in the name of the file that was imported into this workbook. Adding the date of download was done manually, and is always recommended practice for files and databases that do not contain any date or version details. 
+
+
+## R version and R package versions
 
 ```{r info }
 sessionInfo()
 ```
 
 
+## RStudio version
 
 And RStudio version. Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
 
