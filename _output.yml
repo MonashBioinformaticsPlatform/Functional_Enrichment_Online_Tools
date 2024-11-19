@@ -9,7 +9,7 @@ bookdown::bs4_book:
   #   in_header: custom.js
   theme:
     primary: "green"
-  repo: https://github.com/MonashBioinformaticsPlatfor/Functional_Enrichment_BioCommons_2024
+  repo: https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_BioCommons_2024
   # toc_depth: 2  # Adjust the depth as needed (e.g., 2 for up to H2 headers)
 bookdown::pdf_book:
   includes:
@@ -22,8 +22,6 @@ bookdown::gitbook:
   css: style.css
   config:
     toc:
-      before: |
+      after: |
         <a href="https://www.example.com/"><img src="Sydney_informatics_hub_logo.png" width="280"></a>
         <li><a href="./">An example Resource</a></li>
-      after: |
-        <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
