@@ -18,8 +18,8 @@ Note that most of these tools do more than just enrichment tests, and some inclu
 
 https://biit.cs.ut.ee/gprofiler/gost
 
-The g:GOSt 'functional profiling' tool of g:Profiler calculates 
-It has a clean modern interface and a handy summary of which genes contribute to the enrichment. 
+The `g:GOSt` 'functional profiling' tool of `gProfiler`calculates functional enrichment for gene lists, identifying enriched terms across various ontologies and pathways. 
+It features a clean, modern interface and provides a handy summary highlighting which genes contribute to the enrichment.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/gprofiler.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="The gProfiler front page"} 
@@ -55,7 +55,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 https://amp.pharm.mssm.edu/Enrichr/
 
-Enrichr easily calculates enrichment across a wide range of databases. Currently does not allow for a background set. 
+Enrichr easily calculates enrichment across a wide range of databases. Currently does allow for a background set. 
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/enrichr.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="Enrichr"} 
@@ -92,14 +92,12 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 https://string-db.org/
 
-STRING is not a functional enrichment tool, rather it is a convenient way to explore interactions within a genelist. Results are viewed as an interaction network. Best suited to smaller genelists.
+STRING was originally designed as a convenient tool to explore interactions within a gene list, visualised as an interaction network. While it is best suited for smaller gene lists, it now also includes functionality for performing functional enrichment analysis.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/string.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="STRING"} 
 knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/string.png")
 ```
-
-
 
 ## Gene Ontology
 
@@ -128,7 +126,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 http://software.broadinstitute.org/gsea/index.jsp
 
-The desktop-based GSEA tool is (one of many) gene set enrichment approaches. It uses of gene rankings across all genes rather than hypogeometric or fishers-exact tests of genelist enrichment.  MSigDB (Molecular signatures database) is a suite of annotation databases suitable for GSEA analysis.
+The GSEA Desktop is (one of many) gene set enrichment approaches. It uses of gene rankings across all genes rather than hypogeometric or fishers-exact tests of gene list enrichment.  MSigDB (Molecular signatures database) is a suite of annotation databases suitable for GSEA analysis.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/gsea.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="MSigDB"} 
@@ -148,7 +146,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 https://cytoscape.org/
 
-Cytoscape is a desktop-based biological network analysis / visualization tool, rather than a functional enrichment tool (although plugins can change that). It is mentioned here because it is often useful as a next step when you need to create custom figures showing the interactions of an interesting biological pathway. 
+Cytoscape is a desktop-based biological network analysis / visualisation tool, rather than a functional enrichment tool (although plugins can change that). It is mentioned here because it is often useful as a next step when you need to create custom figures showing the interactions of an interesting biological pathway. 
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/cytoscape.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="Cytoscape"} 
