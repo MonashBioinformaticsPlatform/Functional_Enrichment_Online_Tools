@@ -496,7 +496,7 @@ When running FEA in Reactome, how do you prefer the analysis methods?
 This section summarises the [Wünsch et al., 2023](https://wires.onlinelibrary.wiley.com/doi/full/10.1002/wics.1643) paper, which addresses uncertainties in atypical functional enrichment analysis.
 
 ```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="From RNA sequencing measurements to the final results: A practical guide to navigating the choices and uncertainties of gene set analysis"} 
-knitr::include_graphics("images/Wünsch_et_al_2023.png")
+knitr::include_graphics("images/Wunsch_et_al_2023.png")
 ```
 
 
