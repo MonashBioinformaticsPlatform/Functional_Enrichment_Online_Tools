@@ -23,5 +23,7 @@ bookdown::gitbook:
   config:
     toc:
       after: |
-        <a href="https://www.example.com/"><img src="Sydney_informatics_hub_logo.png" width="280"></a>
-        <li><a href="./">An example Resource</a></li>
+          <a href="https://www.example.com/">
+            <img src="Sydney_informatics_hub_logo.png" width="280" alt="Logo">
+          </a>
+          <li><a href="./">An example Resource</a></li>
