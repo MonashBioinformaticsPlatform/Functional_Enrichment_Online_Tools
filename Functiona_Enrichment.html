@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Functional Enrichment Workshop</title>
+
+    <meta name="author" content="Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP)" />
+  
+   <meta name="description" content="<p>A comprehensive guide to functional enrichment analysis using both online platforms and command-line tools.</p>" />
+   <meta name="generator" content="placeholder" />
+  <meta property="og:title" content="Functional Enrichment Workshop" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="<p>A comprehensive guide to functional enrichment analysis using both online platforms and command-line tools.</p>" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Functional Enrichment Workshop" />
+  
+  <meta name="twitter:description" content="<p>A comprehensive guide to functional enrichment analysis using both online platforms and command-line tools.</p>" />
+  
+  <!-- JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script>
+    <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet" />
+    <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script>
+    <script src="libs/bs3compat-0.8.0/transition.js"></script>
+    <script src="libs/bs3compat-0.8.0/tabs.js"></script>
+    <script src="libs/bs3compat-0.8.0/bs3compat.js"></script>
+    <link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet" />
+    <script src="libs/bs4_book-1.0.0/bs4_book.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script>
+
+  <!-- CSS -->
+  <style type="text/css">
+    
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  </style>
+      <link rel="stylesheet" href="style.css" />
+  
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+<div class="container-fluid">
+<!--bookdown:title:start-->
+<!--bookdown:title:end-->
+
+<!--bookdown:toc:start-->
+<div class="row">
+  <header class="col-sm-12 col-lg-3 sidebar sidebar-book">
+    <a class="sr-only sr-only-focusable" href="#content">Skip to main content</a>
+
+    <div class="d-flex align-items-start justify-content-between">
+      <h1>
+        <a href="index.html" title="">Functional Enrichment Workshop</a>
+      </h1>
+      <button class="btn btn-outline-primary d-lg-none ml-2 mt-1" type="button" data-toggle="collapse" data-target="#main-nav" aria-expanded="true" aria-controls="main-nav"><i class="fas fa-bars"></i><span class="sr-only">Show table of contents</span></button>
+    </div>
+
+    <div id="main-nav" class="collapse-lg">
+      <form role="search">
+        <input id="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+      </form>
+
+      <nav aria-label="Table of contents">
+        <h2>Table of contents</h2>
+        <div id="book-toc"></div>
+
+        <div class="book-extra">
+          <p><a id="book-repo" href="#">View book source <i class="fab fa-github"></i></a></li></p>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="col-sm-12 col-md-9 col-lg-7" id="content">
+<span class="main-title"><em>Making sense of gene and proteins lists with functional enrichment analysis</em></span>
+<!--bookdown:toc:end-->
+<!--bookdown:body:start-->
+<div id="functional-enrichment-workshop" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Functional Enrichment Workshop</h1>
+<p><strong>Welcome to the Functional Enrichment Workshop!</strong> This resource is designed to guide you through the process of performing functional enrichment analysis using a variety of tools and methodologies, both online and via command-line interfaces.</p>
+<div id="instructors" class="section level3" number="1.0.1">
+<h3><span class="header-section-number">1.0.1</span> Instructors</h3>
+<ul>
+<li><strong>Hossein V Kahrood</strong>
+<ul>
+<li>Lead Instructor, Monash Genomics and Bioinformatics Platform (MGBP)</li>
+<li><a href="mailto:hossein.valipourkahrood@monash.edu">hossein.valipourkahrood@monash.edu</a></li>
+</ul></li>
+<li><strong>Cali Willet</strong>
+<ul>
+<li>Lead Instructor, Sydney Informatics Hub</li>
+<li><a href="mailto:cali.willet@sydney.edu.au">cali.willet@sydney.edu.au</a></li>
+</ul></li>
+</ul>
+</div>
+<div id="important-links" class="section level3" number="1.0.2">
+<h3><span class="header-section-number">1.0.2</span> Important Links</h3>
+<ul>
+<li><strong>Workshop Page:</strong> <a href="https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/">Functional Enrichment BioCommons 2024</a></li>
+<li><strong>Related Publication:</strong> <a href="https://link.springer.com/article/10.1007%2Fs10571-016-0403-y">NeuroMolecular Medicine Article</a></li>
+<li><strong>Degust Tool:</strong> <a href="https://degust.erc.monash.edu/degust/compare.html?code=5b2c7805ab8f8c5f2dc8c72e61b049b0#/?plot=mds">Degust Comparative Analysis</a></li>
+</ul>
+<hr />
+</div>
+<div id="getting-started" class="section level3" number="1.0.3">
+<h3><span class="header-section-number">1.0.3</span> Getting Started</h3>
+<p>To begin, we recommend reviewing the <a href="https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/">workshop page</a> for an overview of the content and tools covered. This workshop is structured to progressively build your skills, starting with the basics of functional enrichment analysis and moving towards more complex applications.</p>
+<p>Happy learning!</p>
+<!--chapter:end:index.Rmd-->
+</div>
+</div>
+<div id="part-day-1" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> (PART) Day 1</h1>
+<!--chapter:end:part-day1.Rmd-->
+</div>
+<div id="overview" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Overview</h1>
+<p>Placeholder</p>
+<div id="functional-analysis-of--omics-data" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Functional analysis of -Omics data</h2>
+<div id="general-information" class="section level3" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> General information</h3>
+</div>
+<div id="course-objectives" class="section level3" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> Course Objectives</h3>
+</div>
+<div id="target-audience" class="section level3" number="3.1.3">
+<h3><span class="header-section-number">3.1.3</span> Target Audience</h3>
+</div>
+<div id="setup-requirements" class="section level3" number="3.1.4">
+<h3><span class="header-section-number">3.1.4</span> Setup Requirements</h3>
+</div>
+<div id="schedule" class="section level3" number="3.1.5">
+<h3><span class="header-section-number">3.1.5</span> Schedule</h3>
+<!--chapter:end:01-overview.Rmd-->
+</div>
+</div>
+</div>
+<div id="recap" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Recap</h1>
+<p>Placeholder</p>
+<div id="functional-enrichment-analysis" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Functional enrichment analysis</h2>
+<div id="why-is-it-important" class="section level3" number="4.1.1">
+<h3><span class="header-section-number">4.1.1</span> Why Is It Important?</h3>
+</div>
+<div id="when-to-use-functional-enrichment-analysis" class="section level3" number="4.1.2">
+<h3><span class="header-section-number">4.1.2</span> When to Use Functional Enrichment Analysis?</h3>
+</div>
+<div id="what-are-the-input-data" class="section level3" number="4.1.3">
+<h3><span class="header-section-number">4.1.3</span> What Are the Input Data?</h3>
+</div>
+<div id="synonyms" class="section level3" number="4.1.4">
+<h3><span class="header-section-number">4.1.4</span> Synonyms</h3>
+</div>
+</div>
+<div id="concepts" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Concepts</h2>
+</div>
+<div id="types-of-enrichment-analysis" class="section level2" number="4.3">
+<h2><span class="header-section-number">4.3</span> Types of Enrichment Analysis</h2>
+<div id="over-representation-analysis-ora" class="section level3" number="4.3.1">
+<h3><span class="header-section-number">4.3.1</span> Over Representation Analysis (ORA)</h3>
+<div id="input-data" class="section level4" number="4.3.1.1">
+<h4><span class="header-section-number">4.3.1.1</span> Input Data</h4>
+</div>
+<div id="workflow" class="section level4" number="4.3.1.2">
+<h4><span class="header-section-number">4.3.1.2</span> Workflow</h4>
+</div>
+</div>
+<div id="gene-set-enrichment-analysis-gsea" class="section level3" number="4.3.2">
+<h3><span class="header-section-number">4.3.2</span> Gene Set Enrichment Analysis (GSEA)</h3>
+<div id="input-data-1" class="section level4" number="4.3.2.1">
+<h4><span class="header-section-number">4.3.2.1</span> Input Data</h4>
+</div>
+<div id="workflow-1" class="section level4" number="4.3.2.2">
+<h4><span class="header-section-number">4.3.2.2</span> Workflow</h4>
+</div>
+</div>
+<div id="pathway-topology-pt-based-enrichment" class="section level3" number="4.3.3">
+<h3><span class="header-section-number">4.3.3</span> Pathway Topology (PT)-Based Enrichment</h3>
+<div id="input-data-2" class="section level4" number="4.3.3.1">
+<h4><span class="header-section-number">4.3.3.1</span> Input Data</h4>
+</div>
+<div id="workflow-2" class="section level4" number="4.3.3.2">
+<h4><span class="header-section-number">4.3.3.2</span> Workflow</h4>
+</div>
+</div>
+</div>
+<div id="annotation-databses" class="section level2" number="4.4">
+<h2><span class="header-section-number">4.4</span> Annotation Databses</h2>
+<div id="go-gene-ontology" class="section level3" number="4.4.1">
+<h3><span class="header-section-number">4.4.1</span> <a href="https://geneontology.org/">GO: Gene Ontology</a></h3>
+</div>
+<div id="kegg-kyoto-encyclopedia-of-genes-and-genomes" class="section level3" number="4.4.2">
+<h3><span class="header-section-number">4.4.2</span> <a href="https://www.genome.jp/kegg/">KEGG: Kyoto Encyclopedia of Genes and Genomes</a></h3>
+</div>
+<div id="reactome" class="section level3" number="4.4.3">
+<h3><span class="header-section-number">4.4.3</span> <a href="https://reactome.org/">Reactome</a></h3>
+</div>
+<div id="msigdb" class="section level3" number="4.4.4">
+<h3><span class="header-section-number">4.4.4</span> <a href="https://www.gsea-msigdb.org/">MSigDB</a></h3>
+</div>
+</div>
+<div id="common-tools-for-doing-fea" class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> Common Tools for Doing FEA</h2>
+<!--chapter:end:02-recap.Rmd-->
+</div>
+</div>
+<div id="enrichment-statistics" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Enrichment Statistics</h1>
+<p>Placeholder</p>
+<div id="fishers-exact-test" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> <span style="color:orange;">Fisher’s Exact Test</span></h2>
+</div>
+<div id="hypergeometric-test" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> <span style="color:orange;">Hypergeometric Test</span></h2>
+<div id="section" class="section level4 unnumbered">
+<h4 class="unnumbered"></h4>
+</div>
+</div>
+<div id="activity" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Activity</h2>
+<div id="challenge-interactive-calculator" class="section level3 unnumbered challenge">
+<h3 class="unnumbered challenge"><strong>Challenge:</strong> Interactive Calculator</h3>
+<div id="section-1" class="section level4 unnumbered">
+<h4 class="unnumbered"></h4>
+</div>
+</div>
+<div id="questions" class="section level3 unnumbered rationale">
+<h3 class="unnumbered rationale"><strong>Questions</strong></h3>
+<div id="section-2" class="section level4 unnumbered">
+<h4 class="unnumbered"></h4>
+<!--chapter:end:03-stats.Rmd-->
+</div>
+</div>
+</div>
+</div>
+<div id="example-analysis" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Example Analysis</h1>
+<p>Placeholder</p>
+<div id="sh-sy5y-differentiation" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> SH-SY5Y Differentiation</h2>
+</div>
+<div id="the-question-what-pathways-are-involved-in-sh-sy5y-differentiation" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> The question: What pathways are involved in SH-SY5Y Differentiation?</h2>
+</div>
+<div id="the-data-differentially-expressed-genes" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> The data : Differentially expressed genes</h2>
+<!--chapter:end:04-example-dataset.Rmd-->
+</div>
+</div>
+<div id="defining-the-genelist" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> Defining the genelist</h1>
+<p>Placeholder</p>
+<div id="activities" class="section level2" number="7.1">
+<h2><span class="header-section-number">7.1</span> Activities</h2>
+</div>
+<div id="common-gotcha" class="section level2" number="7.2">
+<h2><span class="header-section-number">7.2</span> Common gotcha</h2>
+</div>
+<div id="example" class="section level2" number="7.3">
+<h2><span class="header-section-number">7.3</span> Example</h2>
+<!--chapter:end:05-genelists.Rmd-->
+</div>
+</div>
+<div id="online-tools" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> Online Tools</h1>
+<p>Placeholder</p>
+<div id="fea-in-gprofiler" class="section level2" number="8.1">
+<h2><span class="header-section-number">8.1</span> FEA in gProfiler <a href="https://biit.cs.ut.ee/gprofiler/gost" target="_blank"><img src="images/gp2-logo-new.png" alt="g:Profiler Logo" style="height:35px; vertical-align:middle;"></a></h2>
+<div id="steps-to-perform-ora-in-gprofiler" class="section level3" number="8.1.1">
+<h3><span class="header-section-number">8.1.1</span> Steps to perform ORA in g:Profiler:</h3>
+<div id="browse-the-gprofiler-results" class="section level4" number="8.1.1.1">
+<h4><span class="header-section-number">8.1.1.1</span> Browse the gProfiler Results</h4>
+</div>
+<div id="section-3" class="section level4 unnumbered">
+<h4 class="unnumbered"></h4>
+</div>
+<div id="different-backgrounds" class="section level4" number="8.1.1.2">
+<h4><span class="header-section-number">8.1.1.2</span> Different Backgrounds</h4>
+</div>
+<div id="challenge-how-different-backgrounds-impact-the-output" class="section level4 unnumbered challenge">
+<h4 class="unnumbered challenge"><strong>Challenge:</strong> How different backgrounds impact the output?</h4>
+</div>
+<div id="questions-1" class="section level4 unnumbered rationale">
+<h4 class="unnumbered rationale"><strong>Questions </strong></h4>
+</div>
+</div>
+<div id="steps-to-perform-gsea-in-gprofiler" class="section level3" number="8.1.2">
+<h3><span class="header-section-number">8.1.2</span> Steps to perform GSEA in g:Profiler:</h3>
+<div id="challenge-gsea-with-gprofiler" class="section level4 unnumbered challenge">
+<h4 class="unnumbered challenge"><strong>Challenge:</strong> GSEA with gProfiler</h4>
+</div>
+<div id="question" class="section level4 unnumbered rationale">
+<h4 class="unnumbered rationale"><strong>Question </strong></h4>
+</div>
+</div>
+</div>
+<div id="fea-in-string" class="section level2" number="8.2">
+<h2><span class="header-section-number">8.2</span> FEA in STRING <a href="https://string-db.org" target="_blank"><img src="images/string-logo.png" alt="STRING Logo" style="height:35px; vertical-align:middle;"></a></h2>
+<div id="steps-to-perform-ora-in-string" class="section level3" number="8.2.1">
+<h3><span class="header-section-number">8.2.1</span> Steps to Perform ORA in STRING:</h3>
+</div>
+<div id="browse-the-string-ora-results" class="section level3" number="8.2.2">
+<h3><span class="header-section-number">8.2.2</span> Browse the STRING ORA Results</h3>
+<div id="viewers" class="section level4" number="8.2.2.1">
+<h4><span class="header-section-number">8.2.2.1</span> Viewers</h4>
+</div>
+<div id="legend" class="section level4" number="8.2.2.2">
+<h4><span class="header-section-number">8.2.2.2</span> Legend</h4>
+</div>
+<div id="settings" class="section level4" number="8.2.2.3">
+<h4><span class="header-section-number">8.2.2.3</span> Settings</h4>
+</div>
+<div id="analysis" class="section level4" number="8.2.2.4">
+<h4><span class="header-section-number">8.2.2.4</span> Analysis</h4>
+</div>
+<div id="exports" class="section level4" number="8.2.2.5">
+<h4><span class="header-section-number">8.2.2.5</span> Exports</h4>
+</div>
+<div id="clusters" class="section level4" number="8.2.2.6">
+<h4><span class="header-section-number">8.2.2.6</span> Clusters</h4>
+</div>
+<div id="question-1" class="section level4 unnumbered rationale">
+<h4 class="unnumbered rationale"><strong>Question</strong></h4>
+</div>
+</div>
+<div id="steps-to-perform-gsea-in-string" class="section level3" number="8.2.3">
+<h3><span class="header-section-number">8.2.3</span> Steps to Perform GSEA in STRING:</h3>
+</div>
+<div id="browse-the-string-gsea-results" class="section level3" number="8.2.4">
+<h3><span class="header-section-number">8.2.4</span> Browse the STRING GSEA Results</h3>
+</div>
+</div>
+<div id="fea-in-genepattern" class="section level2" number="8.3">
+<h2><span class="header-section-number">8.3</span> FEA in GenePattern <a href="https://www.genepattern.org/#gsc.tab=0" target="_blank"><img src="images/GenePattern-logo.png" alt="GenePattern Logo" style="height:35px; vertical-align:middle;"></a></h2>
+<div id="steps-to-locate-gsea-module-in-genepattern" class="section level3" number="8.3.1">
+<h3><span class="header-section-number">8.3.1</span> Steps to Locate GSEA Module in GenePattern:</h3>
+</div>
+<div id="steps-to-perform-gsea" class="section level3" number="8.3.2">
+<h3><span class="header-section-number">8.3.2</span> Steps to Perform GSEA:</h3>
+<div id="browse-the-gsea-results" class="section level4" number="8.3.2.1">
+<h4><span class="header-section-number">8.3.2.1</span> Browse the GSEA results</h4>
+</div>
+<div id="challenge-how-do-different-ranking-metrics-impact-the-output" class="section level4 unnumbered challenge">
+<h4 class="unnumbered challenge"><strong>Challenge:</strong> How do different ranking metrics impact the output?</h4>
+</div>
+<div id="question-2" class="section level4 unnumbered rationale">
+<h4 class="unnumbered rationale"><strong>Question </strong></h4>
+</div>
+<div id="section-4" class="section level4 unnumbered">
+<h4 class="unnumbered"></h4>
+</div>
+</div>
+</div>
+<div id="fea-in-reactome" class="section level2" number="8.4">
+<h2><span class="header-section-number">8.4</span> FEA in Reactome <a href="https://reactome.org/" target="_blank"><img src="images/reactome-logo.png" alt="Reactome Logo" style="height:35px; vertical-align:middle;"></a></h2>
+<div id="steps-to-perform-ora-in-reactome" class="section level3" number="8.4.1">
+<h3><span class="header-section-number">8.4.1</span> Steps to perform ORA in Reactome:</h3>
+</div>
+<div id="steps-to-perform-gsa-in-reactome" class="section level3" number="8.4.2">
+<h3><span class="header-section-number">8.4.2</span> Steps to perform GSA in Reactome:</h3>
+</div>
+<div id="browse-the-reactome-results" class="section level3" number="8.4.3">
+<h3><span class="header-section-number">8.4.3</span> Browse the Reactome results</h3>
+<div id="section-5" class="section level4 unnumbered">
+<h4 class="unnumbered"></h4>
+</div>
+<div id="question-3" class="section level4 unnumbered rationale">
+<h4 class="unnumbered rationale"><strong>Question </strong></h4>
+</div>
+<div id="section-6" class="section level4 unnumbered">
+<h4 class="unnumbered"></h4>
+<!--chapter:end:06-web-tools.Rmd-->
+</div>
+</div>
+</div>
+</div>
+<div id="reporting-results" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Reporting results</h1>
+<p>Placeholder</p>
+<div id="in-text" class="section level2" number="9.1">
+<h2><span class="header-section-number">9.1</span> In text</h2>
+</div>
+<div id="as-a-table" class="section level2" number="9.2">
+<h2><span class="header-section-number">9.2</span> As a table</h2>
+</div>
+<div id="as-a-figure" class="section level2" number="9.3">
+<h2><span class="header-section-number">9.3</span> As a figure</h2>
+<!--chapter:end:07-reporting.Rmd-->
+</div>
+</div>
+<div id="resources" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Resources</h1>
+<p>Placeholder</p>
+<div id="gprofiler-ggost" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> g:Profiler / g:GOSt</h2>
+</div>
+<div id="panther" class="section level2" number="10.2">
+<h2><span class="header-section-number">10.2</span> PANTHER</h2>
+</div>
+<div id="david" class="section level2" number="10.3">
+<h2><span class="header-section-number">10.3</span> DAVID</h2>
+</div>
+<div id="enrichr" class="section level2" number="10.4">
+<h2><span class="header-section-number">10.4</span> Enrichr</h2>
+</div>
+<div id="reactome-1" class="section level2" number="10.5">
+<h2><span class="header-section-number">10.5</span> Reactome</h2>
+</div>
+<div id="biocyc" class="section level2" number="10.6">
+<h2><span class="header-section-number">10.6</span> Biocyc</h2>
+</div>
+<div id="string" class="section level2" number="10.7">
+<h2><span class="header-section-number">10.7</span> STRING</h2>
+</div>
+<div id="gene-ontology" class="section level2" number="10.8">
+<h2><span class="header-section-number">10.8</span> Gene Ontology</h2>
+</div>
+<div id="kegg" class="section level2" number="10.9">
+<h2><span class="header-section-number">10.9</span> KEGG</h2>
+</div>
+<div id="gsea-and-msigdb" class="section level2" number="10.10">
+<h2><span class="header-section-number">10.10</span> GSEA and MSigDB</h2>
+</div>
+<div id="metaboanalyst" class="section level2" number="10.11">
+<h2><span class="header-section-number">10.11</span> MetaboAnalyst</h2>
+</div>
+<div id="cytoscape" class="section level2" number="10.12">
+<h2><span class="header-section-number">10.12</span> Cytoscape</h2>
+<!--chapter:end:08-resources.Rmd-->
+</div>
+</div>
+<div id="part-day-2" class="section level1" number="11">
+<h1><span class="header-section-number">11</span> (PART) Day 2</h1>
+<!--chapter:end:part-day2.Rmd-->
+</div>
+<div id="r-environment-set-up" class="section level1" number="12">
+<h1><span class="header-section-number">12</span> R environment set up</h1>
+<p>Placeholder</p>
+<div id="rstudio-basics" class="section level2" number="12.1">
+<h2><span class="header-section-number">12.1</span> RStudio basics</h2>
+</div>
+<div id="download-input-data" class="section level2" number="12.2">
+<h2><span class="header-section-number">12.2</span> Download input data</h2>
+</div>
+<div id="r-notebooks" class="section level2" number="12.3">
+<h2><span class="header-section-number">12.3</span> R notebooks</h2>
+<div id="code-chunks" class="section level3" number="12.3.1">
+<h3><span class="header-section-number">12.3.1</span> Code chunks</h3>
+</div>
+<div id="rendered-html-notebooks" class="section level3" number="12.3.2">
+<h3><span class="header-section-number">12.3.2</span> Rendered HTML notebooks</h3>
+</div>
+<div id="a-fresh-workspace" class="section level3" number="12.3.3">
+<h3><span class="header-section-number">12.3.3</span> A fresh workspace</h3>
+</div>
+<div id="working-directory" class="section level3" number="12.3.4">
+<h3><span class="header-section-number">12.3.4</span> Working directory</h3>
+</div>
+<div id="r-packages" class="section level3" number="12.3.5">
+<h3><span class="header-section-number">12.3.5</span> R packages</h3>
+<!--chapter:end:09-r-environment-setup.Rmd-->
+</div>
+</div>
+</div>
+<div id="ora-with-gprofiler2" class="section level1" number="13">
+<h1><span class="header-section-number">13</span> ORA with gprofiler2</h1>
+<p>Placeholder</p>
+<div id="input-data-3" class="section level2" number="13.1">
+<h2><span class="header-section-number">13.1</span> Input data</h2>
+</div>
+<div id="activity-overview" class="section level2" number="13.2">
+<h2><span class="header-section-number">13.2</span> Activity overview</h2>
+</div>
+<div id="end-of-activity-summary" class="section level2" number="13.3">
+<h2><span class="header-section-number">13.3</span> End of activity summary</h2>
+<!--chapter:end:10-gprofiler2.Rmd-->
+</div>
+</div>
+<div id="gsea-with-clusterprofiler" class="section level1" number="14">
+<h1><span class="header-section-number">14</span> GSEA with clusterProfiler</h1>
+<p>Placeholder</p>
+<div id="activity-overview-1" class="section level2" number="14.1">
+<h2><span class="header-section-number">14.1</span> Activity overview</h2>
+</div>
+<div id="end-of-activity-summary-1" class="section level2" number="14.2">
+<h2><span class="header-section-number">14.2</span> End of activity summary</h2>
+</div>
+<div id="poll" class="section level2" number="14.3">
+<h2><span class="header-section-number">14.3</span> Poll</h2>
+<!--chapter:end:11-clusterprofiler.Rmd-->
+</div>
+</div>
+<div id="webgestaltr" class="section level1" number="15">
+<h1><span class="header-section-number">15</span> WebGestaltR</h1>
+<p>LIST OF AMAZING THINGS ABOUT WEBGESTALTR:
+- makes great html reports with interactive plots and links to external dbs
+- saves the results to disk when running, no need to export stuf and save files manually
+- many dbs and gene lists supported (n = 70)
+- supports metabolomics, with 15 different ID types, see new paper <a href="https://academic.oup.com/nar/article/52/W1/W415/7684598#google_vignette" class="uri">https://academic.oup.com/nar/article/52/W1/W415/7684598#google_vignette</a>
+- can be used for novel species, but i havent tried it yet…
+- does ORA, GSEA, and NTA. I wonder if the NTA works at all for novel species???!
+- super easy to run. many supported namespaces (n = 73), does not require conversions for different functions like clusterProfiler, can even have different napesapce for ORA gene list and background list
+- “Multiple databases in a vector are supported for ORA and GSEA”</p>
+<!--chapter:end:12-webgestaltr.Rmd-->
+</div>
+<div id="non-model-species-functional-enrichment-analysis" class="section level1" number="16">
+<h1><span class="header-section-number">16</span> Non-model species functional enrichment analysis</h1>
+<p>Placeholder</p>
+<div id="axolotl-functional-enrichment-analysis" class="section level2" number="16.1">
+<h2><span class="header-section-number">16.1</span> Axolotl functional enrichment analysis</h2>
+<div id="background" class="section level3" number="16.1.1">
+<h3><span class="header-section-number">16.1.1</span> Background</h3>
+</div>
+<div id="raw-data-sources" class="section level3" number="16.1.2">
+<h3><span class="header-section-number">16.1.2</span> Raw data sources</h3>
+</div>
+<div id="data-preparation" class="section level3" number="16.1.3">
+<h3><span class="header-section-number">16.1.3</span> Data preparation</h3>
+<div id="annotation-files" class="section level4" number="16.1.3.1">
+<h4><span class="header-section-number">16.1.3.1</span> Annotation files</h4>
+</div>
+<div id="reads-processing-and-differential-expression-analysis" class="section level4" number="16.1.3.2">
+<h4><span class="header-section-number">16.1.3.2</span> Reads processing and differential expression analysis</h4>
+</div>
+</div>
+</div>
+<div id="activity-overview-2" class="section level2" number="16.2">
+<h2><span class="header-section-number">16.2</span> Activity overview</h2>
+</div>
+<div id="r-based-fea" class="section level2" number="16.3">
+<h2><span class="header-section-number">16.3</span> R-based FEA</h2>
+<div id="clusterprofiler" class="section level3" number="16.3.1">
+<h3><span class="header-section-number">16.3.1</span> clusterProfiler</h3>
+</div>
+<div id="webgestaltr-1" class="section level3" number="16.3.2">
+<h3><span class="header-section-number">16.3.2</span> WebGestaltR</h3>
+</div>
+</div>
+<div id="rnotebook-fea" class="section level2" number="16.4">
+<h2><span class="header-section-number">16.4</span> RNotebook FEA</h2>
+</div>
+<div id="string-fea" class="section level2" number="16.5">
+<h2><span class="header-section-number">16.5</span> STRING FEA</h2>
+<div id="how-do-the-string-results-compare-to-those-we-generated-in-r" class="section level3" number="16.5.1">
+<h3><span class="header-section-number">16.5.1</span> How do the STRING results compare to those we generated in R?</h3>
+<!--chapter:end:13-novel-species.Rmd-->
+<!--chapter:end:14-reporting-results.Rmd-->
+</div>
+</div>
+</div>
+<!--bookdown:body:end-->
+  </main>
+
+  <div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
+    <nav id="toc" data-toggle="toc" aria-label="On this page">
+      <h2>On this page</h2>
+      <div id="book-on-this-page"></div>
+
+      <div class="book-extra">
+        <ul class="list-unstyled">
+          <li><a id="book-source" href="#">View source <i class="fab fa-github"></i></a></li>
+          <li><a id="book-edit" href="#">Edit this page <i class="fab fa-github"></i></a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+</div>
+</div> <!-- .container -->
+
+<footer class="bg-primary text-light mt-5">
+  <div class="container"><div class="row">
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>"<strong>Functional Enrichment Workshop</strong>" was written by Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP). It was last built on <p>“November 20, 2024”
+<img src="logos.png" width="300" alt="Logo"><br></p>.</p>
+  </div>
+
+  <div class="col-12 col-md-6 mt-3">
+    <p>This book was built by the <a class="text-light" href="https://bookdown.org">bookdown</a> R package.</p>
+  </div>
+
+</div></div>
+</footer>
+
+
+</body>
+
+</html>
