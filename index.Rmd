@@ -1,6 +1,6 @@
 ---
 title: "Functional Enrichment Workshop"
-author: "Monash Genomics and Bioinformatics Platform (MGBP)"
+author: "Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP)"
 date: "Compiled: `r format(Sys.Date(), '%B %d, %Y')`"
 site: bookdown::bookdown_site
 output: bookdown::bs4_book
@@ -10,6 +10,8 @@ description: |
   A comprehensive guide to functional enrichment analysis using both online platforms and command-line tools.
 link-citations: yes
 github-repo: "https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Workshop_2024"
+always_allow_html: true
+# cover-image: Sydney_informatics_hub_logo.png
 ---
 
 # Functional Enrichment Workshop

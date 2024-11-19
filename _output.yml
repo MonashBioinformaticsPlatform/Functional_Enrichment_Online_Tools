@@ -1,4 +1,6 @@
 bookdown::bs4_book:
+  include:
+    before_body: title.html
   css: style.css
   # includes:
   #   in_header: custom-header.html
@@ -6,7 +8,7 @@ bookdown::bs4_book:
   # includes:
   #   in_header: custom.js
   theme:
-    primary: "#1D0F81"
+    primary: "green"
   repo: https://github.com/MonashBioinformaticsPlatfor/Functional_Enrichment_BioCommons_2024
   # toc_depth: 2  # Adjust the depth as needed (e.g., 2 for up to H2 headers)
 bookdown::pdf_book:
@@ -16,3 +18,12 @@ bookdown::pdf_book:
   citation_package: natbib
   keep_tex: yes
 bookdown::epub_book: default
+bookdown::gitbook:
+  css: style.css
+  config:
+    toc:
+      before: |
+        <a href="https://www.example.com/"><img src="Sydney_informatics_hub_logo.png" width="280"></a>
+        <li><a href="./">An example Resource</a></li>
+      after: |
+        <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
