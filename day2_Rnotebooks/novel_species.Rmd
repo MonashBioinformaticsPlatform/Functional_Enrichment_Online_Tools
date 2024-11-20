@@ -146,7 +146,9 @@ tail(ranked_df)
 
 ## 2.3 Create gene lists for ORA
 
-For ORA, both tools require vector class gene lists. We will filter for adjusted P value < 0.01 and absolute log2 fold change greater than 1.5. The matrix has already filtered out genes with very low counts so we take all genes present as the background. 
+For ORA, both tools require vector class gene lists. We will filter for adjusted P value < 0.01 and absolute log2 fold change greater than 1.5. 
+
+The matrix has already filtered out genes with very low counts so we take all genes present as the background. 
 
 ```{r create ORA vector gene lists}
 
@@ -169,6 +171,9 @@ head(background)
 
 ```
 
+Note the large drop in gene numbers: 100K in GTF, 48K in predicted proteome, 24K expressed in the blastema! By reducing the number of background genes to what are expressed in the studied tissue, we can reduce falsely inflated P values and false positives within our list of enriched terms. 
+
+
 ## 2.4 Save gene lists
 
 Saving any outputs generated from R code is vital to reproducibility! You should include all analysed gene lists within the supplementary materials of your manuscript. 
@@ -186,6 +191,8 @@ write.table(ranked_df, file = "Axolotl_rankedFC.txt", sep = "\t", quote = FALSE,
 
 # 3. Reformat annotation files for `clusterProfiler` GO and KEGG analysis
 
+Now we have annotation files and gene lists, we will bring those together to create the custom database files required for R FEA!
+
 ## 3.1 Create TERM2GENE files
 
 These are 2 column text files with the term ID (one per line) alongside the ID of the gene that maps to the term. A gene can map to many terms and thus be present on multiple lines. A term can be mapped to more than one gene and thus be present on many lines.
@@ -200,7 +207,9 @@ We need `GOs` and `KEGG_Pathway` columns.
 
 ### 3.1.1 GO TERM2GENE
 
-Next, we will extract the GO IDs from the `emapper` annotation file, and wrangle into the correct format for `clusterProfiler` `TERM2GENE`. There are several steps to this - comments have been included to outline what each step is doing.
+Next, we will extract the GO IDs from the `emapper` annotation file, and wrangle into the correct format for `clusterProfiler` `TERM2GENE`. 
+
+There are several steps to this - comments have been included to outline what each step is doing.
 
 ```{r GO TERM2GENE}
 go_term2gene <- eggnog_anno %>%
@@ -265,16 +274,15 @@ head(kegg_term2gene)
 
 ### 3.2.1 GO
 
-The GO Core Ontology file (we have saved in our `workshop` folder and labelled the filename as R object `go_core`) will enable us to assign term descriptions to term IDs and create our `TERM2NAME` files. 
+Now we will assign term descriptions to term IDs and create our `TERM2NAME` files. 
 
-
-This may take a few moments to run. It will use the `ontology` object we created earlier. 
+This may take a few moments to run. It will use the `ontology` object we created earlier from the `go.obo` file. 
 
 ```{r GO TERM2NAME}
 
 # Create term to name table, removing duplicates, missing values and obsolete terms 
-go_term2name <- go_term2gene %>%
-    mutate(name = ontology$name[term]) %>%
+go_term2name <- go_term2gene %>% # only keep terms that are in our term2gene object (ie, mapped to axolotl)
+    mutate(name = ontology$name[term]) %>% 
     dplyr::select(term, name) %>%
     distinct() %>%
     drop_na() %>%
@@ -318,7 +326,9 @@ head(kegg_term2name)
 
 ## 3.3 Count annotations 
 
-How much of our proteome was annotated? What about our DEGs and background? Genes that do not have any annotation are excluded from enrichment analysis, so having an understanding of the extent of annotation for your novel species is very important when interpreting results! 
+How much of our proteome was annotated? What about our DEGs and background? 
+
+Genes that do not have any annotation are excluded from enrichment analysis, so having an understanding of the extent of annotation for your novel species is very important when interpreting results! 
 
 
 Count the number of GO terms found within the genome, and the number of genes with GO annotations: 
@@ -345,7 +355,7 @@ print(paste("Number of unique genes with 1 or more annotation terms:", kegg_uniq
 
 ```
 
-47,196 putative axolotl proteins were annotated. That's around 1/4 of our genes mapped to KEGG Pathways, and less than half of our genes mapped to GO! Ouch. As much as we expect this with uncurated novel species genomes, it's still unpleasant to face :-)
+47,196 putative axolotl proteins were annotated. That's around 1/4 of our predicted proteins mapped to KEGG Pathways, and less than half of our genes mapped to GO! Ouch. As much as we expect this with uncurated novel species genomes, it's still unpleasant to face :-)
 
 
 What of the genes in our gene list specifically? We have an uncurated proteome, yet the genes in our input matrix were expressed at a meaningful level within axolotl, so these may actually have a higher annotation percentage than all genes in the proteome. 
@@ -366,6 +376,7 @@ cat("Number of input genes with GO annotations:", unique_genes_with_go, "(",perc
 
 
 ```
+
 
 ```{r report gene list KEGG annotation percentages}
 # Filter the term2gene table to only include genes in the background gene list
@@ -405,6 +416,8 @@ Let's review the help page:
 
 There are parameters for both adjusted P value and q value. Terms must pass all thresholds (unadjusted P, adjusted P, and q value) so the important filter will be the most stringent test applied. Let's go with BH and 0.05 which we have used regularly within this workshop and are fairly common choices in the field. 
 
+we need to provide term2gene and term2name, and don't specify an organism. 
+
 
 ```{r CP GO ORA }
 
@@ -428,7 +441,11 @@ cp_go_ora
 
 91 significantly enriched terms at P.adj < 0.05. 
 
-Note that we used the gene list object `degs` which had 247 genes, but the tool has applied the input size as 145 - this is because it is automatically discarding any that do not have annotations. Results would be the same if we instead used `annotated_degs` object. Likewise, the background size is being reported as 15072 (the number annotated) not 24,419 (the total in background list). 
+Look at the geneRatio column: our gene list object `degs` has 247 genes, but the tool has applied the input size as 145 - this is because it is automatically discarding any that do not have annotations. 
+
+Results would be the same if we instead used `annotated_degs` object. 
+
+Likewise, the background size is being reported as 15072 (the number annotated) not 24,419 (the total in background list). 
 
 
 Save the results to a text file:
@@ -574,7 +591,7 @@ Note that in the below code, the first command is identical the one that created
 ```{r GO GMT}
 
 # Step 1: Extract relevant columns (GO terms and gene IDs) from eggnog_anno
-go_data <- eggnog_anno %>%
+go_data <- eggnog_anno %>% # use the emapper annotations for axolotl 
   dplyr::select(GOs, `#query`) %>%  # Select the GO terms and the gene IDs
   dplyr::filter(GOs != "-") %>%  # Filter out rows where the GO ID is missing ("-")
   separate_rows(GOs, sep = ",") %>%  # Split comma-delimited list of GO terms into separate rows
@@ -589,7 +606,7 @@ colnames(go_data) <- c("term", "gene")
 go_data <- go_data %>%
   dplyr::mutate(external_link = paste0("https://www.ebi.ac.uk/QuickGO/term/", term))
 
-# Step 3: Group genes by GO term and concatenate gene list by tab
+# Step 3: Group genes by GO term and concatenate gene list by tab so all genes per term are on the same row
 go_term_grouped <- go_data %>%
   dplyr::group_by(term) %>%
   dplyr::summarize(genes = paste(gene, collapse = "\t"), .groups = "drop")
@@ -605,6 +622,9 @@ go_gmt <- go_term_grouped %>%
 
 # Save to file
 write.table(go_gmt, file = "Axolotl_GO.gmt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+# check only the first line (the lines can be long re all genes per term!:
+cat(go_gmt$gmt_entry[1:1], sep = "\n")
 
 ```
 
@@ -651,6 +671,9 @@ kegg_gmt <- kegg_term_grouped %>%
 
 # Save to file
 write.table(kegg_gmt, file = "Axolotl_KEGG-pathways.gmt", sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+
+# check only the first line (the lines can be long re all genes per term!:
+cat(kegg_gmt$gmt_entry[1:1], sep = "\n")
 
 ```
 
@@ -726,6 +749,11 @@ We will use the same approach as with `clusterProfiler` and run ORA with GO and 
 
 ## 6.1 WebGestaltR ORA of GO terms
 
+Parameters to note for novel species:
+
+- `organism = others` 
+- `enrichDatabaseFile = "Axolotl_GO.gmt"`
+- `enrichDatabaseDescriptionFile = "Axolotl_GO.des"`
 
 ```{r WGR ORA GO }
 
@@ -745,7 +773,6 @@ WebGestaltR(
     fdrThr = 0.05,                                # FDR significance threshold
     minNum = 10,                                   # Minimum number of genes per category
     maxNum = 500,                                 # Maximum number of genes per category
-    boxplot = TRUE,
     outputDirectory = outputDirectory,
     projectName = project
 )
@@ -757,7 +784,9 @@ Open the HTML report `WebGestaltR_results/Project_Axolotl_ORA_GO/Report_Axolotl_
 
 Note some term similarity to what we have seen with the past 2 analyses (that's reassuring!) 
 
-Change the 'Enrichment Results' view from table to 'Bar  chart', then try the 'Affinity propagation' and 'Weighted set cover' term clustering algorithms. Both methods help focus the results. 
+We no longer have GO Slim, as this needs to call the actual GO database, which we haven't used. 
+
+Change the 'Enrichment Results' view from table to 'Bar  chart', then try the 'Affinity propagation' and 'Weighted set cover' term clustering algorithms. 'All' has more terms with higher specificty, and the term redundancy has performed clustering to give fewwer terms and provide a more concise overview. It's up to you as the researcher to decided which approach is best suited to your dataset! 
 
 Confirm that our GMT file correctly included the term link by selecting a term and clicking the hyperlink at `Analyte set`. Pretty neat huh :-) 
 
@@ -771,6 +800,7 @@ There is no `seed` parameter for `WebGestaltR` GSEA as there is for `clusterProf
 set.seed(123)
 ```
 
+Again we are specifying `organism = "others"` and providing our GMT and description file: 
 
 ```{r WGR GSEA KEGG }
 

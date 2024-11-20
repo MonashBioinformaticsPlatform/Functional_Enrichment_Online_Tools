@@ -60,7 +60,7 @@ This axolotl data ticked A through D yet not E (RNA from various tissues were se
 
 The [reference genome](https://www.axolotl-omics.org/dl/AmexG_v6.0-DD.fa.gz) and [GTF gene prediction file](https://www.axolotl-omics.org/dl/AmexT_v47-AmexG_v6.0-DD.gtf.gz) were downloaded from www.axolotl-omics.org. A proteome was created by extracting the predicted peptide sequences from the GTF then retaining the longest isoform per gene with `AGAT` v 1.4.0. The predicated proteome was then annotated with `eggNOG emapper` v 2.1.12.
 
-The annotation output file has been provided to you, and we will import this into R and use the `dplyr` package v 1.1.4 to extract GO and KEGG IDs into the required format for R-based FEA with `clsuterProfiler` and `WebGestaltR`.
+The annotation output file has been provided to you, and we will import this into R and use the `dplyr` package v 1.1.4 to extract GO and KEGG IDs into the required format for R-based FEA with `clusterProfiler` and `WebGestaltR`.
 
 The predicted proteome was also annotated with [STRING](https://string-db.org/) v 12.0. As of version 12, STRING includes a feature `Add any organism to STRING / Annotate proteome` ([Szklarczyk etl al 2023](https://pmc.ncbi.nlm.nih.gov/articles/PMC9825434/)). The axolotl proteome was uploaded to STRING and annotation performed on STRING servers in less than 1 day. The [resulting annotation](https://version-12-0.string-db.org/organism/STRG0A90SNX) is persistent and shareable and can be used for all of STRING's search functions including ORA (`Multiple proteins`) and GSEA (`Proteins with Values/Ranks`).
 
