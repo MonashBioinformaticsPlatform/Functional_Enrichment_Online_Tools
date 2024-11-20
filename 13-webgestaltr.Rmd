@@ -9,7 +9,7 @@ This tool (both the web and R versions) has many features and advantages:
 - Natively supports 12 organisms
 - Can be used for novel species (we will do this in the final session)
 - Supports many namespaces (n = 73 for human) 
-- Does not require namespace conversion between the databases like  `clusterProfiler` does, and even allows different namespaces between query gene list and ORA background gene list 
+- Does not require namespace conversion between the databases like  `clusterProfiler` does (it converts to Entrez behind the scenes), and even allows different namespaces between query gene list and ORA background gene list 
 - Supports many databases/gene sets (n = 70 for human) including 'nonredundant' versions of GO
 - Supports metabolomics, with 15 different ID types, described in [Elizarraras et al 2024](https://academic.oup.com/nar/article/52/W1/W415/7684598)
 - Can run query against multiple databases simultaneously by providing database names as a list to the enrichment function
