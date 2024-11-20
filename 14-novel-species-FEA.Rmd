@@ -197,7 +197,7 @@ We will now take a quick look at novel species FEA online with `STRING`.
 
 ## STRING (web) novel species FEA
 
-The axolotl putative proteome was previosuly uploaded to STRING and custom annotation performed. This completed using the STRING servers, with compute time less than one day. 
+The axolotl putative proteome was previously uploaded to STRING and custom annotation performed. This completed using the STRING servers, with compute time less than one day. 
 
 
 <img src="images/string-upload-proteome.png" style="border: none; box-shadow: none; background: none;">
