@@ -18,7 +18,6 @@ library(tidyverse)
 library(clusterProfiler)
 library(WebGestaltR)
 library(enrichplot)
-#library(ggupset)
 
 ```
 
@@ -169,6 +168,7 @@ head(degs)
 head(background)
 
 ```
+
 ## 2.4 Save gene lists
 
 Saving any outputs generated from R code is vital to reproducibility! You should include all analysed gene lists within the supplementary materials of your manuscript. 
@@ -195,6 +195,7 @@ Check the column names of the `emapper` annotation file so we know which are the
 ```{r colnames anno}
 colnames(eggnog_anno)
 ```
+
 We need `GOs` and `KEGG_Pathway` columns. 
 
 ### 3.1.1 GO TERM2GENE
@@ -227,9 +228,6 @@ head(go_term2gene)
 
 ```
 
-```{r}
-
-```
 
 ### 3.1.2 KEGG TERM2GENE
 

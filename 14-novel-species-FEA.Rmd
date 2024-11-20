@@ -2,9 +2,7 @@
 
 FEA can be easily performed for many non-model species with user friendly web tools or R packages. [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) web currently supports 984 species, and [STRING](https://string-db.org/) currently supports over 12 thousand species. 
 
-Since many non-model species are supported by some FEA tools (eg g:Profiler > 900, STRING > 12K), today I am using the term **novel species** to describe a species that is not currently supported by any FEA tool.
-
-This activity creates custom database files required for novel species FEA, but it's worth noting that the same methods are also applicable to custom gene set analysis. The only difference is that instead of mapping your species' genes against a known database (eg GO, KEGG), you would map your species genes to the genes in the custom gene set, and use those ID mappings. 
+Since many non-model species are supported by some FEA tools, today I am using the term **novel species** to describe a species that is not currently supported by any FEA tool. 
 
 Novel species FEA is possible with `clusterProfiler` or `WebGestaltR` in R, or using web tools `WebGestalt` or `STRING`. The requirements for each tool are slightly different, however at minimum a predicted proteome fasta is necessary. If you do not have a predicted proteome for your species, you would need to perform gene prediction, for which there are a number of *in silico* tools available. It must be kept in mind that *in silico* predicted proteomes can vary greatly in quality. Those that include multiple data sources such as polished genome assemblies generated with both short and long read shotgun sequencing and gene prediction that includes RNAseq data are likely to produce better gene predictions than those that are based only on for example short read sequencing. 
 
@@ -245,7 +243,7 @@ Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`.
 
 Before we explore the results, note that we have performed ORA without a background gene list! 😮
 
-There is no option at the query page (even under `Advanced Settings`) to provide a custom background gene list initially. This must be done *after* the initial search has been run. Hopefully this will change in future versions. 
+There is no option at the query page (even under `Advanced Settings`) to provide a custom background gene list initially. This must be done *after* the initial search has been run. Hopefully this will change in future versions 🫠 
 
 ❗In order to add or apply a previously saved custom background gene list, you need to be logged in to `STRING`. The upload can take a bit of time, so you do not need to do this now, however the dropdowns below provide instructions for applying a saved background or adding a new one. 
 
@@ -288,7 +286,7 @@ There is no option at the query page (even under `Advanced Settings`) to provide
 
 `STRING` saves your custom datasets under `My Data`:
 
-<img src="images/string-set-novel-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+<img src="images/string-my-data.png" style="border: none; box-shadow: none; background: none; width: 100%;">
 
 </details>
 
@@ -338,10 +336,12 @@ First of all we see a difference in the number of genes annotated to terms:
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-And a clear lack of overlap in number of enriched terms and term IDs between `STRING` and the `R` tools:
+And a clear lack of overlap in number of enriched GO terms and term IDs between `STRING` and the `R` tools:
 
 <img src="images/string-novel-ora-compare.png" style="border: none; box-shadow: none; background: none; ">
 
 These GO terms from `STRING` may be parent terms of more specific child terms prevalent in the `R` output. For a real world analysis, it would be optimal to compare, and deduce whether both methods could provide valuable and complimentary insights, or whether the results from one annotation approach or the other were more suited to your novel species. 
 
 Whichever you choose, strength to you! This is not an easy space to work in 💪 
+
+Remember the importance of validating your results through other means! 🧪
