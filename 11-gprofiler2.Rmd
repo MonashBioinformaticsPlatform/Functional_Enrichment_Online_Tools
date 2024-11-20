@@ -37,18 +37,7 @@ Since we are doing ORA, we will need a filtered gene list, and a background gene
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-## End of activity summary
-
-- We have extracted a gene list and background gene list from a DE dataset and run ORA with `gprofiler2` `gost` function
-- We have plotted the data with `gostplot` Manhattan plots and `ggplot2` dotplots
-- We have run a `gost` multi-query separating up and down regulated genes
-- We have verified that `gprofiler2` results match the results from `g:Profiler` web
-- We have captured all version details relevant to the session within the R notebook
-
-<p>&nbsp;</p>  <!-- insert blank line -->
-
-The last task is to `knit` the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work. 
-
+**To finish up:** The last task is to `knit` the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work. 
 
 &#x27A4; Knit the notebook to HTML 
 
@@ -56,7 +45,9 @@ On the `editor` pane toolbar, under `Preview`, select `Knit to HTML`.
 
 If you have already run `Preview`, you will see `Knit` instead of `Preview`. 
 
-The HTML file will be saved in the same directory as the notebook, and with the same filename, but the `.Rmd` prefix will be replaced by `.html`. The knit HTML will typically open automatically once complete. If you receive a popup blocker error, click `cancel`, and in the `Files` pane of RStudio, single click the `gprofiler.html` file and select `View in Web Browser`. 
+The HTML file will be saved in the same directory as the notebook, and with the same filename, but the `.Rmd` prefix will be replaced by `.html`. The knit HTML will typically open automatically once complete. 
+
+❗If you receive a popup blocker error, click `cancel` (not `try again`), and in the `Files` pane of RStudio, single click the `gprofiler.html` file and select `View in Web Browser`. 
 
 <img src="images/open-html-rstudio.png" style="border: none; box-shadow: none; background: none; ">
 
@@ -64,6 +55,21 @@ The HTML file will be saved in the same directory as the notebook, and with the 
 
 Note that the notebook will only successsfully knit if there are <span style="color: red;">no errors</span> in the code. You can 'preview' HTML with code errors. 
 
-✋ **If your knit fails, please ask for assistance resolving the errors**  
+✋ **If your knit fails, please ask for assistance resolving the errors**
+
+## End of activity summary
+
+- We have extracted a gene list and background gene list from a DE dataset and run ORA with `gprofiler2` `gost` function
+- We have plotted the data with `gostplot` Manhattan plots and `ggplot2` dotplots
+- We have run a `gost` multi-query separating up and down regulated genes
+- We have verified that `gprofiler2` results match the results from `g:Profiler` web
+- We have saved a rendered HTML document as a static record of our analysis including all code executed, parameters applied, as well as version information for R, RStudio, R packages and gProfiler database to ensure reproducibility
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+
+
+
+  
 
 
