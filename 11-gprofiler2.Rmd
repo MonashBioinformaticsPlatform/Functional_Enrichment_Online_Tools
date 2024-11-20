@@ -25,7 +25,7 @@ Since we are doing ORA, we will need a filtered gene list, and a background gene
 3. Extract background genes and create a background gene list R object
 4. Run ORA with `gost` function
 5. Save the tabular results to a file
-6. Visualise the results 
+6. Visualise the results with `gostplot`
 7. Run a `gost` multi-query for up-regulated and down-regulated genes
 8. Compare `gprofiler2` R results to the `g:Profiler` web results
 

@@ -46,7 +46,10 @@ The input data file is within the current working directory so we do not need to
 
 
 ```{r load input data}
+# save data file to an R object called 'data' 
 data <- read_tsv("Pezzini_DE.txt", col_names = TRUE, show_col_types = FALSE)
+
+# view the first few lines
 head(data)
 ```
 
@@ -58,9 +61,12 @@ Look on the environment pane of RStudio, and you can see a description '14420 ob
 
 Now we need to filter for differentially expressed genes (DEGs), and we will apply the thresholds adjusted P values/FDR < 0.01, and log2fold change of 2. 
 
+We will use ENSEMBL gene IDs (column 1). 
+
 ```{r get ORA gene list}
+# Filter DEGs and save to an object named 'degs'
 degs <- data %>%
-  filter(FDR < 0.01 & abs(Log2FC) > 2) %>%
+  filter(FDR <= 0.01 & abs(Log2FC) >= 2) %>%
   pull(Gene.ID)
 cat("Number of genes passing FDR and fold change filter:", length(degs), "\n")
 
@@ -71,6 +77,7 @@ write.table(degs, "Pezzini_DEGs.txt", row.names = FALSE, col.names = FALSE, quot
 cat("Table saved to", title, "\n")
 
 ```
+
 We have 792 genes passing our filters. 
 
 # 3. Get background gene list
@@ -80,7 +87,9 @@ Recall from the webinar and day 1 of the workshop that an experimental backgroun
 The analysis in Degust has already removed lowly expressed genes, so we can simply extract all genes from this data matrix as our background gene list and save it as our 'background' object, as well as save to disk so that we can include it within the supplementary materials of any resultant publications for reproducibility. 
 
 ```{r get background }
+# select the column labelled 'Gene.ID' from the 'data' dataframe, save to object named 'background'
 background <- data$Gene.ID
+
 cat("Number of background genes:", length(background), "\n")
 
 # Save the background gene list to disk:
@@ -103,47 +112,42 @@ Before running the below code chunk, review the parameters for the `gost` ORA fu
 Observe the similarities to the parameters available on the g:Profiler web interface, for example organism, the correction method (g:Profiler's custom `g_scs` method), and domain scope (background genes). 
 
 
-Run the below code which explicitly includes all available `gost` parameters. An error-free `gost` run should produce no console output.  Our results are saved in the R object `ora`.
+Run the below code which explicitly includes all available `gost` parameters. Including all parameters, even if the defaults suit your needs, makes your
+parameter choices explicit. Sometimes, default settings can change between versions!
+
+An error-free `gost` run should produce no console output.  As the code is running, there wll be a green bar to the elft of the code chunk. 
+
+Our results are saved in the R object `ora`.
 
 
 ```{r run gost}
 ora <- gost( 
-    degs, 
-    organism = "hsapiens", 
+    degs, # 'degs' gene list object 
+    organism = "hsapiens", # human data
     ordered_query = FALSE, 
     multi_query = FALSE, 
-    significant = TRUE, 
-    exclude_iea = FALSE, 
+    significant = TRUE, # only print significant terms
+    exclude_iea = FALSE, # exclude GO electronic annotations
     measure_underrepresentation = FALSE, 
-    evcodes = FALSE, 
-    user_threshold = 0.05, 
-    correction_method = "g_SCS", 
-    domain_scope = "custom_annotated", 
-    custom_bg = background, 
-    numeric_ns = "", 
-    sources = NULL, 
-    as_short_link = FALSE, 
-    highlight = FALSE
+    evcodes = FALSE, 	# don't include evidence codes in the results - good to have, but will make it run slower
+    user_threshold = 0.05, # adj P value cutoff for terms 
+    correction_method = "g_SCS",  # gprofiler's custom multiple testing correctionmethod (recommended)
+    domain_scope = "custom_annotated", # custom background, restrict to only annotated genes 
+    custom_bg = background, # 'background' gene list object
+    numeric_ns = "", # we don't have numeric IDs 
+    sources = NULL, # use all databases
+    as_short_link = FALSE, # save our results here not as a weblink to gprofiler
+    highlight = TRUE # highlight driver terms (will add a 'highlighted' column with TRUE/FALSE)
 )
 ```
 
 
-Since we are using many of the default parameters, we could shorten this code to what is shown below. The results would be identical, however not as transparent as far as easily identifying what parameters were applied to a run. 
-
-```{r abbreviated gost code }
-
-#ora <- gost( 
-#    degs, 
-#    correction_method = "g_SCS", 
-#    domain_scope = "custom_annotated",
-#    custom_bg = background,
-#)
-
-```
 
 
-View the top-most significant enrichments with the R `head` command. Only significant enrichments passing your specified threshold (adjusted P value < 0.05) are included in the results object.
 
+View the top-most significant enrichments with the R `head` command. Only significant enrichments passing your specified threshold (adjusted P value < 0.05) are included in the results object because we have included `significant = TRUE`. 
+
+Use the black arrow on the right of the table to scroll to other columns. 
 
 ```{r head ora}
 head(ora$result)
@@ -152,11 +156,11 @@ head(ora$result)
 Let's give our query a name:
 
 ```{r ora name the query list }
+# reassign query name to something more specific 
 ora$result$query <- 'DEGs_Padj0.05_FC2'
 head(ora$result)
 ```
 
-Use the small black arrow near the column names to view columns wider than the page width.  The `head` view only shows the top 6 enrichments, which are all GO Biological Process. 
 
 We can obtain a list of queried databases:
 
@@ -199,7 +203,7 @@ cat("Table saved to", title, "\n")
 
 Let's extract the results for Reactome and save to a `gosttable`. 
 
-```{r reactome gosttable, fig.width = 10 }
+```{r reactome gosttable }
 # Filter results for the 'Reactome' database
 reactome_results <- ora$result %>% filter(source == "REAC")
 
@@ -207,7 +211,7 @@ reactome_results <- ora$result %>% filter(source == "REAC")
 reac <- reactome_results$term_id
 
 # Create the GOST table for Reactome terms
-filename <- "gprofiler_Reactome_gosttable.png"
+filename <- "gprofiler_Reactome_gosttable.pdf"
 
 publish_gosttable(ora,
   highlight_terms = reac,
@@ -251,11 +255,12 @@ gostplot(ora,
 ```
 
 
-There are a lot of significant enrichments for GO biological processes. Many of these are probably terms containing a large number of genes, so not particularly informative. Other  R tools have default settings limiting the minimum and maximum number of genes in a geneset to be included in the analysis. Since there is no direct parameter to restrict term size to `gostplot`, we can filter the ORA results before plotting. Let's apply a maximum gene set size of 500, and a minimum gene set size of 10, which are the default setting used by clusterProfiler. 
+There are a lot of significant enrichments for GO biological processes. Many of these are probably terms containing a large number of genes, so not particularly informative. Other R tools have default settings limiting the minimum and maximum number of genes in a geneset to be included in the analysis. Since there is no direct parameter to restrict term size to `gostplot`, we can filter the ORA results before plotting. Let's apply a maximum gene set size of 500, and a minimum gene set size of 10, which are the default setting used by clusterProfiler. 
  
 
 ```{r filter for term size}
 # Filter the results for GO:BP terms with term_size <= 500 and >= 10
+# save the filtered results in a new object called 'ora_filter_termsize'
 ora_filter_termsize <- ora
 ora_filter_termsize$result <- ora$result %>% filter(term_size <= 500) %>% filter(term_size >= 10)
 ```
@@ -284,12 +289,12 @@ gostplot(ora_filter_termsize,
 
 This has cleaned up 'Biological Process' a little bit, enabling signals of more specific terms to be highlighted. 
 
-gprofiler2 includes a function for creating a publication-ready image that can optionally highlight specific terms. We need to first produce a plot with `interactice = FALSE`, save it to an object, and then provide that plot object to the `publish_gostplot` function. 
+`gprofiler2` includes a function for creating a publication-ready image that can optionally highlight specific terms. We need to first produce a plot with `interactice = FALSE`, save it to an object, and then provide that plot object to the `publish_gostplot` function. 
 
 
 ```{r save gostplot non-interactive to object}
 
-# Plot with gostplot using the filtered results
+# Plot with gostplot using the filtered results, save to object called 'plot'
 plot <- gostplot(ora_filter_termsize, 
   capped = TRUE, 
   interactive = FALSE, 
@@ -314,12 +319,12 @@ The `publish_gostplot` parameter `highlight_terms` enables you to highlight spec
 Let's highlight some selected terms manually. You need to provide the term ID not term name. 
 
 ```{r save terms to highlight }
-#Term IDs for 'Collagen degradation' and 'Collagen formation'
+#specify term IDs for tmers of interest: 'Collagen degradation' and 'Collagen formation'
 highlight <- c("REAC:R-HSA-1442490", "REAC:R-HSA-1474290")
 ```
 
 ```{r save gostplot with highlighted terms}
-filename <- "gostplot_filter_termsize_collagen.png"
+filename <- "gprofiler_collagen_gostplot.pdf"
 
 publish_gostplot(plot, 
   highlight_terms = highlight, 
@@ -334,8 +339,7 @@ Like g:Profiler web, the coloured boxes on the table are by adjusted P value, wi
 You can use R `grepl` function to search for terms with names matching some keyword. Let's highlight all terms related to receptors. The code chunk applies an increased figure height, to ensure we can see the whole plot within the notebook. 
 
 ```{r highlight receptor terms}
-
-# Filter terms containing "receptor" keyword and create a list of those term IDs
+# extract from ora results all terms containing "receptor" keyword and create a list of those term IDs
 highlight <- ora$result %>% 
   filter(grepl("receptor", term_name, ignore.case = TRUE)) %>% 
   pull(term_id) 
@@ -343,7 +347,7 @@ highlight <- ora$result %>%
 
 ```{r publish gostplot highlight receptors}
 
-filename <- "gostplot_filter_termsize_receptors.png"
+filename <- "gprofiler_receptors_gostplot.pdf"
 
 publish_gostplot(plot, 
   highlight_terms = highlight, 
@@ -437,6 +441,8 @@ By providing more than one gene list and setting `multi_query = TRUE`, results f
 First, we need to extracts separate gene lists for up-regulated and down-regulated genes. 
 
 ```{r get ORA gene lists up and down }
+
+# make an object for upregualted genes 
 up_degs <- data %>%
   filter(FDR < 0.01 & Log2FC >= 2) %>%
   pull(Gene.ID)
@@ -447,6 +453,7 @@ title <- "up_DEGs.txt"
 write.table(up_degs, title, row.names = FALSE, col.names = FALSE, quote = FALSE)
 cat("Up-regulated DEGs saved to", title, "\n")
 
+# make an object for downregualted genes 
 down_degs <- data %>%
   filter(FDR < 0.01 & Log2FC <= -2) %>%
   pull(Gene.ID)
@@ -499,7 +506,7 @@ Unfortunately, notebook view squashes the top plot over the bottom one, and adju
 
 ```{r gostplot multi non-interactive}
 p <- gostplot(ora_multi, capped = TRUE, interactive = FALSE)
-filename <- "gprofiler_ORA_multiquery.png"
+filename <- "gprofiler_ORA_multiquery.pdf"
 
 publish_gostplot(p, 
   highlight_terms = NULL, 
@@ -525,13 +532,18 @@ sapply(ora_multi$result, class)
 Convert the columns that are lists to characters
 
 ```{r convert lists}
+#  convert lists into characters
 list_columns <- names(ora_multi$result)[sapply(ora_multi$result, class) == "list"]
 ora_multi$result[list_columns] <- lapply(ora_multi$result[list_columns], function(col) {
   sapply(col, function(x) paste(x, collapse = ","))
 })
 sapply(ora_multi$result, class)
 ```
+View the new table format:
 
+```{r check converted table}
+head(ora_multi$result)
+```
 
 
 ```{r write multiquery table}
@@ -555,10 +567,12 @@ The input file here is one that we have created, but should match yours as long 
 
 ```{r import g:profiler web results}
 web <- read.csv("gProfiler_hsapiens_07-11-2024_11-27-09__intersections.csv")
+head(web)
 ```
 
 
-Check the numbers: are there any terms significant frm one tool but not the other? 
+
+Check the numbers: are there any terms significant from one tool but not the other? 
 
 ```{r}
 # Extract significant term names
@@ -584,7 +598,9 @@ if (length(common_terms) == length(web_terms) && length(common_terms) == length(
 
 ```
 
-That's a good start! Do the P values differ? Let's look closely at GO 'Molecular Function'. 
+That's a good start! Do the P values differ? Let's look closely at the GO 'Molecular Function' P values via a barplot.
+
+Format the P values for plotting: 
 
 ```{r extract GO MF P values from web and R for comparison }
 
@@ -605,6 +621,9 @@ comparison_data_long <- comparison_data_go_mf %>%
                names_to = "source", 
                values_to = "p_value")
 ```
+
+
+Create barplot to compare P values web vs R: 
 
 ```{r print barplot, fig.width=10, fig.height=8}
 # Create the bar plot with -log10 transformed p-values
@@ -650,7 +669,6 @@ sessionInfo()
 Typically, we would simply run `RStudio.Version()` to print the version details. However, when we knit this document to HTML, the `RStudio.Version()` function is not available and will cause an error. So to make sure our version details are saved to our static record of the work, we will save to a file, then print the file contents back into the notebook. 
 
 
-
 ```{r rstudio version - not run during knit, eval=FALSE}
 # Get RStudio version information
 rstudio_info <- RStudio.Version()
@@ -682,6 +700,8 @@ rstudio_version_text
 ```
 
 # 10.  Knit workbook to HTML
+
+Make sure your document is saved if you have made any changes! (there will be an asterisk next to the filename on editor pane if unsaved changes are present).
 
 The last task is to knit the notebook. Our notebook is editable, and can be changed. Deleting code deletes the output, so we could lose valuable details. If we knit the notebook to HTML, we have a permanent static copy of the work.
 
