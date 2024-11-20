@@ -1,8 +1,7 @@
 ---
 title: "Functional Enrichment Workshop"
 author: 'Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP)'
-date: "`r format(Sys.Date(), '%B %d, %Y')`" |
-       <br><img src="logos.png" width="300" alt="Logo"><br>
+date: <span>"`r format(Sys.Date(), '%B %d, %Y')`"</span>  <br><img src="logos.png" width="300" alt="Logo"><br>
 site: bookdown::bookdown_site
 output: bookdown::bs4_book
 documentclass: book
