@@ -29,14 +29,10 @@ Suitability to your experiment depends on many factors, including:
 - How much flexibility you want or require with visualisation
 
 
-## Interesting papers for further reading
-
-*Informative and instructional*
+## Relevant papers for further reading
 
 
 - [Interpreting omics data with pathway enrichment analysis](https://www.sciencedirect.com/science/article/abs/pii/S0168952523000185)
-
-*Things to watch out for*
 
 - [Urgent need for consistent standards in functional enrichment analysis](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1009935)
 
@@ -44,10 +40,37 @@ Suitability to your experiment depends on many factors, including:
 
 - [Multiple sources of bias confound functional enrichment analysis of global -omics data](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0761-7)
 
-- [The Impact of Pathway Database Choice on Statistical Enrichment Analysis and Predictive Modeling](https://pmc.ncbi.nlm.nih.gov/articles/PMC6883970/#:~:text=Pathway%2Dcentric%20approaches%20are%20widely,the%20context%20of%20precision%20medicine)
-
+- [The Impact of Pathway Database Choice on Statistical Enrichment Analysis and Predictive Modeling](https://pmc.ncbi.nlm.nih.gov/articles/PMC6883970/)
 
 - [Two subtle problems with overrepresentation analysis](https://academic.oup.com/bioinformaticsadvances/article/4/1/vbae159/7829164?login=false)
+
+- [Gene set analysis methods: A systematic comparison](https://biodatamining.biomedcentral.com/articles/10.1186/s13040-018-0166-8)
+
+- [A Comparison of Gene Set Analysis Methods in Terms of Sensitivity, Prioritization and Specificity](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0079217)
+
+- [Transcriptomic Profiling Discloses Molecular and Cellular Events Related to Neuronal Differentiation in SH-SY5Y Neuroblastoma Cells](https://link.springer.com/article/10.1007/s10571-016-0403-y)
+
+- [Ten Years of Pathway Analysis: Current Approaches and Outstanding Challenges](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002375)
+
+- [A critical comparison of topology-based pathway analysis methods](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0191154)
+
+- [Ranking metrics in Gene Set Enrichment Analysis: Do they matter?](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1674-0)
+
+- [Methods and approaches in the topology-based analysis of biological pathways](https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2013.00278/full)
+
+- [Gene set analysis methods: Statistical models and methodological differences](https://academic.oup.com/bib/article/15/4/504/407653)
+
+- [A Comparative Study of Topology-based Pathway Enrichment Analysis Methods](https://pubmed.ncbi.nlm.nih.gov/31684881/)
+
+- [Toward a Gold Standard for Benchmarking Gene Set Enrichment Analysis](https://academic.oup.com/bib/article/22/1/545/5722384)
+
+- [Gene Set Enrichment Analysis: A Knowledge-Based Approach for Interpreting Genome-Wide Expression Profiles](https://www.pnas.org/content/102/43/15545)
+
+- [From RNA sequencing measurements to the final results: A practical guide to navigating the choices and uncertainties of gene set analysis](https://arxiv.org/abs/2308.15171)
+
+
+
+
 
 ## Audience poll
 
