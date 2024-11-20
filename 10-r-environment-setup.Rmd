@@ -1,22 +1,15 @@
 # R environment set up 
 
-For today's session, we will be using the [R](https://www.r-project.org/) statistical programming language to perform functional enrichmemt analysis using a range of dedicated R packages. To simplify our work, we will be using the [RStudio](https://posit.co/download/rstudio-desktop/) integrated development environment. 
-
-This will create a central place to write code, comments, run code, view and save graphics.
-
-<img src="images/rstudio_logo.png" style="border: none; box-shadow: none; background: none;">
 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
-
-## RStudio basics
+## VM login
 
 You have previosuly been provided with an IP address, user name and password for a VM for this workshop. The VM runs RStudio and has all of the required R libraries for today's workshop pre-installed. 
 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-&#x27A4; Open the RStudio VM by copying the IP address into a web browser. 
+&#x27A4; Open the VM by copying the IP address into a web browser. 
 
 When prompted, select `RStudio` from the options: 
 
@@ -74,19 +67,6 @@ cat(name)
 
 Note that the object `name` is now listed in the environment. 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
-
-Now let's see the `plots` pane in action by creating a simple dummy barplot: 
-
-&#x27A4; Copy paste the below code into your console then press enter:
-
-```{r plot, echo=TRUE, eval=FALSE}
-values <- c(5, 10, 15)
-labels <- c("A", "B", "C")
-barplot(values, names.arg = labels)
-```
-
-You will now see a barplot in the `plots` pane, as well as 2 new objects in the `environment`. Note that the environment list also tells you what type of objects it is: for our `name` object, the double quotes indicate it's a single string, where `chr [1:3]` for `labels` shows that it is a `character vector` with 3 text elements. `num [1:3]` indicates that `values` is a numeric vector with 3 values. The takeaway message here is that the environment shows your active R objects, and that these are of different types. This is important to be aware of when working in R, because different R functions require different input types. During the workshop, we may need to convert our input to a `dataframe` or `vector` for example. 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -95,7 +75,7 @@ You will now see a barplot in the `plots` pane, as well as 2 new objects in the 
 
 Today we will not be entering R commands directly into the console like this. We will instead be using an R notebook. 
 
-Using notebooks in RStudio is a great way to save your code and comments, as well as have the code output display inside the notebook. Notebooks can be easily shared with others so they can run your analysis, and also rendered to HTML which is a neat way of saving and presenting results to others. 
+Using notebooks in RStudio is a great way to save your code and comments, as well as have the code output display inside the notebook. Notebooks can be easily shared with others so they can run your analysis, and also rendered to HTML which is a neat way of saving a static copy of your work and presenting results to others. 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -122,19 +102,8 @@ New code chunks can be added with the shortcut `ctrl + alt + i` or via the toolb
 
 &#x27A4; Run the demo code chunk that was included in the new notebook to plot `cars`
 
-Note that the plot dispalys *inside* the notebook, rather than within the plot pane as we saw earlier.
+Note that the plot dispalys *inside* the notebook, rather than within the plot pane. If this code was executed directly from the `console` rather than the notebook, the plot would be in the `Plots` pane. 
 
-<p>&nbsp;</p>  <!-- insert blank line -->
-
-
-&#x27A4; Add a new code chunk by entering `ctrl + alt + i` and label it `barplot`. Then copy the dummy barplot code from earlier into the code chunk and run it
-
-
-```{r barplot, echo=TRUE, eval=FALSE}
-values <- c(5, 10, 15)
-labels <- c("A", "B", "C")
-barplot(values, names.arg = labels)
-```
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -160,8 +129,6 @@ Next we will look at what a HTML version of the notebook looks like. In order to
 
 Note that the HTML is saved to your current working directory, which we previously verified was `/home/userN`. Check that the file appears where you expect it to via the `Files` pane. 
 
-The workshop data you have downloadaed contains 4 R notebooks required to run the analyses. After each activity, you may choose to knit the notebook to HTML to have a static record of your work 📖
-
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ### A fresh workspace
@@ -171,9 +138,19 @@ Next we will open the R notebook for the first analysis activity.  It's ideal to
 
 &#x27A4; Clear your environment by selecting `Session` &rarr; `Quit session` &rarr; `Dont save` &rarr;`Start mew session` 
 
-**Note:** when asked `Save workspace image to ~/R.Data?` it is typically advisable to select `Don't Save`. Not saving the workspace image can help avoid workspace clashes that can be hard to resolve or have unintended consequences. You don't need to worry about losing data - after all, your input data is saved elsewhere, and your R code that produces all required outputs is safely saved within the notebook.
+**Note:** when asked `Save workspace image to ~/R.Data?` please select **`Don't Save`** during this workshop. 
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+<details>
+<summary>Workspace data: to save or not to save?</summary>
+
+Not saving the workspace image can help avoid workspace clashes that can be hard to resolve or have unintended consequences. You don't need to worry about losing data - after all, your input data is saved elsewhere, and your R code that produces all required outputs is safely saved within the notebook.
 
 Saving the workspace image saves all objects from the session such as your variables and dataframes. This can save time if you need to close an analysis part way through and continue later. However, this can have drawbacks such as library and function name clashes, unexpected objects present in the environment, large objects and relic objects cluttering the workspace, old objects conflicting with new ones, etc. Since we will be performing discrete analysis tasks today, and not continuing on a growing body of work, selecting `Dont save` will be the most appropriate. 
+
+</details>
+
+<p>&nbsp;</p>  <!-- insert blank line -->
 
 👀 You may notice there is also a `Clear Workspace` option under `Session`. This will remove all R objects from your environment, but it won't remove loaded libraries. You can of course unload these with R code, but refreshing the session is easier 😊 Some libraries share function names. If you are being very correct, you can prefix the R package before the function, to ensure the exact function you want is being called to avoid any potential function clashes. I admit to being guilty of not doing that enough! 🤭
 

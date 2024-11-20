@@ -5,7 +5,7 @@
 
 One of the key advantages of using R over web tools is flexibility with visualisations. 
 
-The same authors have released a companion plotting package [enrichplot](https://www.bioconductor.org/packages/release/bioc/html/enrichplot.html) dedicated to plotting enrichment results. In this activity, we will perform GSEA with `clusterProfiler` then explore many different visualisation options. At the end of the activity, we will have a poll to see which of the many plot types are the favourites! 😁
+The same authors have released a plotting package [enrichplot](https://www.bioconductor.org/packages/release/bioc/html/enrichplot.html) dedicated to plotting enrichment results. In this activity, we will perform GSEA with `clusterProfiler` then explore many different visualisation options. At the end of the activity, we will have a poll to see which of the many plot types are the favourites! 😁
 
  
 
@@ -60,10 +60,7 @@ Let's head over to RStudio now and try out some functions! 🏃
 
 
 &#x27A4; Open the `clusterProfiler.Rmd` notebook
-
-&#x27A4; Load the notebook `gprofiler2.Rmd` notebook by clicking on it in the `Files` pane
-
-You could also open the file by selecting `File` &rarr; `Open file`, or use the keyboard shortcut `ctrl + o`. 
+ 
 
 **<span style="color: #006400;">Instructions for the analysis will continue from the R notebook.</span>**
 
@@ -87,7 +84,7 @@ This may be the one you found most informative, easiest to interpret, most eye-c
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-<img src="images/poll-favourite-plot-type.jpg " style="border: none; box-shadow: none; background: none; width: 100%;">
+<img src="images/poll-favourite-plot-type.png" style="border: none; box-shadow: none; background: none; width: 100%;">
 
 
 

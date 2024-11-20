@@ -78,4 +78,4 @@ There is of course no correct answer here, we are just interested to hear your t
 
 
 
-**<span style="color: green;">"If you were to run FEA on your own data tomorrow, would you choose web or R tools?"</span>** :thinking:
+**<span style="color: green;">"If you were to run FEA on your own data tomorrow, would you choose web or R tools?"</span>** 🤔

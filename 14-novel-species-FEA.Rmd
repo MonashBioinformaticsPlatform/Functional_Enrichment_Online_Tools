@@ -2,13 +2,15 @@
 
 FEA can be easily performed for many non-model species with user friendly web tools or R packages. [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) web currently supports 984 species, and [STRING](https://string-db.org/) currently supports over 12 thousand species. 
 
-Since many non-model species are supported by some FEA tools, today I am using the term **novel species** to describe a species that is not currently supported by any FEA tool. 
+Since many non-model species are supported by some FEA tools (eg g:Profiler > 900, STRING > 12K), today I am using the term **novel species** to describe a species that is not currently supported by any FEA tool.
+
+This activity creates custom database files required for novel species FEA, but it's worth noting that the same methods are also applicable to custom gene set analysis. The only difference is that instead of mapping your species' genes against a known database (eg GO, KEGG), you would map your species genes to the genes in the custom gene set, and use those ID mappings. 
 
 Novel species FEA is possible with `clusterProfiler` or `WebGestaltR` in R, or using web tools `WebGestalt` or `STRING`. The requirements for each tool are slightly different, however at minimum a predicted proteome fasta is necessary. If you do not have a predicted proteome for your species, you would need to perform gene prediction, for which there are a number of *in silico* tools available. It must be kept in mind that *in silico* predicted proteomes can vary greatly in quality. Those that include multiple data sources such as polished genome assemblies generated with both short and long read shotgun sequencing and gene prediction that includes RNAseq data are likely to produce better gene predictions than those that are based only on for example short read sequencing. 
 
 **Workflow overview of novel species annotation**
 
-<img src="images/novel-species-annotation-workflow.png" style="border: none; box-shadow: none; background: none;">
+<img src="images/novel-species-annotation-workflow.png" style="border: none; box-shadow: none; background: none; width: 100%;">
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -32,13 +34,13 @@ Today we will use [public RNAseq data](https://www.ncbi.nlm.nih.gov/pmc/articles
 
 ## Caveat!
 
-This is not a real experiment! It was tricky to find a novel species that had 
+This is not a real experiment! It was tricky to find a novel species that had: 
 
-a) a reference genome
-b) a GTF
-c) was not natively supported by any FEA tool
-d) had publicly available RNAseq data
-e) FEA described in a peer-reviewed study 
+A) a reference genome
+B) a GTF
+C) was not natively supported by any FEA tool
+D) had publicly available RNAseq data
+E) FEA described in a peer-reviewed study 
 
 This axolotl data ticked A through D yet not E (RNA from various tissues were sequenced to aid a genome assembly project rather than for a valid biological experiment). Please keep this in mind when reviewing the results of the FEA we perform 😉 The goal of the session is not *really* to uncover how a blastema differentiates into a hand or an arm, but to demonstrate to you how you can apply this method to your own novel species. 
 
@@ -177,7 +179,9 @@ The KEGG Pathways file is identical in format to what is required for both the `
 
 ## RNotebook novel species FEA
 
-&#x27A4; Return to RStudio and open the notebook `novel_species.Rmd`.
+&#x27A4; Go back to your RStudio interface and clear your environment by selecting `Session` &rarr; `Quit session` &rarr; `Dont save` &rarr; `Start new session`
+
+&#x27A4; Open the notebook `novel_species.Rmd`.
 
 **We will now continue with the activity in RStudio, before returning here to finish up with STRING web-based analysis.**
 
@@ -198,10 +202,11 @@ We will now take a quick look at novel species FEA online with `STRING`.
 The axolotl putative proteome was previosuly uploaded to STRING and custom annotation performed. This completed using the STRING servers, with compute time less than one day. 
 
 
-<div style="display: flex; justify-content: space-between;">
-  <img src="images/string-upload-proteome.png" alt="Proteome upload" width="400">
-  <img src="images/string-annotation-summary.png" alt="Annotation summary" width="400">
-</div>
+<img src="images/string-upload-proteome.png" style="border: none; box-shadow: none; background: none;">
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+<img src="images/string-annotation-summary.png" style="border: none; box-shadow: none; background: none;">
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -240,44 +245,64 @@ Note that the `Organism` field is pre-filled with `STRG0A90SNX (axolotl)`.
 
 Before we explore the results, note that we have performed ORA without a background gene list! 😮
 
-There is no option at the query page (even under `Advanced Settings`) to provide a custom background gene list. This must be done *after* the initial search has been run. Hopefully this will change in future versions. 
+There is no option at the query page (even under `Advanced Settings`) to provide a custom background gene list initially. This must be done *after* the initial search has been run. Hopefully this will change in future versions. 
 
-**To add a custom background to STRING ORA:**
+❗In order to add or apply a previously saved custom background gene list, you need to be logged in to `STRING`. The upload can take a bit of time, so you do not need to do this now, however the dropdowns below provide instructions for applying a saved background or adding a new one. 
 
-In order to perform this part, you need a `STRING` login. If you have one, feel free to follow these instructions, otherwise, view along. 
-
-1. Click on the `ANALYSIS` tab
-2. Scroll ALL the way to the bottom of the page to the subheading `Statistical background`
-    - If you do not have a relevant saved background gene list in your `STRING` saved datasets, you would select `Add background`. See next sub-heading for details 
-    - If you do have a relevant background saved, change `Whole Genome` to select the relevant gene background list from your saved datasets
-3. Once you have selected the background, click `UPDATE` and the ORA will be re-computed using the custom statistical background 
+<details>
+<summary>Add a saved custom background to STRING analysis</summary>
 
 <p>&nbsp;</p>  <!-- insert blank line -->
+
+1. After running ORA or GSEA, on the results page, click on the `ANALYSIS` tab
+2. Scroll ALL the way to the bottom of the page to the subheading `Statistical background`
+    - If you do not have a relevant saved background gene list in your `STRING` saved datasets, you would select `Add background`. See next dropdown for details 
+    - If you do have a relevant background saved, change `Whole Genome` to the relevant gene background list from the drop-down menu
+3. Once you have selected the background, click `UPDATE` and the FEA will be re-computed using the custom statistical background 
 
 <img src="images/string-update-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
 
 
+</details>
+
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-**Load axolotl background gene list to your STRING profile**
-- Under `ANALYSIS` tab of ORA results page, at `Statistical background`, select `ADD BACKGROUND`
-- You will be prompted to login if you are not already
-- Under `1) name your new set` provide a descriptive name for your background gene list. I chose `axolotl-blastema-background`
-- At `2) identify your organism` this will be pre-filled with our custom axolotl annotation
-- For `3) provide identifiers` return to `RStudio`, copy the list of genes from the file `workshop/Axolotl_background.txt` and paste them into the `list of gene/protein names` field
-- Ensure that `enable usage as a statistical background` is checked at `4) set additional options...`
+<details>
+<summary>Save a new custom background gene list to your STRING profile</summary>
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+1. Under `ANALYSIS` tab of results page, at `Statistical background`, select `ADD BACKGROUND`
+2. You will be prompted to login if you are not already
+3. Under `1) name your new set` provide a descriptive name for your background gene list
+4. Select your organism at `2) identify your organism` 
+5. At `3) provide identifiers` copy your list of background IDs into the `list of gene/protein names` field
+6. Ensure that `enable usage as a statistical background` is checked at `4) set additional options...`
+7. Click `CONTINUE` to map your IDs. This may take several minutes. 
+
+<p>&nbsp;</p>  <!-- insert blank line -->
 
 <img src="images/string-set-novel-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
-
-- Then click `CONTINUE`
-
-The gene list will be mapped to the STRING database. This may take several minutes.  
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 `STRING` saves your custom datasets under `My Data`:
 
 <img src="images/string-set-novel-bg.png" style="border: none; box-shadow: none; background: none; width: 100%;">
+
+</details>
+
+
+
+
+
+
+
+
+<p>&nbsp;</p>  <!-- insert blank line -->
+
+
+
 
 
 <p>&nbsp;</p>  <!-- insert blank line -->

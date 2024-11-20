@@ -51,4 +51,4 @@ You could also open the file by selecting `File` &rarr; `Open file`, or use the 
 - We have reviewed the organisms and databases that are natively supported by this easy to use tool 
 - We have run both ORA and GSEA and explored the interactive HTML results summary  
 - We have touched on the redundancy filters available within this tool, for GO as well as two external algorithms applied automatically to any enrichment performed
-- In the next session, we will use `WebGestaltR` with novel species
+- In the next session, we will use `WebGestaltR` for novel species FEA

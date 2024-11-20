@@ -1,45 +1,23 @@
 # Introduction
 
-## Day 1 recap
+For today's session, we will be using the [R](https://www.r-project.org/) statistical programming language to perform functional enrichmemt analysis using a range of dedicated R packages. To simplify our work, we will be using the [RStudio](https://posit.co/download/rstudio-desktop/) integrated development environment. 
 
-- We explored several web-based tools and databases for performing Functional Enrichment Analysis (FEA)
-- Two types of FEA, Over-Representation Analysis (ORA) and Gene Set Enrichment Analysis (GSEA), were introduced and their differences discussed
-- We examined how filtering the input gene list and selecting the background gene list (the "statistical domain scope") influence ORA results
-- We explored how the choice of ranking metric affects GSEA outcomes
-- The impact of database selection on FEA results was evaluated
-- Differences in outputs between various tools were compared and discussed
-- Uncertainties, implications, and recommendations were highlighted to address challenges in gene set analysis
+RStudio provides a central place to write code, comments, run code, and view output. We will be using the workshop VMs today which run RStudio and have all the required R packages pre-installed. 
+
+<img src="images/rstudio_logo.png" style="border: none; box-shadow: none; background: none;">
+
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
 ## Day 2 overview
 
-In day 2 of this workshop, we will focus on FEA with R-based tools. 
-
 1. R environment setup including VM login
 2. ORA with `gprofiler2` including multi-query of up and down regulated genes
-3. GSEA over KEGG database with `clusterProfiler` and multiple enrichmnet visualisations with `enrichplot`
+3. GSEA over KEGG database with `clusterProfiler` and multiple enrichment visualisations with `enrichplot`
 4. ORA and GSEA with `WebGestaltR`, interactive HTML reports, and exploration of term redundancy options 
-5. Novel species FEA with `cluterProfiler`, `WebGestaltR` and `STRING` (web) 
+5. Novel species FEA with `clusterProfiler`, `WebGestaltR` and `STRING` (web) 
 6. End of workshop summary
 
-<p>&nbsp;</p>  <!-- insert blank line -->
-
-## R FEA tool choice
-
-At a high level, there are 3 fundamental questions to consider when selecting an anaylsis tool:
-
-**1.** Does the governance of your data prohibit you from analysing it on an external server? (ie "highly protected" data) 
-**2.** What web or R tools support your species and relevant annotation database?
-**3.** Are you comfortable using R? 
-
-<p>&nbsp;</p>  <!-- insert blank line -->
-
-<img src="images/r-v-web-decision-tree.png" style="border: none; box-shadow: none; background: none; width: 100%;">
-
-<p>&nbsp;</p>  <!-- insert blank line -->
-
- 
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
@@ -53,14 +31,16 @@ There are numerous R packages for FEA, each with their strenghts and limitations
 
 <p>&nbsp;</p>  <!-- insert blank line -->
 
-The following 3 R tools have been selected for today's workshop:  
+The following three R tools have been selected for today's workshop:  
 
-**1.** `gprofiler1` due to its ease of use, high number of supported species, and multiple database enrichments produced within a single run. Caveat: only ORA analysis 
-**2.** `clusterProfiler2` due to its integrated database support, runs both GSEA and ORA, companion plotting tool `enrichplot` with diverse plot options, and novel species support 
-**3.** `WebGestaltR` due to its ease of use, high number of suported databases and namespaces, runs both GSEA and ORA, interactive HTML reports and plots, and novel species support 
+1. `gprofiler2` due to its ease of use, high number of supported species, and multiple database enrichments produced within a single run. Caveat: only ORA analysis 
+2. `clusterProfiler2` due to its integrated database support, runs both GSEA and ORA, companion plotting tool `enrichplot` with diverse plot options, and novel species support 
+3. `WebGestaltR` due to its ease of use, high number of suported databases and namespaces, runs both GSEA and ORA, interactive HTML reports and plots, and novel species support 
 
 ## Day 2 approach
 
-For this part of the workshop, we will be doing a 'semi code-along' approach, where you are not required to type any code (apart from a few basics in the RStudio familiarisation part next up) but we will be running code chunks together, talking about what each part of the code is doing, and viewing the output in real time. All of the code required has been prepared into separate code files for each activity, and we will download these to the VMs in the next section. 
+For this part of the workshop, we will be doing a **semi code-along** approach, where you are not required to type any code (apart from a few basics in the RStudio familiarisation part next up) but we will be running code chunks together, talking about what each part of the code is doing, and viewing the output in real time. 
+
+All of the code required has been prepared into separate code files for each activity, and we will download these to the VMs in the next section. 
 
 
