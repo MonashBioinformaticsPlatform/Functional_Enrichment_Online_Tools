@@ -258,7 +258,9 @@ There is no `seed` parameter for `WebGestaltR` GSEA as there is for `clusterProf
 set.seed(123)
 ```
 
-A note from testing: without setting the seed in R, a slightly different number of enriched terms were returned over 3 runs. With setting the seed, the same number and IDs of terms were significant among the replicate runs, BUT the NES and the FDR were slightly different! The unadjusted ES and P values were the same. 
+This is an advantage of using `WebGestaltR` over the web counterpart :-) 
+
+However, a note from testing: without setting the seed in R, a slightly different number of enriched terms for the GSEA below were returned over 3 replicate runs. With setting the seed, the same number and IDs of terms were significant among the replicate runs, BUT the NES and FDR were slightly different! The unadjusted ES and P values were the same. 
 
 
 
