@@ -225,7 +225,7 @@ The code chunk labelled `working directory` contains only "hashed out" code and 
 
 Note that the default directory for RStusio (set in the 'Global options') and the default directory for a code notebook differ! You can change the working directory of the console to match the notebook by issuing the below command into your console directly:
 
-```{r plot, echo=TRUE, eval=FALSE}
+```{r plot2, echo=TRUE, eval=FALSE}
 setwd("workshop")
 ``` 
 
