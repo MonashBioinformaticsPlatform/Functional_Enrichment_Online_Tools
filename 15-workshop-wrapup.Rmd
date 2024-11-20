@@ -4,28 +4,28 @@ Over the last two days, as well as the webinar in October, we've explored the st
 
 ## Summary of key messages
 
-**<span style="color: green;">ORA and GSEA are different statistical analyses, and their inputs differ</span>**
+**ORA and GSEA are different statistical analyses, and their inputs differ**
 
 GSEA: Kolmogorov-Smirnov test, requires a ranked yet unfiltered gene list
 ORA: Hypergeometric or Fisher’s Exact test, requires a filtered unranked gene list and experimental background gene list
 
-**<span style="color: green;">Always correct for multiple testing</span>**
+**Always correct for multiple testing**
 
 Never use unadjusted P values, as this will introduce many false positives. Different tools offer different multiple testing correction such as FDR or the more stringent BH. Always report your chosen method and the significance threshold applied to terms.  
 
-**<span style="color: green;">Different analysis methods will return different results</span>**
+**Different analysis methods will return different results**
 
 This is expected, due to underlying differences in database, algorithm, P value methods etc. As long as your methods are robust, sensible and reproducible, you can have confidence that your methods will stand up to scrutiny under peer review.
 
-**<span style="color: green;">Ensure reproducibility</span>** 
+**Ensure reproducibility** 
 
 Lack of reproducibility through under-reporting methods is a common issue in this field (see Wijesooriya et al, linked below). Ensure to record all methodological details while you are working, including all the parameters and arguments applied, how the gene lists were generated, versions of databases and tools etc. If using R, specify a seed for constant random number generation in GSEA. 
 
-**<span style="color: green;">Interpret your results in their biological context</span>**
+**Interpret your results in their biological context**
 
-Functional categories are often broad and redundant. Use the FEA results as a guide, not the end point. Use visualisations and explore term redundancy methods to help focus results. Validate through aditional means according to the nature of your experiment, with the gold standard being wet-lab rather than *in silico* validation methods.
+Functional categories are often broad and redundant. Use the FEA results as a guide, not the end point. Use visualisations and explore term redundancy methods to help focus results. Validate through aditional means according to the nature of your experiment, with the gold standard being wet-lab rather than *in silico* validation methods. Keep in mind the limitations of the input data when working with novel species with uncurated resources. 
 
-**<span style="color: green;">There are many databases and tool choices available</span>**
+**There are many databases and tool choices available**
 
 Suitability to your experiment depends on many factors, including:
 
