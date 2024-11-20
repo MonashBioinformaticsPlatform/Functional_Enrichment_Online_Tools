@@ -10,7 +10,6 @@ output:
 library(WebGestaltR)
 library(readr)
 library(dplyr)
-library(enrichplot)
 ```
 
 # 0. Working directory
@@ -33,13 +32,13 @@ dir.create("WebGestaltR_results")
 
 WebGestaltR supports 12 species directly, however, you can import your own database files to perform ORA and GSEA for novel species :-) We will do that in the next session. 
 
-The next two commands have a default setting of  `organism = "hsapiens"` (hint: check with `?listOrganism` and `?listIdType`).
-
-Let's view the list of supported organisms. We don't have to specify any arguments to the function as the defaults do what we need. We do however need the empty brackets. Without them will print the function source code. 
+Let's view the list of supported organisms. We don't have to specify any arguments, but we do need the empty brackets. Without them will print the function source code. 
 
 ```{r list organisms }
 listOrganism()
 ```
+
+The next two commands have a default setting of  `organism = "hsapiens"`, so running without any argument will show the genesets (databases) and ID types (namespaces) that are supported for human.
 
 View databases for human. Use the black arrow on the right of the table to view the other 2 columns, and use the numbers below the table (or 'next') to view the next 10 rows.
 
@@ -71,10 +70,6 @@ listGeneSet(organism = "cfamiliaris")
 ```
 
 
-
-
-
-
 # 2. Load input data and extract gene lists
 
 We will use the same Pezzini RNAseq dataset as earlier. Since we have previously saved our ranked list, DEGs and background genes to the `workshop` folder, we could import those. However, clarity of how the gene list inputs were made is retained within the notebook, and this enhances reproducibility. Gene lists are quick and simple to extract from the input data. If the process was slow and compute-intensive, we would instead document the source and methods behind the gene lists in the notebook comments instead of re-creating them.
@@ -100,30 +95,32 @@ Bring up the help menu for the `WebGestaltR` function and spend a few minutes re
 
 There are quite a few! For many of them (eg gene set size filters, multiple testing correction method, P value cutoff) the default settings are suitable. 
 
-In particular, look for the arguments that control:
+In particular, look for the parameters that control:
 
 - whether ORA, GSEA or NTA is performed
 
 - which database/s to run enrichment on
 
-- what is the namespace for the gene list query 
+- what is the namespace/gee ID type for the gene list query 
 
 - how to specify the input gene list/s
 
-Hopefully you've discovered that the `WebGestaltR` function can intake either gene lists from files (as long as the right column format and file suffix is provided) or R objects. 
+Hopefully you've discovered that the `WebGestaltR` function can intake EITHER gene lists from files (as long as the right column format and file suffix is provided) or R objects. 
 
-Since we have decided to extract the gene lists from the DE matrix to R objects, we need to provide the gene list object to `interestGene` parameter (and `referenceGene` for ORA background). For ORA, the gene lists need to be vectors, and for GSEA, a 2-column dataframe (unlike `clusterProfiler`, which requires a GSEA vector).
+Since we have decided to extract the gene lists from the DE matrix to R objects, we need to provide the gene list object to `interestGene` parameter (and `referenceGene` for ORA background). 
+
+For ORA, the gene lists need to be vectors, and for GSEA, a 2-column dataframe (unlike `clusterProfiler`, which requires a GSEA vector).
 
 Our input matrix contains ENSEMBL IDs as well as official gene symbols, so we could use "ensembl_gene_id" or "genesymbol" for the parameter `interestGeneType`. Let's extract the ENSEMBL IDs since they are more specific than symbol. 
 
 
 ```{r extract ora gene list vectors}
-# Filter genes with adjusted p-value < 0.01 and absolute log2 fold change > 2
+# Filter genes with adjusted p-value < 0.01 and absolute log2 fold change > 2 and saved as 'DEGs' vector
 DEGs <- data %>%
   filter(FDR < 0.01, abs(Log2FC) > 2) %>%
   pull(Gene.ID)
 
-# Extract all gene IDs as the background
+# Extract all gene IDs as the 'background' vector
 background <- data %>%
   pull(Gene.ID)
 
@@ -136,7 +133,7 @@ cat("Fist 6 background genes:", head(background), "\n")
 
 
 ```{r extract ranked gene list dataframe}
-# extract ranked dataframe
+# extract ranked dataframe, saved as 'ranked' object 
 ranked <- data %>%
   arrange(desc(Log2FC)) %>%
   dplyr::select(Gene.ID, Log2FC)
@@ -154,13 +151,13 @@ tail(ranked)
 For this task, let's focus on the pathway gene sets. From skimming the output of `listGeneSet()` there were a few. We could manually locate these and copy them in to our list, or take advantage of the fact that the `WebGestaltR` developers have been systematic in the gene set naming, ensuring all database names are prefixed with their type, ie `geneontology_`, `pathway_`, `network_`, plus a few others. 
 
 ```{r select pathway databases}
-# Save the list of databases for human
+# Save the databases for human
 databases <- listGeneSet()
 
 # Extract the the pathways from the 'name' column that start with 'pathway'
 pathway_dbs <- subset(databases, grepl("^pathway", name))
 
-# Save the pathway names to a list
+# Save the pathway 'names' column to a list
 pathway_names <- pathway_dbs$name
 
 # Check the list
@@ -194,19 +191,25 @@ WebGestaltR(
     referenceGene = background,                    # Background gene list
     referenceGeneType = "ensembl_gene_id",        # Gene ID type for background
     enrichDatabase = pathway_names,  # Database name or list of databases to enrich over
-    isOutput = TRUE,                        # Set to FALSE if you don't want files saved to disk
+    isOutput = TRUE,                        # yes save report files saved to disk
     fdrMethod = "BH",                        # Multiple testing correction method (BH = Benjamini-Hochberg)
     sigMethod = "fdr",                       # Significance method ('fdr' = false discover rate)
     fdrThr = 0.05,                           # FDR significance threshold
     minNum = 10,                              # Minimum number of genes in a gene set to include
     maxNum = 500,                             # Maximum number of genes in a gene set to include
-    outputDirectory = outdir,
+    outputDirectory = outdir,                  
     projectName = project,
-    nThreads = 6
+    nThreads = 6                            # use 6 threads for faster run 
 )
 ```
 
 The results are saved within a new folder inside our new folder `WebGestaltR_results/Project_ORA_pathways`. There are a number of results files, the one we will focus on is the interactive HTML summary file. 
+
+
+
+STOP: to save time for GSEA compute, skip ahead, run the code chunk labelled `GSEA GO MF with redundant` (it takes several minutes) then return here where we will explore the ORA HTML while the GSEA runs!!!
+
+
 
 In the `Files` pane, open the folder `WebGestaltR_results/Project_ORA_pathways` then click on the `Report_ORA_pathways.html` file. Select `View in Web Browser`.
 
@@ -323,7 +326,7 @@ Notice in the GSEA code chunks above, the R function `supressWarnings` has been 
 
 Now that we have both results saved in R objects, we can compare the enriched terms. 
 
-Visualise the number of unique and shared terms: 
+How many significant terms from each DB? 
 
 ```{r Count signif terms}
 
@@ -360,24 +363,31 @@ shared_terms <- intersect(nr_terms, r_terms)
 
 ```
 
+Print shared terms from both DBs:
+
 ```{r shared signif terms}
 print(shared_terms)
 ```
+
+Print terms only in non-redundant:
+
 ```{r terms signif only in nonredundant}
 print(unique_nr_terms)
 ```
+
+Print terms only in redundant: 
 
 ```{r terms signif only in with-redundant}
 print(unique_r_terms)
 ```
 
-Scanning the list of terms only within the full GO MF (including redundant terms) we see many terms to do with DNA molecular functions. 
+Scanning the list of terms only within the full GO MF (including redundant terms) we see many terms to do with DNA activity and binding. 
 
 Significant in the 'non-redundant' analysis, we can see just 2 DNA activity functions: "DNA secondary structure binding" (significant in both) and "single-stranded DNA binding" (unique to GO MF NR). 
 
 By grouping so many similar terms with the non-redundant analyses, the overall number of enrichments is lower and more targeted, providing a more concise overview of the biology from your results.  
 
-For your own research, you could explore the relationships between these terms by viewing the neighborhood of GO terms on AmiGO: https://amigo.geneontology.org/amigo, or using NaviGO https://kiharalab.org/navigo/views/goset.php
+For your own research, you could explore the relationships between these terms by viewing the neighborhood of GO terms on AmiGO: https://amigo.geneontology.org/amigo, or using NaviGO https://kiharalab.org/navigo/views/goset.php (enter multiple GO IDs to see their relationships).
 
 
 # 5. Save versions and session details
@@ -438,6 +448,7 @@ rstudio_version_text
 ```
 
 
+STOP: while this is knitting, we will commence the novel species activity in the online workshop materials. 
 
 # 6.  Knit workbook to HTML
 
