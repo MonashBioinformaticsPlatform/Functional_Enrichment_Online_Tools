@@ -1,12 +1,9 @@
 ---
-title: "Non-model species functional enrichment analysis"
+title: "Novel species functional enrichment analysis"
 output:
   html_document:
     df_print: paged
-    self_contained: false
 ---
-
-
 
 
 ```{r  Load libraries, include=FALSE }
