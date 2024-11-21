@@ -160,35 +160,11 @@ Saving the workspace image saves all objects from the session such as your varia
 
 &#x27A4; Copy the below code into your RStudio `console` and press the `enter` key
 
-This will create a new folder called `workshop` and download the required code files and input files for today's activities. 
+This will download `workshop.zip` and unzip it. This contains four R code notebooks (.Rmd) and six input data files. 
 
 ```{r download data, echo=TRUE, eval=FALSE}
-# Create a new directory for the workshop:
-dir.create("workshop")
-
-#Download R code notebooks into 'workshop' directory:
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_Rnotebooks/gprofiler2.Rmd","workshop/gprofiler2.Rmd")
-
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_Rnotebooks/gprofiler2.Rmd","workshop/clusterProfiler.Rmd")
-
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_Rnotebooks/gprofiler2.Rmd","workshop/WebGestaltR.Rmd")
-
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_Rnotebooks/gprofiler2.Rmd","workshop/novel_species.Rmd")
-
-# Download required input data files:
-
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_inputData/Pezzini_DE.txt","workshop/Pezzini_DE.txt")
-
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_inputData/gProfiler_hsapiens_07-11-2024_11-27-09__intersections.csv","workshop/gProfiler_hsapiens_07-11-2024_11-27-09__intersections.csv")
-
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_inputData/AmexG_v6.0-DD.emapper.annotations.txt","workshop/AmexG_v6.0-DD.emapper.annotations.txt")
-
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_inputData/axolotl_DE_results.txt","workshop/axolotl_DE_results.txt")
-
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_inputData/go.obo","workshop/go.obo")
-
-download.file("https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/day2_inputData/kegg_pathways_2024-11-13.txt","workshop/kegg_pathways_2024-11-13.txt")
-
+download.file("https://raw.githubusercontent.com/MonashBioinformaticsPlatform/Functional_Enrichment_BioCommons_2024/refs/heads/main/workshop.zip", "workshop.zip")
+unzip("workshop.zip")
 ```
 
 <p>&nbsp;</p>  <!-- insert blank line -->
