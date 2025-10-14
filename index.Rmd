@@ -16,21 +16,23 @@ always_allow_html: true
 
 # Functional Enrichment Workshop
 
-**Welcome to the Functional Enrichment Workshop!** This resource is designed to guide you through the process of performing functional enrichment analysis using a variety of tools and methodologies, both online and via command-line interfaces.
+**Welcome to the Functional Enrichment Workshop!** This resource is designed to guide you through the process of performing functional enrichment analysis using a variety of web-based tools.
 
 ### Instructors
 
 - **Hossein V Kahrood**
-  - Lead Instructor, Monash Genomics and Bioinformatics Platform (MGBP)
   - [hossein.valipourkahrood@monash.edu](mailto:hossein.valipourkahrood@monash.edu)
 
-- **Cali Willet**
-  - Lead Instructor, Sydney Informatics Hub
-  - [cali.willet@sydney.edu.au](mailto:cali.willet@sydney.edu.au)
+- **Giulia Iacono**
+  - [giulia.iacono1@monash.edu](mailto:giulia.iacono1@monash.edu)
+
+- **Stuart Archer**
+  - [stuart.archer@monash.edu](mailto:stuart.archer@monash.edu)
+
 
 ### Important Links
 
-- **Workshop Page:** [Functional Enrichment BioCommons 2024](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/)
+- **Workshop Page:** [Functional Enrichment - Web-based Tools](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Online_Tools/)
 - **Related Publication:** [NeuroMolecular Medicine Article](https://link.springer.com/article/10.1007%2Fs10571-016-0403-y)
 - **Degust Tool:** [Degust Comparative Analysis](https://degust.erc.monash.edu/degust/compare.html?code=5b2c7805ab8f8c5f2dc8c72e61b049b0#/?plot=mds)
 
@@ -38,6 +40,6 @@ always_allow_html: true
 
 ### Getting Started
 
-To begin, we recommend reviewing the [workshop page](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_BioCommons_2024/) for an overview of the content and tools covered. This workshop is structured to progressively build your skills, starting with the basics of functional enrichment analysis and moving towards more complex applications.
+To begin, we recommend reviewing the [workshop page](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Online_Tools/) for an overview of the content and tools covered. This workshop is structured to progressively build your skills, starting with the basics of functional enrichment analysis and moving towards more complex applications.
 
 Happy learning!
