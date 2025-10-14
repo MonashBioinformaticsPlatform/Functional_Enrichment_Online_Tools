@@ -16,8 +16,8 @@ Functional enrichment analysis is typically applied after conducting a different
 
 - Transcriptomics (eg high-fat diet vs. low-fat diet)
 - Proteomics (eg tumor tissue vs. healthy tissue)
-- Lipidomics (eg disease vs. healthy state)
 - Metabolomics (eg diabetic vs. non-diabetic patients)
+- Lipidomics (eg disease vs. healthy state)
 - Epigenomics (eg smokers vs. non-smokers)
 - ...
 

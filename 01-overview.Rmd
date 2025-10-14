@@ -39,55 +39,61 @@ suppressWarnings(library(kableExtra))
 library(downlit)
 
 # Create the table data
-# Updated one-day schedule: 10:00–15:00 (5 hours)
-
-# Updated one-day schedule: 10:00–15:00 (5 hours), no Day column
 
 # One-day schedule: 10:00–15:00 (5 hours)
-# Added 30-min Lunch break; reduced HK block by 30 min (from 95 -> 65)
+# Added 30-min Lunch break
 
 library(dplyr)
 library(lubridate)
 
-start_time <- ymd_hm("2025-01-01 10:00")  # arbitrary date; time anchors the day
+start_time <- ymd_hm("2025-11-13 10:00")  # arbitrary date; time anchors the day
 
 schedule <- tibble::tibble(
   Instructor = c(
-    # Part 1 — HK (reduced totals)
-    rep("HK", 7),
-    # Lunch
+    # Part 1 — LP (10 min)
+    rep("LP", 1),
+    # Part 2 — HK ()
+    rep("HK", 4),
+    # Part 3 — GI (2 hrs)
+    rep("GI", 1),
+      # Lunch (30 min)
     "",
-    # Part 2 — GI (3 hrs)
-    rep("GI", 2),
-    # Part 3 — SA
-    "SA"
+    # Part 4 — GI (2 hrs)
+    rep("GI", 1),
+    # Part 5 — SA (1 hr)
+    rep("SA", 1)
   ),
   Activity = c(
-    # HK
+    # LP
     "Welcome and housekeeping",
-    "Introduction",
-    "Data acquisition",
-    "Filtering gene list",
-    "Hands-on with Interactive Calculator (breakout rooms); https://bioinformatics3.erc.monash.edu/rsconnect/content/241/",
-    "gProfiler [GO + pathways] (https://biit.cs.ut.ee/gprofiler/gost)",
-    "Hands-on with gProfiler (breakout rooms)",
+    # HK
+    "Introduction to functional enrichment analysis",
+    "Data acquisition & filtering gene list",
+    "Interactive Calculator <br> https://bioinformatics3.erc.monash.edu/rsconnect/content/241/",
+    "gProfiler (https://biit.cs.ut.ee/gprofiler/gost)",
+    # GI - 1
+    "STRING (https://string-db.org/)",
     # Lunch
     "Lunch break",
-    # GI
-    "STRING (https://string-db.org/)",
-    "GSEA (GenePattern) (https://cloud.genepattern.org/gp/pages/index.jsf)",
+    # GI - 2
+    "GSEA (https://www.gsea-msigdb.org/) <br>
+    (GenePattern) (https://cloud.genepattern.org/)",
     # SA
     "Reactome (https://reactome.org/)"
   ),
   `Time (mins)` = c(
-    # HK (total 65 min after reduction)
-    8, 8, 5, 10, 10, 12, 12,
+    # LP (10 min)
+    10,
+    # HK (100 mins)
+    30, 15, 15, 40,
+    # GI (100 mins)
+    40, 
     # Lunch
     30,
-    # GI (3 hours total)
-    60, 120,
-    # SA
-    25
+    # GI
+    60,
+    # SA (60 mins)
+    60
   )
 ) %>%
   mutate(
@@ -111,7 +117,8 @@ kable(schedule, "html", escape = FALSE) %>%
 
 <!-- ### Abbreviations -->
 
-- **HK**: Hossein V Kahrood
+- **LP**: Laura Perlaza-Jimenez
+- **HK**: Hossein Valipour Kahrood
 - **GI**: Giulia Iacono
 - **SA**: Stuart Archer
 

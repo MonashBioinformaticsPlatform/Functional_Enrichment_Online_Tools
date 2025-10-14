@@ -42,7 +42,11 @@ Plots of -log p-value are a popular option for a figure. By taking the exponent 
 For instance, this figure is taken from the [(Pezzini et al. 2017)](https://link.springer.com/article/10.1007%2Fs10571-016-0403-y) paper. 
 Note that in this figure shows 2 specifics categories from the IPA (ingenuity) database using the IPA tool (not covered here), so the terms themselves differ. 
 
-![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/NegLogPvalPlot_Pezzini2017.png)
+<!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/NegLogPvalPlot_Pezzini2017.png) -->
+```{r, out.width="90%", fig.align='center'}
+# knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/NegLogPvalPlot_Pezzini2017.png")
+knitr::include_graphics("images/NegLogPvalPlot_Pezzini2017.png")
+```
 
 You can also build on such a plot with number of genes and the like. For an example, see the 'bubble' chart produced by a package called pathfindR here: https://www.biostars.org/p/322415/
 
