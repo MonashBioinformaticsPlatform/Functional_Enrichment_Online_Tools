@@ -73,12 +73,16 @@ Given this contingency table:
 
 
 *R syntax*
-```{r, eval=FALSE}
+
+```{r, eval=TRUE, echo=TRUE, results='hide', message=FALSE}
+a=50
+b=100
+c=200
+d=15900
 data <- matrix(c(a, b, c, d), nrow = 2, byrow = TRUE)
-# Two-tailed test
-fisher.test(data, alternative = "two.sided")
+
 # One-tailed test
-fisher.test(data, alternative = "greater") # or "less"
+fisher.test(data, alternative = "g") # greater or "less"
 ```
 
 
@@ -106,8 +110,16 @@ The parameters in our example:
 N=16250; K=250; n=150; k=50
 
 *R syntax*
-```{r, eval=FALSE}
-phyper(k-1, K, N-K, n, lower.tail = FALSE)
+
+
+```{r, eval=TRUE, echo=TRUE, results='hide', message=FALSE}
+# Observed value
+N <- a + b + c + d
+K <- a + c
+n <- a + b
+
+# One-tailed p-value (P[X >= a])
+phyper(a - 1, K, N - K, n, lower.tail = FALSE)
 ```
 
 Where:
