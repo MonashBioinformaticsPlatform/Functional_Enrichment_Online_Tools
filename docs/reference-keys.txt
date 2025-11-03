@@ -130,3 +130,4 @@ kegg
 gsea-and-msigdb
 metaboanalyst
 cytoscape
+cover-image-sydney_informatics_hub_logo.png

@@ -1,6 +1,6 @@
 # Overview
 
-## Functional analysis of -Omics data 
+## Functional analysis of -Omics data
 
 ### General information
 
@@ -10,13 +10,13 @@ The workshop covers the bioinformatics concepts and tools available for interpre
 
 Participants will gain practical experience and skills to be able to:
 
-- Understand basic concepts of functional enrichment analysis;
-- Interpret enrichment analysis results;
-- Get systems perspective of gene functions;
-- Get more information about a gene list;
-- Discover what pathways are enriched in a gene list (and use it for hypothesis generation);
-- Predict gene function and extend a gene list;
-- Follow workflow after the workshop to conduct their own analysis.
+-   Understand basic concepts of functional enrichment analysis;
+-   Interpret enrichment analysis results;
+-   Get systems perspective of gene functions;
+-   Get more information about a gene list;
+-   Discover what pathways are enriched in a gene list (and use it for hypothesis generation);
+-   Predict gene function and extend a gene list;
+-   Follow workflow after the workshop to conduct their own analysis.
 
 ### Target Audience
 
@@ -30,7 +30,6 @@ Links and material are provided on `resources` page.
 
 BYO coffee :)
 
-
 ### Schedule
 
 ```{r, echo=FALSE, message=FALSE}
@@ -38,62 +37,52 @@ library(knitr)
 suppressWarnings(library(kableExtra))
 library(downlit)
 
-# Create the table data
-
-# One-day schedule: 10:00–15:00 (5 hours)
-# Added 30-min Lunch break
-
 library(dplyr)
 library(lubridate)
 
-start_time <- ymd_hm("2025-11-13 10:00")  # arbitrary date; time anchors the day
+start_time <- ymd_hm("2025-11-13 10:00")  # anchors the day
 
 schedule <- tibble::tibble(
   Instructor = c(
-    # Part 1 — LP (10 min)
-    rep("LP", 1),
-    # Part 2 — HK ()
-    rep("HK", 4),
-    # Part 3 — GI (2 hrs)
-    rep("GI", 1),
-      # Lunch (30 min)
+    # LP (10 min)
+    "LP",
+    # HK (3 items before break)
+    rep("HK", 3),
+    # Morning break (10 min)
     "",
-    # Part 4 — GI (2 hrs)
-    rep("GI", 1),
-    # Part 5 — SA (1 hr)
-    rep("SA", 1)
+    # HK resumes (gProfiler)
+    "HK",
+    # GI - 1
+    "GI",
+    # Lunch (20 min)
+    "",
+    # GI - 2
+    "GI",
+    # SA
+    "SA"
   ),
   Activity = c(
-    # LP
     "Welcome and housekeeping",
-    # HK
     "Introduction to functional enrichment analysis",
     "Data acquisition & filtering gene list",
     "Interactive Calculator <br> https://bioinformatics3.erc.monash.edu/rsconnect/content/241/",
+    "Morning break",
     "gProfiler (https://biit.cs.ut.ee/gprofiler/gost)",
-    # GI - 1
     "STRING (https://string-db.org/)",
-    # Lunch
     "Lunch break",
-    # GI - 2
     "GSEA (https://www.gsea-msigdb.org/) <br>
     (GenePattern) (https://cloud.genepattern.org/)",
-    # SA
     "Reactome (https://reactome.org/)"
   ),
   `Time (mins)` = c(
-    # LP (10 min)
-    10,
-    # HK (100 mins)
-    30, 15, 15, 40,
-    # GI (100 mins)
-    40, 
-    # Lunch
-    30,
-    # GI
-    60,
-    # SA (60 mins)
-    60
+    10,     # LP
+    30,15,15,  # HK before break
+    10,     # Morning break (new)
+    40,     # HK: gProfiler (resumes at 11:20)
+    40,     # GI - 1: STRING
+    20,     # Lunch reduced from 30 -> 20
+    60,     # GI - 2: GSEA
+    60      # SA: Reactome
   )
 ) %>%
   mutate(
@@ -103,22 +92,20 @@ schedule <- tibble::tibble(
     End   = format(End,   "%I:%M %p")
   )
 
-# Optional sanity checks
+# Sanity check: still a 300-min day (10:00–15:00)
 stopifnot(sum(schedule$`Time (mins)`) == 300)
 
-
-# Render the table with specified column widths
+# Render the table
 kable(schedule, "html", escape = FALSE) %>%
   kable_styling(full_width = FALSE, position = "center") %>%
-  column_spec(1, width = "10em", bold = TRUE) %>%  # Adjust width
-  column_spec(3, width = "25em")  # Center align
+  column_spec(1, width = "10em", bold = TRUE) %>%
+  column_spec(3, width = "8em")
 ```
 
 
-<!-- ### Abbreviations -->
+### Abbreviations
 
-- **LP**: Laura Perlaza-Jimenez
-- **HK**: Hossein Valipour Kahrood
-- **GI**: Giulia Iacono
-- **SA**: Stuart Archer
-
+-   **LP**: Laura Perlaza-Jimenez
+-   **HK**: Hossein Valipour Kahrood
+-   **GI**: Giulia Iacono
+-   **SA**: Stuart Archer

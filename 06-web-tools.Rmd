@@ -68,7 +68,7 @@ How is multi-query support implemented in gProfiler?
 
 How can one perform Under Representation Analysis in gProfiler?
 
-### Steps to perform GSEA in g:Profiler:
+### Steps to perform GSEA-style analysis in g:Profiler:
 <span style="color:orange;">- Prepare Your Pre-ranked List:</span> Steps to provide a ranked gene list are given [here](degust.html).
 
 <span style="color:orange;">- Input Gene List:</span> Paste your prepared gene list directly into the input box on the g:Profiler web page or upload a file containing your list.

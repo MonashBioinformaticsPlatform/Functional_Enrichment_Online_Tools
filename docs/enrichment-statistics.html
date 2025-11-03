@@ -6,14 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 4 Enrichment Statistics | Functional Enrichment Workshop</title>
 <meta name="author" content="Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP)">
-<meta name="description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table like so:     ..in term  ..not in term  Total  ..in gene list  50...">
+<meta name="description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table like so:     ..in term  ..not in term  Total  ..in gene list  30...">
 <meta name="generator" content="bookdown 0.40 with bs4_book()">
 <meta property="og:title" content="Chapter 4 Enrichment Statistics | Functional Enrichment Workshop">
 <meta property="og:type" content="book">
-<meta property="og:description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table like so:     ..in term  ..not in term  Total  ..in gene list  50...">
+<meta property="og:description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table like so:     ..in term  ..not in term  Total  ..in gene list  30...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 4 Enrichment Statistics | Functional Enrichment Workshop">
-<meta name="twitter:description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table like so:     ..in term  ..not in term  Total  ..in gene list  50...">
+<meta name="twitter:description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table like so:     ..in term  ..not in term  Total  ..in gene list  30...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.8.0/transition.js"></script><script src="libs/bs3compat-0.8.0/tabs.js"></script><script src="libs/bs3compat-0.8.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
@@ -66,11 +66,11 @@
 <span class="header-section-number">4</span> Enrichment Statistics<a class="anchor" aria-label="anchor" href="#enrichment-statistics"><i class="fas fa-link"></i></a>
 </h1>
 <p>Enrichment statistics are based on a contingency table like so:</p>
-<!-- |        Gene        | ..in term | ..not in term | Total | -->
+<!-- | Gene | ..in term | ..not in term | Total | -->
 <!-- |:------------------:|----------:|--------------:|------:| -->
-<!-- |     ..in gene list |        50 |           100 |   150 | -->
-<!-- | ..not in gene list (but in background) |       200 |         15900 | 16100 | -->
-<!-- |              Total |       250 |         16000 | 16250 | -->
+<!-- | ..in gene list | 30 | 270 |   300 | -->
+<!-- | ..not in gene list (but in background) | 470 | 15230 | 15700 | -->
+<!-- | Total |       500 | 15500 | 16000 | -->
 <div class="inline-table"><table border="1" style="border-collapse: collapse; width: 100%;" class="table table-sm">
 <tr>
 <th>
@@ -90,13 +90,13 @@ Total
 ..in gene list
 </th>
 <td style="background-color: #ffcccb;">
-50
+30
 </td>
 <td style="background-color: #90ee90;">
-100
+270
 </td>
 <td>
-150
+300
 </td>
 </tr>
 <tr>
@@ -104,13 +104,13 @@ Total
 ..not in gene list (but in background)
 </th>
 <td style="background-color: #add8e6;">
-200
+470
 </td>
 <td style="background-color: #ffffe0;">
-15900
+15230
 </td>
 <td>
-16100
+15700
 </td>
 </tr>
 <tr>
@@ -118,20 +118,21 @@ Total
 Total
 </td>
 <td>
-250
+500
 </td>
 <td>
+15500
+</td>
+<!-- <td>16000</td> -->
+<td style="color: orange;">
 16000
 </td>
-<!-- <td>16250</td> -->
-<td style="color: orange;">
-16250
-</td>
-<!-- Colored text for 16250 -->
+<!-- Colored text for 16000 -->
 </tr>
 </table></div>
-<p>This is based on the 16250 genes that were measured in your experiment.</p>
-<p>Note that there might be extra genes that weren’t measured these are excluded from the calculations entirely. E.g. There might have been an extra 5000 terms (some of which might have been annotated with the term of interest), making for 21250 <em>annotated</em> genes.</p>
+<p>This is based on the 16,000 genes that were measured in your experiment.</p>
+<p>Note that some genes may not have been measured; these are excluded entirely from the calculations.
+For example, there might have been an additional 5,000 genes (some of which could have been annotated with the term of interest), resulting in a total of <em>21,250 annotated genes</em>.</p>
 <hr>
 <div id="fishers-exact-test" class="section level2" number="4.1">
 <h2>
@@ -177,16 +178,17 @@ Total
 </tr>
 </tbody>
 </table></div>
-<p><em>R syntax</em></p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">a</span><span class="op">=</span><span class="fl">50</span></span>
-<span><span class="va">b</span><span class="op">=</span><span class="fl">100</span></span>
-<span><span class="va">c</span><span class="op">=</span><span class="fl">200</span></span>
-<span><span class="va">d</span><span class="op">=</span><span class="fl">15900</span></span>
+<details><summary><em>R syntax</em>
+</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">a</span> <span class="op">=</span> <span class="fl">30</span></span>
+<span><span class="va">b</span> <span class="op">=</span> <span class="fl">270</span></span>
+<span><span class="va">c</span> <span class="op">=</span> <span class="fl">470</span></span>
+<span><span class="va">d</span> <span class="op">=</span> <span class="fl">15230</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">a</span>, <span class="va">b</span>, <span class="va">c</span>, <span class="va">d</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># One-tailed test</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/fisher.test.html">fisher.test</a></span><span class="op">(</span><span class="va">data</span>, alternative <span class="op">=</span> <span class="st">"g"</span><span class="op">)</span> <span class="co"># greater or "less"</span></span></code></pre></div>
+</details>
 </div>
 <div id="hypergeometric-test" class="section level2" number="4.2">
 <h2>
@@ -200,26 +202,27 @@ Total
 <span class="math display">\[P(X = k) = \frac{\binom{K}{k} \binom{N - K}{n - k}}{\binom{N}{n}}\]</span>
 Where:</p>
 <ul>
-<li><p><span class="math inline">\(N\)</span> = Total number of items in the population.</p></li>
-<li><p><span class="math inline">\(K\)</span> = Number of success items in the population.</p></li>
-<li><p><span class="math inline">\(n\)</span> = Number of items in the sample.</p></li>
-<li><p><span class="math inline">\(k\)</span> = Number of success items in the sample.</p></li>
+<li><p><span class="math inline">\(k\)</span> = Number of success items in the sample (overlap).</p></li>
+<li><p><span class="math inline">\(n\)</span> = Number of items in the sample (DE genes).</p></li>
+<li><p><span class="math inline">\(K\)</span> = Number of success items in the population (in term).</p></li>
+<li><p><span class="math inline">\(N\)</span> = Total number of items in the population (background).</p></li>
 </ul>
 <p>The parameters in our example:
-N=16250; K=250; n=150; k=50</p>
-<p><em>R syntax</em></p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Observed value</span></span>
-<span><span class="va">N</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span> <span class="op">+</span> <span class="va">c</span> <span class="op">+</span> <span class="va">d</span></span>
-<span><span class="va">K</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">c</span></span>
-<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span></span>
-<span></span>
-<span><span class="co"># One-tailed p-value (P[X &gt;= a])</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/Hypergeometric.html">phyper</a></span><span class="op">(</span><span class="va">a</span> <span class="op">-</span> <span class="fl">1</span>, <span class="va">K</span>, <span class="va">N</span> <span class="op">-</span> <span class="va">K</span>, <span class="va">n</span>, lower.tail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+k=30; n=300; K=500; N=16000;</p>
 <p>Where:</p>
 <p>k−1 is the number of observed successes minus 1 (for the “at least” scenario).
 lower.tail = FALSE gives the probability of getting at least k successes (right-tail).</p>
-<hr>
+<details><summary><em>R syntax</em>
+</summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Observed value</span></span>
+<span><span class="va">k</span> <span class="op">&lt;-</span> <span class="va">a</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span></span>
+<span><span class="va">K</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">c</span></span>
+<span><span class="va">N</span> <span class="op">&lt;-</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span> <span class="op">+</span> <span class="va">c</span> <span class="op">+</span> <span class="va">d</span></span>
+<span></span>
+<span><span class="co"># (P[X &gt;= k])</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/Hypergeometric.html">phyper</a></span><span class="op">(</span><span class="va">k</span> <span class="op">-</span> <span class="fl">1</span>, <span class="va">K</span>, <span class="va">N</span> <span class="op">-</span> <span class="va">K</span>, <span class="va">n</span>, lower.tail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+</details><hr>
 <div id="section" class="section level4 unnumbered">
 <h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section"><i class="fas fa-link"></i></a></h4>
 </div>
@@ -320,7 +323,7 @@ lower.tail = FALSE gives the probability of getting at least k successes (right-
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Functional Enrichment Workshop</strong>" was written by Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP). It was last built on <span>“October 30, 2025”</span> <br><img src="logos.png" width="300" alt="Logo"><br>.</p>
+    <p>"<strong>Functional Enrichment Workshop</strong>" was written by Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP). It was last built on <span>“October 31, 2025”</span> <br><img src="logos.png" width="300" alt="Logo"><br>.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

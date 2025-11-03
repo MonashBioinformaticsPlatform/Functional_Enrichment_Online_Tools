@@ -4,11 +4,11 @@
 
 Enrichment statistics are based on a contingency table like so:
 
-<!-- |        Gene        | ..in term | ..not in term | Total | -->
+<!-- | Gene | ..in term | ..not in term | Total | -->
 <!-- |:------------------:|----------:|--------------:|------:| -->
-<!-- |     ..in gene list |        50 |           100 |   150 | -->
-<!-- | ..not in gene list (but in background) |       200 |         15900 | 16100 | -->
-<!-- |              Total |       250 |         16000 | 16250 | -->
+<!-- | ..in gene list | 30 | 270 |   300 | -->
+<!-- | ..not in gene list (but in background) | 470 | 15230 | 15700 | -->
+<!-- | Total |       500 | 15500 | 16000 | -->
 
 
 <table border="1" style="border-collapse: collapse; width: 100%;">
@@ -20,30 +20,30 @@ Enrichment statistics are based on a contingency table like so:
   </tr>
   <tr>
     <th>..in gene list</th>
-    <td style="background-color: #ffcccb;">50</td>
-    <td style="background-color: #90ee90;">100</td>
-    <td>150</td>
+    <td style="background-color: #ffcccb;">30</td>
+    <td style="background-color: #90ee90;">270</td>
+    <td>300</td>
   </tr>
   <tr>
     <th>..not in gene list (but in background)</th>
-    <td style="background-color: #add8e6;">200</td>
-    <td style="background-color: #ffffe0;">15900</td>
-    <td>16100</td>
+    <td style="background-color: #add8e6;">470</td>
+    <td style="background-color: #ffffe0;">15230</td>
+    <td>15700</td>
   </tr>
   <tr>
     <td>Total</td>
-    <td>250</td>
-    <td>16000</td>
-    <!-- <td>16250</td> -->
-    <td style="color: orange;">16250</td> <!-- Colored text for 16250 -->
+    <td>500</td>
+    <td>15500</td>
+    <!-- <td>16000</td> -->
+    <td style="color: orange;">16000</td> <!-- Colored text for 16000 -->
   </tr>
 </table>
 
 
-This is based on the 16250 genes that were measured in your experiment. 
+This is based on the 16,000 genes that were measured in your experiment. 
 
-Note that there might be extra genes that weren't measured these are excluded from the calculations entirely. E.g. There might have been an extra 5000 terms (some of which might have been annotated with the term of interest), making for 21250 _annotated_ genes.
-
+Note that some genes may not have been measured; these are excluded entirely from the calculations.
+For example, there might have been an additional 5,000 genes (some of which could have been annotated with the term of interest), resulting in a total of *21,250 annotated genes*.
 
 ---
 
@@ -72,18 +72,21 @@ Given this contingency table:
 | **Total**     | \(a + c\)    | \(b + d\)    | \(a + b + c + d\) |
 
 
-*R syntax*
+<details>
+<summary><em>R syntax</em></summary>
 
-```{r, eval=TRUE, echo=TRUE, results='hide', message=FALSE}
-a=50
-b=100
-c=200
-d=15900
+```{r eval=TRUE, echo=TRUE, results='hide', message=FALSE}
+a = 30
+b = 270
+c = 470
+d = 15230
+
 data <- matrix(c(a, b, c, d), nrow = 2, byrow = TRUE)
 
 # One-tailed test
 fisher.test(data, alternative = "g") # greater or "less"
 ```
+</details> 
 
 
 ## <span style="color:orange;">Hypergeometric Test</span>
@@ -98,34 +101,38 @@ Hypergeometric test calculates the probability of observing the given number of 
 $$P(X = k) = \frac{\binom{K}{k} \binom{N - K}{n - k}}{\binom{N}{n}}$$
 Where:
 
-  - \(N\) = Total number of items in the population.
+  - \(k\) = Number of success items in the sample (overlap).
   
-  - \(K\) = Number of success items in the population.
+  - \(n\) = Number of items in the sample (DE genes).
   
-  - \(n\) = Number of items in the sample.
+  - \(K\) = Number of success items in the population (in term).
   
-  - \(k\) = Number of success items in the sample.
-  
+  - \(N\) = Total number of items in the population (background).
+
+
 The parameters in our example:
-N=16250; K=250; n=150; k=50
-
-*R syntax*
-
-
-```{r, eval=TRUE, echo=TRUE, results='hide', message=FALSE}
-# Observed value
-N <- a + b + c + d
-K <- a + c
-n <- a + b
-
-# One-tailed p-value (P[X >= a])
-phyper(a - 1, K, N - K, n, lower.tail = FALSE)
-```
+k=30; n=300; K=500; N=16000;
 
 Where:
 
 k−1 is the number of observed successes minus 1 (for the "at least" scenario).
 lower.tail = FALSE gives the probability of getting at least k successes (right-tail).
+
+
+<details>
+<summary><em>R syntax</em></summary>
+
+```{r eval=TRUE, echo=TRUE, results='hide', message=FALSE}
+# Observed value
+k <- a
+n <- a + b
+K <- a + c
+N <- a + b + c + d
+
+# (P[X >= k])
+phyper(k - 1, K, N - K, n, lower.tail = FALSE)
+```
+</details>
 
 ---
 
