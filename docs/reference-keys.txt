@@ -49,7 +49,8 @@ course-objectives
 target-audience
 setup-requirements
 schedule
-recap
+abbreviations
+introduction
 functional-enrichment-analysis
 why-is-it-important
 when-to-use-functional-enrichment-analysis
@@ -85,12 +86,12 @@ activities
 common-gotcha
 example
 online-tools
-fea-in-gprofiler
+section-3
 steps-to-perform-ora-in-gprofiler
 browse-the-gprofiler-results
 different-backgrounds
-steps-to-perform-gsea-in-gprofiler
-fea-in-string
+steps-to-perform-gsea-style-analysis-in-gprofiler
+section-5
 steps-to-perform-ora-in-string
 browse-the-string-ora-results
 viewers
@@ -101,11 +102,11 @@ exports
 clusters
 steps-to-perform-gsea-in-string
 browse-the-string-gsea-results
-fea-in-genepattern
+or
 steps-to-locate-gsea-module-in-genepattern
 steps-to-perform-gsea
 browse-the-gsea-results
-fea-in-reactome
+section-7
 steps-to-perform-ora-in-reactome
 steps-to-perform-gsa-in-reactome
 browse-the-reactome-results
@@ -130,4 +131,3 @@ kegg
 gsea-and-msigdb
 metaboanalyst
 cytoscape
-cover-image-sydney_informatics_hub_logo.png

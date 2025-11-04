@@ -1,4 +1,4 @@
-# Recap
+# Introduction
 
 ## Functional enrichment analysis
 Functional enrichment analysis (FEA) refers to a set of computational approaches designed to derive biological meaning from lists of biomolecules, such as genes, proteins, or metabolites.

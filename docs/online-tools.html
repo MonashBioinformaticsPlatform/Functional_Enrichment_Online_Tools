@@ -46,7 +46,7 @@
         <ul class="book-toc list-unstyled">
 <li><a class="" href="index.html"><span class="header-section-number">1</span> Functional Enrichment Workshop</a></li>
 <li><a class="" href="overview.html"><span class="header-section-number">2</span> Overview</a></li>
-<li><a class="" href="recap.html"><span class="header-section-number">3</span> Recap</a></li>
+<li><a class="" href="introduction.html"><span class="header-section-number">3</span> Introduction</a></li>
 <li><a class="" href="enrichment-statistics.html"><span class="header-section-number">4</span> Enrichment Statistics</a></li>
 <li><a class="" href="example-analysis.html"><span class="header-section-number">5</span> Example Analysis</a></li>
 <li><a class="" href="defining-the-genelist.html"><span class="header-section-number">6</span> Defining the genelist</a></li>
@@ -68,11 +68,11 @@
 <p>Functional enrichment analysis can be performed using various web-based tools, each of which is designed to meet specific analytical needs. These tools often vary in the databases they use, their statistical approaches, and their capabilities to perform different types of analysis, such as Over-Representation Analysis (ORA) or Gene Set Enrichment Analysis (GSEA).</p>
 <p>In this workshop, we will explore several popular tools for functional enrichment analysis, including gProfiler, STRING, Reactome, and MSigDB GSEA. Each tool offers unique features and insights, providing flexibility in selecting the right method for diverse datasets and research questions.</p>
 <!-- ## FEA in [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) -->
-<div id="fea-in-gprofiler" class="section level2" number="7.1">
+<div id="section-3" class="section level2" number="7.1">
 <h2>
-<span class="header-section-number">7.1</span> FEA in gProfiler <a href="https://biit.cs.ut.ee/gprofiler/gost" target="_blank"><img src="images/gp2-logo-new.png" alt="g:Profiler Logo" style="height:35px; vertical-align:middle;"></a><a class="anchor" aria-label="anchor" href="#fea-in-gprofiler"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.1</span> <a href="https://biit.cs.ut.ee/gprofiler/gost" target="_blank"><img src="images/gp2-logo-new.png" alt="g:Profiler Logo" style="height:35px; vertical-align:middle;"></a><a class="anchor" aria-label="anchor" href="#section-3"><i class="fas fa-link"></i></a>
 </h2>
-<p>gProfiler is known for its integration of numerous species and databases. It supports both ORA and GSEA, enabling users to assess Gene Ontology (GO), biological pathways, regulatory motifs and protein databases. With gProfile one can</p>
+<p><a href="https://biit.cs.ut.ee/gprofiler/gost">gProfiler</a> is known for its integration of numerous species and databases. It supports both ORA and GSEA, enabling users to assess Gene Ontology (GO), biological pathways, regulatory motifs and protein databases. With gProfile one can</p>
 <div id="steps-to-perform-ora-in-gprofiler" class="section level3" number="7.1.1">
 <h3>
 <span class="header-section-number">7.1.1</span> Steps to perform ORA in g:Profiler:<a class="anchor" aria-label="anchor" href="#steps-to-perform-ora-in-gprofiler"><i class="fas fa-link"></i></a>
@@ -112,8 +112,8 @@ The Gene Ontology (GO) context is divided into three main categories: Biological
 This section includes specifics about the input data, including the total number of queried genes and any identifiers not recognised or mapped. It also details the statistical background used, the chosen organism, and other analysis settings, ensuring transparency and reproducibility of the results.</p></li>
 </ul>
 </div>
-<div id="section-3" class="section level4 unnumbered">
-<h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-3"><i class="fas fa-link"></i></a></h4>
+<div id="section-4" class="section level4 unnumbered">
+<h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-4"><i class="fas fa-link"></i></a></h4>
 </div>
 <div id="different-backgrounds" class="section level4" number="7.1.1.2">
 <h4>
@@ -135,9 +135,9 @@ This section includes specifics about the input data, including the total number
 <p>How can one perform Under Representation Analysis in gProfiler?</p>
 </div>
 </div>
-<div id="steps-to-perform-gsea-in-gprofiler" class="section level3" number="7.1.2">
+<div id="steps-to-perform-gsea-style-analysis-in-gprofiler" class="section level3" number="7.1.2">
 <h3>
-<span class="header-section-number">7.1.2</span> Steps to perform GSEA in g:Profiler:<a class="anchor" aria-label="anchor" href="#steps-to-perform-gsea-in-gprofiler"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.1.2</span> Steps to perform GSEA-style analysis in g:Profiler:<a class="anchor" aria-label="anchor" href="#steps-to-perform-gsea-style-analysis-in-gprofiler"><i class="fas fa-link"></i></a>
 </h3>
 <p><span style="color:orange;">- Prepare Your Pre-ranked List:</span> Steps to provide a ranked gene list are given <a href="degust.html">here</a>.</p>
 <p><span style="color:orange;">- Input Gene List:</span> Paste your prepared gene list directly into the input box on the g:Profiler web page or upload a file containing your list.</p>
@@ -163,11 +163,11 @@ This section includes specifics about the input data, including the total number
 </div>
 </div>
 </div>
-<div id="fea-in-string" class="section level2" number="7.2">
+<div id="section-5" class="section level2" number="7.2">
 <h2>
-<span class="header-section-number">7.2</span> FEA in STRING <a href="https://string-db.org" target="_blank"><img src="images/string-logo.png" alt="STRING Logo" style="height:35px; vertical-align:middle;"></a><a class="anchor" aria-label="anchor" href="#fea-in-string"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.2</span> <a href="https://string-db.org" target="_blank"><img src="images/string-logo.png" alt="STRING Logo" style="height:35px; vertical-align:middle;"></a><a class="anchor" aria-label="anchor" href="#section-5"><i class="fas fa-link"></i></a>
 </h2>
-<p>STRING (Search Tool for the Retrieval of Interacting Genes/Proteins) is a resource for exploring protein-protein interaction (PPI) networks. It combines experimental data, predictions, and curated information to build networks that highlight functional relationships, helping to reveal shared pathways or biological processes within gene or protein lists.</p>
+<p><a href="https://string-db.org/">STRING</a> (Search Tool for the Retrieval of Interacting Genes/Proteins) is a resource for exploring protein-protein interaction (PPI) networks. It combines experimental data, predictions, and curated information to build networks that highlight functional relationships, helping to reveal shared pathways or biological processes within gene or protein lists.</p>
 <div id="steps-to-perform-ora-in-string" class="section level3" number="7.2.1">
 <h3>
 <span class="header-section-number">7.2.1</span> Steps to Perform ORA in STRING:<a class="anchor" aria-label="anchor" href="#steps-to-perform-ora-in-string"><i class="fas fa-link"></i></a>
@@ -331,12 +331,12 @@ Figure 7.9: Enrichment display settings
 <!-- ## FEA in [GenePattern](https://www.genepattern.org/#gsc.tab=0) -->
 </div>
 </div>
-<div id="fea-in-genepattern" class="section level2" number="7.3">
+<div id="or" class="section level2" number="7.3">
 <h2>
-<span class="header-section-number">7.3</span> FEA in GenePattern <a href="https://www.genepattern.org/#gsc.tab=0" target="_blank"><img src="images/GenePattern-logo.png" alt="GenePattern Logo" style="height:35px; vertical-align:middle;"></a><a class="anchor" aria-label="anchor" href="#fea-in-genepattern"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.3</span> <a href="https://www.gsea-msigdb.org/gsea/downloads.jsp" target="_blank"><img src="images/GSEA-logo.gif" alt="MSigDB GSEA Logo" style="height:35px; vertical-align:middle;"></a> or <a href="https://www.genepattern.org/#gsc.tab=0" target="_blank"><img src="images/GenePattern-logo.png" alt="GenePattern Logo" style="height:35px; vertical-align:middle;"></a><a class="anchor" aria-label="anchor" href="#or"><i class="fas fa-link"></i></a>
 </h2>
-<p>GenePattern, an online platform developed by the Broad Institute, offers a suite of tools for analyzing and visualizing genomic data, making bioinformatics accessible to researchers through a user-friendly, no-programming interface. Among its supported tools is Gene Set Enrichment Analysis (GSEA), which implements <a href="https://www.gsea-msigdb.org/gsea/index.jsp">MSigDB GSEA</a> analysis for identifying enriched gene sets in genomic data.</p>
-<p>MSigDB (Molecular Signatures Database) is a collection of gene sets for Gene Set Enrichment Analysis, representing pathways and gene signatures linked to biological states or diseases. It helps identify enriched gene sets, aiding the analysis of gene expression changes and key pathways in experimental data.</p>
+<p><a href="https://www.genepattern.org/">GenePattern</a>, an online platform developed by the Broad Institute, offers a suite of tools for analyzing and visualizing genomic data, making bioinformatics accessible to researchers through a user-friendly, no-programming interface. Among its supported tools is Gene Set Enrichment Analysis (GSEA), which implements <a href="https://www.gsea-msigdb.org/gsea/index.jsp">MSigDB GSEA</a> analysis for identifying enriched gene sets in genomic data.</p>
+<p><a href="https://www.gsea-msigdb.org/gsea/index.jsp">MSigDB</a> (Molecular Signatures Database) is a collection of gene sets for Gene Set Enrichment Analysis, representing pathways and gene signatures linked to biological states or diseases. It helps identify enriched gene sets, aiding the analysis of gene expression changes and key pathways in experimental data.</p>
 <div id="steps-to-locate-gsea-module-in-genepattern" class="section level3" number="7.3.1">
 <h3>
 <span class="header-section-number">7.3.1</span> Steps to Locate GSEA Module in GenePattern:<a class="anchor" aria-label="anchor" href="#steps-to-locate-gsea-module-in-genepattern"><i class="fas fa-link"></i></a>
@@ -494,17 +494,17 @@ Show
 <li>Possible Insight: Upregulation of genes in this set could signify that differentiating cells are actively producing or transporting cholesterol to support membrane synthesis and cellular remodeling required for mature neuronal structures.</li>
 </ul></details>
 </div>
-<div id="section-4" class="section level4 unnumbered">
-<h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-4"><i class="fas fa-link"></i></a></h4>
+<div id="section-6" class="section level4 unnumbered">
+<h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-6"><i class="fas fa-link"></i></a></h4>
 <!-- ## FEA in [Reactome](https://reactome.org/) -->
 </div>
 </div>
 </div>
-<div id="fea-in-reactome" class="section level2" number="7.4">
+<div id="section-7" class="section level2" number="7.4">
 <h2>
-<span class="header-section-number">7.4</span> FEA in Reactome <a href="https://reactome.org/" target="_blank"><img src="images/reactome-logo.png" alt="Reactome Logo" style="height:35px; vertical-align:middle;"></a><a class="anchor" aria-label="anchor" href="#fea-in-reactome"><i class="fas fa-link"></i></a>
+<span class="header-section-number">7.4</span> <a href="https://reactome.org/" target="_blank"><img src="images/reactome-logo.png" alt="Reactome Logo" style="height:35px; vertical-align:middle;"></a><a class="anchor" aria-label="anchor" href="#section-7"><i class="fas fa-link"></i></a>
 </h2>
-<p>Reactome is an open-source database of curated biological pathways across species, offering pathway maps and enrichment tools to analyse gene lists in a pathway-focused context. It’s ideal for visualising data within established biochemical and cellular processes.</p>
+<p><a href="https://reactome.org/">Reactome</a> is an open-source database of curated biological pathways across species, offering pathway maps and enrichment tools to analyse gene lists in a pathway-focused context. It’s ideal for visualising data within established biochemical and cellular processes.</p>
 <div id="steps-to-perform-ora-in-reactome" class="section level3" number="7.4.1">
 <h3>
 <span class="header-section-number">7.4.1</span> Steps to perform ORA in Reactome:<a class="anchor" aria-label="anchor" href="#steps-to-perform-ora-in-reactome"><i class="fas fa-link"></i></a>
@@ -604,8 +604,8 @@ Figure 7.19: Pathway diagram - GSA
 Figure 7.20: Expression of top 30 pathways with ssGSEA
 </p>
 </div>
-<div id="section-5" class="section level4 unnumbered">
-<h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-5"><i class="fas fa-link"></i></a></h4>
+<div id="section-8" class="section level4 unnumbered">
+<h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-8"><i class="fas fa-link"></i></a></h4>
 </div>
 <div id="question-3" class="section level4 unnumbered rationale">
 <h4>
@@ -616,8 +616,8 @@ Figure 7.20: Expression of top 30 pathways with ssGSEA
 <p>- CAMERA (Correlation Adjusted Mean Rank)</p>
 <p>- ssGSEA (Single Sample Gene Set Enrichment Analysis)</p>
 </div>
-<div id="section-6" class="section level4 unnumbered">
-<h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-6"><i class="fas fa-link"></i></a></h4>
+<div id="section-9" class="section level4 unnumbered">
+<h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-9"><i class="fas fa-link"></i></a></h4>
 </div>
 </div>
 </div>
@@ -702,13 +702,13 @@ Figure 7.21: From RNA sequencing measurements to the final results: A practical 
       <ul class="nav navbar-nav">
 <li><a class="nav-link" href="#online-tools"><span class="header-section-number">7</span> Online Tools</a></li>
 <li>
-<a class="nav-link" href="#fea-in-gprofiler"><span class="header-section-number">7.1</span> FEA in gProfiler </a><ul class="nav navbar-nav">
+<a class="nav-link" href="#section-3"><span class="header-section-number">7.1</span></a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#steps-to-perform-ora-in-gprofiler"><span class="header-section-number">7.1.1</span> Steps to perform ORA in g:Profiler:</a></li>
-<li><a class="nav-link" href="#steps-to-perform-gsea-in-gprofiler"><span class="header-section-number">7.1.2</span> Steps to perform GSEA in g:Profiler:</a></li>
+<li><a class="nav-link" href="#steps-to-perform-gsea-style-analysis-in-gprofiler"><span class="header-section-number">7.1.2</span> Steps to perform GSEA-style analysis in g:Profiler:</a></li>
 </ul>
 </li>
 <li>
-<a class="nav-link" href="#fea-in-string"><span class="header-section-number">7.2</span> FEA in STRING </a><ul class="nav navbar-nav">
+<a class="nav-link" href="#section-5"><span class="header-section-number">7.2</span></a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#steps-to-perform-ora-in-string"><span class="header-section-number">7.2.1</span> Steps to Perform ORA in STRING:</a></li>
 <li><a class="nav-link" href="#browse-the-string-ora-results"><span class="header-section-number">7.2.2</span> Browse the STRING ORA Results</a></li>
 <li><a class="nav-link" href="#steps-to-perform-gsea-in-string"><span class="header-section-number">7.2.3</span> Steps to Perform GSEA in STRING:</a></li>
@@ -716,13 +716,13 @@ Figure 7.21: From RNA sequencing measurements to the final results: A practical 
 </ul>
 </li>
 <li>
-<a class="nav-link" href="#fea-in-genepattern"><span class="header-section-number">7.3</span> FEA in GenePattern </a><ul class="nav navbar-nav">
+<a class="nav-link" href="#or"><span class="header-section-number">7.3</span>  or </a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#steps-to-locate-gsea-module-in-genepattern"><span class="header-section-number">7.3.1</span> Steps to Locate GSEA Module in GenePattern:</a></li>
 <li><a class="nav-link" href="#steps-to-perform-gsea"><span class="header-section-number">7.3.2</span> Steps to Perform GSEA:</a></li>
 </ul>
 </li>
 <li>
-<a class="nav-link" href="#fea-in-reactome"><span class="header-section-number">7.4</span> FEA in Reactome </a><ul class="nav navbar-nav">
+<a class="nav-link" href="#section-7"><span class="header-section-number">7.4</span></a><ul class="nav navbar-nav">
 <li><a class="nav-link" href="#steps-to-perform-ora-in-reactome"><span class="header-section-number">7.4.1</span> Steps to perform ORA in Reactome:</a></li>
 <li><a class="nav-link" href="#steps-to-perform-gsa-in-reactome"><span class="header-section-number">7.4.2</span> Steps to perform GSA in Reactome:</a></li>
 <li><a class="nav-link" href="#browse-the-reactome-results"><span class="header-section-number">7.4.3</span> Browse the Reactome results</a></li>
@@ -752,7 +752,7 @@ Figure 7.21: From RNA sequencing measurements to the final results: A practical 
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Functional Enrichment Workshop</strong>" was written by Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP). It was last built on <span>“October 31, 2025”</span> <br><img src="logos.png" width="300" alt="Logo"><br>.</p>
+    <p>"<strong>Functional Enrichment Workshop</strong>" was written by Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP). It was last built on <span>“November 04, 2025”</span> <br><img src="logos.png" width="300" alt="Logo"><br>.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

@@ -65,14 +65,13 @@ schedule <- tibble::tibble(
     "Welcome and housekeeping",
     "Introduction to functional enrichment analysis",
     "Data acquisition & filtering gene list",
-    "Interactive Calculator <br> https://bioinformatics3.erc.monash.edu/rsconnect/content/241/",
+    "Interactive Calculator",
     "Morning break",
-    "gProfiler (https://biit.cs.ut.ee/gprofiler/gost)",
-    "STRING (https://string-db.org/)",
+    "gProfiler",
+    "STRING",
     "Lunch break",
-    "GSEA (https://www.gsea-msigdb.org/) <br>
-    (GenePattern) (https://cloud.genepattern.org/)",
-    "Reactome (https://reactome.org/)"
+    "GSEA",
+    "Reactome"
   ),
   `Time (mins)` = c(
     10,     # LP
