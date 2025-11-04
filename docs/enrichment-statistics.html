@@ -287,9 +287,91 @@ lower.tail = FALSE gives the probability of getting at least k successes (right-
 </ol>
 <div id="section-2" class="section level4 unnumbered">
 <h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-2"><i class="fas fa-link"></i></a></h4>
-
 </div>
 </div>
+</div>
+<div id="kolmogorovsmirnov-kslike-test" class="section level2" number="4.4">
+<h2>
+<span class="header-section-number">4.4</span> <span style="color:orange;">Kolmogorov–Smirnov (KS)–like Test</span><a class="anchor" aria-label="anchor" href="#kolmogorovsmirnov-kslike-test"><i class="fas fa-link"></i></a>
+</h2>
+<p>The Kolmogorov–Smirnov (KS)–like test is used in Functional Class Scoring approaches such as Gene Set Enrichment Analysis (GSEA) to test whether genes from a predefined set are non-randomly distributed near the top or bottom of a ranked list of all genes.</p>
+<p>This test computes a running-sum statistic as it walks down the ranked list:</p>
+<ul>
+<li><p>The running sum increases when a gene in the set is encountered (weighted by the strength of its rank statistic).</p></li>
+<li><p>It decreases when a gene not in the set is encountered.</p></li>
+<li><p>The maximum deviation from zero is the enrichment score (ES).</p></li>
+</ul>
+<p>The significance of the observed ES is then estimated by <em>permutation testing</em>, generating a null distribution to calculate p-values, followed by FDR correction for multiple comparisons.</p>
+<details><summary><em>Formula:</em>
+</summary><p>According to <a href="https://www.pnas.org/doi/full/10.1073/pnas.0506580102">Subramanian et al. (2005)</a>, the enrichment score is defined as:</p>
+<p><span class="math display">\[
+P_{\text{hit}}(S,i) = \sum_{\substack{g_j \in S \\ j \le i}} \frac{|r_j|^{p}}{N_R}
+\]</span></p>
+<p><span class="math display">\[
+P_{\text{miss}}(S,i) = \sum_{\substack{g_j \notin S \\ j \le i}} \frac{1}{N - N_H}
+\]</span></p>
+<p><span class="math display">\[
+\mathrm{ES}(S) = \max_i \big[ P_{\text{hit}}(i) - P_{\text{miss}}(i) \big]
+\]</span></p>
+<p>Explanation of the Terms:</p>
+<table class="table table-sm">
+<colgroup>
+<col width="39%">
+<col width="60%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Symbol</th>
+<th align="left">Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><span class="math inline">\(S\)</span></td>
+<td align="left">The gene set being tested (e.g., pathway or GO term).</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(L = \{ g_1, g_2, \dots, g_N \}\)</span></td>
+<td align="left">The ranked list of all genes, ordered by correlation with the phenotype.</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(g_j\)</span></td>
+<td align="left">The j-th gene in the ranked list.</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(r_j\)</span></td>
+<td align="left">The ranking metric for gene <span class="math inline">\(g_j\)</span> (e.g., signal-to-noise ratio, t-statistic, or correlation).</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(p\)</span></td>
+<td align="left">The weighting parameter (usually <span class="math inline">\(p = 1\)</span> in standard GSEA). Higher <span class="math inline">\(p\)</span> values emphasize genes with stronger correlations.</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(N_H = |S|\)</span></td>
+<td align="left">The number of genes in the gene set <span class="math inline">\(S\)</span>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(N\)</span></td>
+<td align="left">The total number of genes in the ranked list.</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(N_R = \sum_{g_j \in S} |r_j|^p\)</span></td>
+<td align="left">The normalization constant for the “hits” in the gene set.</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(P_{\text{hit}}(i)\)</span></td>
+<td align="left">The cumulative fraction of genes in <span class="math inline">\(S\)</span> found up to position <span class="math inline">\(i\)</span>.</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(P_{\text{miss}}(i)\)</span></td>
+<td align="left">The cumulative fraction of genes not in <span class="math inline">\(S\)</span> found up to position <span class="math inline">\(i\)</span>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(\mathrm{ES}(S)\)</span></td>
+<td align="left">The enrichment score, i.e., the maximum deviation between <span class="math inline">\(P_{\text{hit}}(i)\)</span> and <span class="math inline">\(P_{\text{miss}}(i)\)</span>. A positive ES indicates enrichment at the top of the ranked list; a negative ES indicates enrichment at the bottom.</td>
+</tr>
+</tbody>
+</table>
+<p><em>(Adapted from Subramanian et al., 2005, Proc. Natl. Acad. Sci. U.S.A. 102:15545–15550.)</em></p>
+</details>
 </div>
 </div>
   <div class="chapter-nav">
@@ -307,6 +389,7 @@ lower.tail = FALSE gives the probability of getting at least k successes (right-
 <li><a class="nav-link" href="#questions">Questions</a></li>
 </ul>
 </li>
+<li><a class="nav-link" href="#kolmogorovsmirnov-kslike-test"><span class="header-section-number">4.4</span> Kolmogorov–Smirnov (KS)–like Test</a></li>
 </ul>
 
       <div class="book-extra">

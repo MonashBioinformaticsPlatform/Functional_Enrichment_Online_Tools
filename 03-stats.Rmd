@@ -179,3 +179,57 @@ Yes, now corrected pval=0.017
 </details>
 
 ####  {-}
+
+## <span style="color:orange;">Kolmogorov–Smirnov (KS)–like Test</span>
+The Kolmogorov–Smirnov (KS)–like test is used in Functional Class Scoring approaches such as Gene Set Enrichment Analysis (GSEA) to test whether genes from a predefined set are non-randomly distributed near the top or bottom of a ranked list of all genes.
+
+This test computes a running-sum statistic as it walks down the ranked list:
+
+ - The running sum increases when a gene in the set is encountered (weighted by the strength of its rank statistic).
+
+ - It decreases when a gene not in the set is encountered.
+ 
+ - The maximum deviation from zero is the enrichment score (ES).
+ 
+The significance of the observed ES is then estimated by *permutation testing*, generating a null distribution to calculate p-values, followed by FDR correction for multiple comparisons.
+
+
+<details>
+<summary>*Formula:*</summary>
+
+According to [Subramanian et al. (2005)](https://www.pnas.org/doi/full/10.1073/pnas.0506580102), the enrichment score is defined as:
+
+$$
+P_{\text{hit}}(S,i) = \sum_{\substack{g_j \in S \\ j \le i}} \frac{|r_j|^{p}}{N_R}
+$$
+
+$$
+P_{\text{miss}}(S,i) = \sum_{\substack{g_j \notin S \\ j \le i}} \frac{1}{N - N_H}
+$$
+
+$$
+\mathrm{ES}(S) = \max_i \big[ P_{\text{hit}}(i) - P_{\text{miss}}(i) \big]
+$$
+
+Explanation of the Terms:
+
+| Symbol                               | Meaning                                                   |
+|:-------------------------------------|:----------------------------------------------------------|
+| \( S \)                              | The gene set being tested (e.g., pathway or GO term). |
+| \( L = \{ g_1, g_2, \dots, g_N \} \) | The ranked list of all genes, ordered by correlation with the phenotype. |
+| \( g_j \)                            | The j-th gene in the ranked list. |
+| \( r_j \)                            | The ranking metric for gene \( g_j \) (e.g., signal-to-noise ratio, t-statistic, or correlation). |
+| \( p \)                              | The weighting parameter (usually \( p = 1 \) in standard GSEA). Higher \( p \) values emphasize genes with stronger correlations. |
+| \( N_H = |S| \)                      | The number of genes in the gene set \( S \). |
+| \( N \)                              | The total number of genes in the ranked list. |
+| \( N_R = \sum_{g_j \in S} |r_j|^p \) | The normalization constant for the “hits” in the gene set. |
+| \( P_{\text{hit}}(i) \)              | The cumulative fraction of genes in \( S \) found up to position \( i \). |
+| \( P_{\text{miss}}(i) \)             | The cumulative fraction of genes not in \( S \) found up to position \( i \). |
+| \( \mathrm{ES}(S) \)                 | The enrichment score, i.e., the maximum deviation between \( P_{\text{hit}}(i) \) and \( P_{\text{miss}}(i) \). A positive ES indicates enrichment at the top of the ranked list; a negative ES indicates enrichment at the bottom. |
+
+*(Adapted from Subramanian et al., 2005, Proc. Natl. Acad. Sci. U.S.A. 102:15545–15550.)*
+
+</details>
+
+
+
