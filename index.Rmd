@@ -7,7 +7,7 @@ output: bookdown::bs4_book
 documentclass: book
 bibliography: [book.bib, packages.bib]
 description: |
-  A comprehensive guide to functional enrichment analysis using both online platforms and command-line tools.
+  A comprehensive guide to functional enrichment analysis using web-based platforms.
 link-citations: yes
 github-repo: "https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools"
 always_allow_html: true

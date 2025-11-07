@@ -5,15 +5,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 4 Enrichment Statistics | Functional Enrichment Workshop</title>
-<meta name="author" content="Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP)">
-<meta name="description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table like so:     ..in term  ..not in term  Total  ..in gene list  30...">
+<meta name="author" content="Monash Genomics and Bioinformatics Platform (MGBP)">
+<meta name="description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table, as shown below:     ..in term  ..not in term  Total  ..in gene...">
 <meta name="generator" content="bookdown 0.45 with bs4_book()">
 <meta property="og:title" content="Chapter 4 Enrichment Statistics | Functional Enrichment Workshop">
 <meta property="og:type" content="book">
-<meta property="og:description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table like so:     ..in term  ..not in term  Total  ..in gene list  30...">
+<meta property="og:description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table, as shown below:     ..in term  ..not in term  Total  ..in gene...">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Chapter 4 Enrichment Statistics | Functional Enrichment Workshop">
-<meta name="twitter:description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table like so:     ..in term  ..not in term  Total  ..in gene list  30...">
+<meta name="twitter:description" content="Making sense of gene and proteins lists with functional enrichment analysis  Enrichment statistics are based on a contingency table, as shown below:     ..in term  ..not in term  Total  ..in gene...">
 <!-- JS --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://kit.fontawesome.com/6ecbd6c532.js" crossorigin="anonymous"></script><script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet">
 <script src="libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script><script src="libs/bs3compat-0.9.0/transition.js"></script><script src="libs/bs3compat-0.9.0/tabs.js"></script><script src="libs/bs3compat-0.9.0/bs3compat.js"></script><link href="libs/bs4_book-1.0.0/bs4_book.css" rel="stylesheet">
@@ -49,7 +49,7 @@
 <li><a class="" href="introduction.html"><span class="header-section-number">3</span> Introduction</a></li>
 <li><a class="active" href="enrichment-statistics.html"><span class="header-section-number">4</span> Enrichment Statistics</a></li>
 <li><a class="" href="example-analysis.html"><span class="header-section-number">5</span> Example Analysis</a></li>
-<li><a class="" href="defining-the-genelist.html"><span class="header-section-number">6</span> Defining the genelist</a></li>
+<li><a class="" href="defining-the-gene-list.html"><span class="header-section-number">6</span> Defining the Gene List</a></li>
 <li><a class="" href="online-tools.html"><span class="header-section-number">7</span> Online Tools</a></li>
 <li><a class="" href="reporting-results.html"><span class="header-section-number">8</span> Reporting results</a></li>
 <li><a class="" href="resources.html"><span class="header-section-number">9</span> Resources</a></li>
@@ -65,7 +65,7 @@
 <h1>
 <span class="header-section-number">4</span> Enrichment Statistics<a class="anchor" aria-label="anchor" href="#enrichment-statistics"><i class="fas fa-link"></i></a>
 </h1>
-<p>Enrichment statistics are based on a contingency table like so:</p>
+<p>Enrichment statistics are based on a contingency table, as shown below:</p>
 <!-- | Gene | ..in term | ..not in term | Total | -->
 <!-- |:------------------:|----------:|--------------:|------:| -->
 <!-- | ..in gene list | 30 | 270 |   300 | -->
@@ -138,9 +138,9 @@ For example, there might have been an additional 5,000 genes (some of which coul
 <h2>
 <span class="header-section-number">4.1</span> <span style="color:orange;">Fisher’s Exact Test</span><a class="anchor" aria-label="anchor" href="#fishers-exact-test"><i class="fas fa-link"></i></a>
 </h2>
-<p>Fisher’s Exact Test is a statistical test used to determine if there are nonrandom associations between the proportions of two categorical variables. It calculates the exact probability of observing the given distribution of counts in a 2x2 contingency table, under the null hypothesis of no association between the variables.</p>
+<p>Fisher’s Exact Test is a statistical test used to determine whether there are non-random associations between the proportions of two categorical variables. It calculates the exact probability of observing the given distribution of counts in a 2x2 contingency table, under the null hypothesis of no association between the variables.</p>
 <blockquote>
-<p><em>Note:</em> This is just a toy calculator for this training, it is quite limited. You can also use some online tools like <a href="https://www.socscistatistics.com/tests/fisher/default2.aspx">Social Science Statistics</a> to play with.</p>
+<p><em>Note:</em> This is just a toy calculator for this training and is quite limited. You can also use some online tools like <a href="https://www.socscistatistics.com/tests/fisher/default2.aspx">Social Science Statistics</a> to play with.</p>
 </blockquote>
 <p><em>Formula</em>:
 <span class="math display">\[P = \frac{(a + b)!(c + d)!(a + c)!(b + d)!}{a!b!c!d!N!}\]</span></p>
@@ -195,9 +195,9 @@ For example, there might have been an additional 5,000 genes (some of which coul
 <h2>
 <span class="header-section-number">4.2</span> <span style="color:orange;">Hypergeometric Test</span><a class="anchor" aria-label="anchor" href="#hypergeometric-test"><i class="fas fa-link"></i></a>
 </h2>
-<p>Hypergeometric test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance. It models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).</p>
+<p>The hypergeometric test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance; it models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).</p>
 <blockquote>
-<p><em>Note:</em> Here is a tool by <a href="https://stattrek.com/online-calculator/hypergeometric">Stat Trek</a> to play around with the hypergeometric test.</p>
+<p><em>Note:</em> Here is a tool by <a href="https://stattrek.com/online-calculator/hypergeometric">Stat Trek</a> to experiment with the hypergeometric test.</p>
 </blockquote>
 <p><em>Formula:</em>
 <span class="math display">\[P(X = k) = \frac{\binom{K}{k} \binom{N - K}{n - k}}{\binom{N}{n}}\]</span>
@@ -211,8 +211,8 @@ Where:</p>
 <p>The parameters in our example:
 k=30; n=300; K=500; N=16000;</p>
 <p>Where:</p>
-<p>k−1 is the number of observed successes minus 1 (for the “at least” scenario).
-lower.tail = FALSE gives the probability of getting at least k successes (right-tail).</p>
+<p><code>k−1</code> is the number of observed successes minus 1 (for the “at least” scenario).
+Setting <code>lower.tail = FALSE</code> gives the probability of obtaining at least 𝑘 successes (right-tail).</p>
 <details><summary><em>R syntax</em>
 </summary><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Observed value</span></span>
@@ -237,7 +237,7 @@ lower.tail = FALSE gives the probability of getting at least k successes (right-
 <strong>Challenge:</strong> Interactive Calculator<a class="anchor" aria-label="anchor" href="#challenge-interactive-calculator"><i class="fas fa-link"></i></a>
 </h3>
 <p><a href="https://bioinformatics3.erc.monash.edu/rsconnect/content/241/"><em>Link to open toy enrichment calculator</em></a>.</p>
-<p>This calculates enrichment for a single hypothetical genelist (e.g. your RNAseq differentially expressed genelist) against a single hypothetical ‘term’ (some set of interesting genes, e.g. synaptic signaling genes). It makes a Venn diagram and a wordy description of what is being tested.</p>
+<p>This calculates enrichment for a single hypothetical gene list (e.g. your RNA-seq differentially expressed gene-list) against a single hypothetical ‘term’ (a set of interesting genes, e.g., synaptic signalling genes). It makes a Venn diagram and a wordy description of what is being tested.</p>
 <p>You can adjust various factors and see their effect on the enrichment p-values.</p>
 <div id="section-1" class="section level4 unnumbered">
 <h4 class="unnumbered"><a class="anchor" aria-label="anchor" href="#section-1"><i class="fas fa-link"></i></a></h4>
@@ -313,7 +313,7 @@ P_{\text{miss}}(S,i) = \sum_{\substack{g_j \notin S \\ j \le i}} \frac{1}{N - N_
 <p><span class="math display">\[
 \mathrm{ES}(S) = \max_i \big[ P_{\text{hit}}(i) - P_{\text{miss}}(i) \big]
 \]</span></p>
-<p>Explanation of the Terms:</p>
+<p>Explanation of the terms:</p>
 <table class="table table-sm">
 <colgroup>
 <col width="39%">
@@ -354,7 +354,7 @@ P_{\text{miss}}(S,i) = \sum_{\substack{g_j \notin S \\ j \le i}} \frac{1}{N - N_
 </tr>
 <tr class="even">
 <td align="left"><span class="math inline">\(N_R = \sum_{g_j \in S} |r_j|^p\)</span></td>
-<td align="left">The normalization constant for the “hits” in the gene set.</td>
+<td align="left">The normalisation constant for the “hits” in the gene set.</td>
 </tr>
 <tr class="odd">
 <td align="left"><span class="math inline">\(P_{\text{hit}}(i)\)</span></td>
@@ -407,7 +407,7 @@ P_{\text{miss}}(S,i) = \sum_{\substack{g_j \notin S \\ j \le i}} \frac{1}{N - N_
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Functional Enrichment Workshop</strong>" was written by Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP). It was last built on <span>“November 06, 2025”</span> <br><img src="logos.png" width="300" alt="Logo"><br>.</p>
+    <p>"<strong>Functional Enrichment Workshop</strong>" was written by Monash Genomics and Bioinformatics Platform (MGBP). It was last built on <span>“November 07, 2025”</span> <br><img src="logos.png" width="300" alt="Logo"><br>.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

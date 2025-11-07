@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Chapter 7 Online Tools | Functional Enrichment Workshop</title>
-<meta name="author" content="Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP)">
+<meta name="author" content="Monash Genomics and Bioinformatics Platform (MGBP)">
 <meta name="description" content="Making sense of gene and proteins lists with functional enrichment analysis  Functional enrichment analysis can be performed using various web-based tools, each of which is designed to meet...">
 <meta name="generator" content="bookdown 0.45 with bs4_book()">
 <meta property="og:title" content="Chapter 7 Online Tools | Functional Enrichment Workshop">
@@ -49,7 +49,7 @@
 <li><a class="" href="introduction.html"><span class="header-section-number">3</span> Introduction</a></li>
 <li><a class="" href="enrichment-statistics.html"><span class="header-section-number">4</span> Enrichment Statistics</a></li>
 <li><a class="" href="example-analysis.html"><span class="header-section-number">5</span> Example Analysis</a></li>
-<li><a class="" href="defining-the-genelist.html"><span class="header-section-number">6</span> Defining the genelist</a></li>
+<li><a class="" href="defining-the-gene-list.html"><span class="header-section-number">6</span> Defining the Gene List</a></li>
 <li><a class="active" href="online-tools.html"><span class="header-section-number">7</span> Online Tools</a></li>
 <li><a class="" href="reporting-results.html"><span class="header-section-number">8</span> Reporting results</a></li>
 <li><a class="" href="resources.html"><span class="header-section-number">9</span> Resources</a></li>
@@ -72,7 +72,7 @@
 <h2>
 <span class="header-section-number">7.1</span> <a href="https://biit.cs.ut.ee/gprofiler/gost" target="_blank"><img src="images/gp2-logo-new.png" alt="g:Profiler Logo" style="height:35px; vertical-align:middle;"></a><a class="anchor" aria-label="anchor" href="#section-3"><i class="fas fa-link"></i></a>
 </h2>
-<p><a href="https://biit.cs.ut.ee/gprofiler/gost">gProfiler</a> is known for its integration of numerous species and databases. It supports both ORA and GSEA, enabling users to assess Gene Ontology (GO), biological pathways, regulatory motifs and protein databases. With gProfile one can</p>
+<p><a href="https://biit.cs.ut.ee/gprofiler/gost">gProfiler</a> is known for its integration of numerous species and databases. It supports both ORA and GSEA, enabling users to assess Gene Ontology (GO), biological pathways, regulatory motifs and protein databases. With gProfiler one can</p>
 <div id="steps-to-perform-ora-in-gprofiler" class="section level3" number="7.1.1">
 <h3>
 <span class="header-section-number">7.1.1</span> Steps to perform ORA in g:Profiler:<a class="anchor" aria-label="anchor" href="#steps-to-perform-ora-in-gprofiler"><i class="fas fa-link"></i></a>
@@ -80,7 +80,7 @@
 <p><span style="color:orange;">- Prepare Input List:</span> Ensure your input is formatted as one gene per line or in a suitable format for g:Profiler.</p>
 <p><span style="color:orange;">- Input Gene List:</span> Paste your prepared gene list directly into the input box on the g:Profiler web page or upload a file containing your list.</p>
 <p><span style="color:orange;">- Select Organism:</span> Choose the appropriate organism from the <code>Organism</code> dropdown menu (e.g., <em>Homo sapiens</em> for human data).</p>
-<p><span style="color:orange;">- Choose Statistical Domain Scope:</span> Under <code>Advanced options</code>, select your preferred statistical background from the <code>Statistical domain scope</code> menu.If you choose “Custom” background, provide your custom background list by pasting or uploading the relevant file.</p>
+<p><span style="color:orange;">- Choose Statistical Domain Scope:</span> Under <code>Advanced options</code>, select your preferred statistical background from the <code>Statistical domain scope</code> menu. If you choose “Custom” background, provide your custom background list by pasting or uploading the relevant file.</p>
 <p><span style="color:orange;">- Set Significance Threshold:</span> Select the desired significance threshold method, such as <em>g:SCS</em>, <em>Bonferroni</em>, or <em>Benjamini-Hochberg</em>.
 - Specify the threshold value (e.g., 0.05, 0.1, etc.).</p>
 <p><span style="color:orange;">- Select Functional Annotation Databases: </span> Navigate to the <code>Data sources</code> tab and choose one or more databases for analysis. Available options include:</p>
@@ -176,7 +176,7 @@ This section includes specifics about the input data, including the total number
 <p><span style="color:orange;">- Input Gene List:</span> Paste your prepared gene list directly into the input box on the STRING web page or upload a file containing your list.</p>
 <p><span style="color:orange;">- Select Organism:</span> Choose the appropriate organism from the <code>Organisms</code> dropdown menu (e.g., <em>Homo sapiens</em> for human data). STRING would auto-detect the organism if ENSEMBL IDs provided.</p>
 <p><span style="color:orange;">- Modify Settings:</span> Under <code>Advanced Settings</code>, you can modify <code>Required score</code> from low (0.15) to highest (0.9) confidence. Similarly <code>FDR stringency</code> and <code>Network type</code> can be selected.</p>
-<p>NOTE: In cases where long list of features is provided, STRING may chnage some of its settings so that:</p>
+<p>NOTE: In cases where long list of features is provided, STRING may change some of its settings so that:</p>
 <ul>
 <li>the nodes will have a simplified (not 3D) design</li>
 <li>previews of protein structures are not shown</li>
@@ -218,7 +218,7 @@ Figure 7.2: Nodes and edges colour-coded
 <h4>
 <span class="header-section-number">7.2.2.3</span> Settings<a class="anchor" aria-label="anchor" href="#settings"><i class="fas fa-link"></i></a>
 </h4>
-<p>In the <code>Settings</code> tab of the STRING results, users have the flexibility to adjust existing settings and apply new filters to customise their data view and analysis. This tab you to switch between network types, strengths, data sources, intertaction scores and more.</p>
+<p>In the <code>Settings</code> tab of the STRING results, users have the flexibility to adjust existing settings and apply new filters to customise their data view and analysis. This tab you to switch between network types, strengths, data sources, interaction scores and more.</p>
 </div>
 <div id="analysis" class="section level4" number="7.2.2.4">
 <h4>
@@ -232,7 +232,7 @@ The first number indicates how many proteins in your network are annotated with 
 <p><span style="color:orange;">- Strength:</span>
 Log10(observed / expected). This measure describes how large the enrichment effect is. It’s the ratio between i) the number of proteins in your network that are annotated with a term and ii) the number of proteins that we expect to be annotated with this term in a random network of the same size.</p>
 <p><span style="color:orange;">- Signal:</span>
-The signal is defined as a weighted harmonic mean between the observed/expected ratio and -log(FDR). FDR tends to emphasise larger terms due to their potential for achieving lower p-values, while the observed/expected ratio highlights smaller terms, which have a high foreground to background ratio but cannot achieve low FDR values due to their size. The signal measure seeks to balance both metrics for a more intuittive ordering of enriched terms.</p>
+The signal is defined as a weighted harmonic mean between the observed/expected ratio and -log(FDR). FDR tends to emphasise larger terms due to their potential for achieving lower p-values, while the observed/expected ratio highlights smaller terms, which have a high foreground to background ratio but cannot achieve low FDR values due to their size. The signal measure seeks to balance both metrics for a more intuitive ordering of enriched terms.</p>
 <p><span style="color:orange;">- False Discovery Rate:</span>
 This measure describes how significant the enrichment is. Shown are p-values corrected for multiple testing within each category using the Benjamini–Hochberg procedure.</p>
 <p>STRING visualises terms within each category using a bubble plot, effectively showcasing the significance and size of enriched terms. Additionally, it renders groups of related terms based on a user-defined similarity level, allowing users to identify clusters of functionally related terms within the data. This helps in interpreting complex enrichment results and highlighting key biological processes or pathways that are closely associated.</p>
@@ -243,7 +243,7 @@ This measure describes how significant the enrichment is. Shown are p-values cor
 Figure 7.3: Functional enrichment visualisation with STRING
 </p>
 </div>
-Towards the the bottom of the <code>Analysis</code> page, one can change the background including adding one of their own.
+Towards the bottom of the <code>Analysis</code> page, one can change the background including adding one of their own.
 <!-- ![Statistical background](images/string-statistical-background.png){ width=100% } -->
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-20"></span>
@@ -265,8 +265,8 @@ Figure 7.4: Statistical background
 </h4>
 <p>The <code>Clusters</code> tab essentially provides three different types of clustering algorithms:</p>
 <ul>
-<li><p>k-means clustering: Initialise <em>k</em> centroids randomly, assigns each data point to the nearest centroid, recompute the centroids as the mean of all points in a cluster until until centroids do not change significantly.</p></li>
-<li><p>MCL clustering (Markov clustering): is a graph-based algorithm that uses flow simulation to detect clusters in a network by modeling random walks.</p></li>
+<li><p>k-means clustering: Initialises <em>k</em> centroids randomly, assigns each data point to the nearest centroid, recomputes the centroids as the mean of all points in a cluster until centroids do not change significantly.</p></li>
+<li><p>MCL clustering (Markov clustering): is a graph-based algorithm that uses flow simulation to detect clusters in a network by modelling random walks.</p></li>
 <li><p>DBSCAN clustering: is a density-based algorithm that groups points closely packed together while marking points in low-density regions as outliers or noise</p></li>
 </ul>
 <!-- ![](images/string-clusters.png) --><div class="figure" style="text-align: center">
@@ -288,7 +288,7 @@ Figure 7.5: Network clustering in STRING
 <h3>
 <span class="header-section-number">7.2.3</span> Steps to Perform GSEA in STRING:<a class="anchor" aria-label="anchor" href="#steps-to-perform-gsea-in-string"><i class="fas fa-link"></i></a>
 </h3>
-<p><span style="color:orange;">- Selcet Proteins with Values/Ranks.</span></p>
+<p><span style="color:orange;">- Select Proteins with Values/Ranks.</span></p>
 <p><span style="color:orange;">- Input Gene List:</span> Paste your gene list with a meaningful value for ranking (fold-change, log-pvalue, abundance, …) directly into the input box on the STRING web page or upload a file containing your list of features and their corresponding values.</p>
 <p><span style="color:orange;">- Select Organism:</span> Same as above.</p>
 <p><span style="color:orange;">- Advanced Setting:</span> FDR stringency and the initial sort order can be set up in advance and hit the Search.</p>
@@ -374,7 +374,7 @@ Figure 7.11: Browse GSEA module in GenePattern
 <p>- Load the <code>.gct</code> input file in the <code>expression dataset</code> tab and <code>.cls</code> file in the <code>phenotype labels</code> tab</p>
 <p>- Select a <code>.gmt</code> file (Gene Matrix Transposed) from the <code>gene sets database</code> tab</p>
 <p>- Set permutation under <code>number of permutations</code> tab</p>
-<p>- Type of the permuattaion to be set under <code>permutation type</code> tab</p>
+<p>- Type of the permutation to be set under <code>permutation type</code> tab</p>
 <p>- Select an appropriate DNA Chip annotation file from <code>chip platform file</code> tab</p>
 <p>- Name the output file in <code>output file name</code> tab</p>
 <ol start="2" style="list-style-type: decimal">
@@ -385,7 +385,7 @@ Figure 7.11: Browse GSEA module in GenePattern
 <li><p>K-S: The score increment is the same for all genes in <em>S</em> regardless of their ranking or correlation strength.</p></li>
 <li><p>WEighted: the score increment for each gene in <em>S</em> is weighted by its correlation with the phenotype, typically the absolute value of the correlation or ranking metric.</p></li>
 </ul>
-<p>- Metric for ranking genes: Ranking metric of interest can be chosen from drop down menu. A detailed description od the metrics is given on <a href="https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/#metrics-for-ranking-genes">GSEA-MSigDB Documentation</a>.</p>
+<p>- Metric for ranking genes: Ranking metric of interest can be chosen from drop down menu. A detailed description of the metrics is given on <a href="https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/#metrics-for-ranking-genes">GSEA-MSigDB Documentation</a>.</p>
 <ul>
 <li><p>Categorical Phenotypes: Signal-to-Noise Ratio, t-Test, Ratio of Classes, Log2 Ratio of Classes</p></li>
 <li><p>Continuous Phenotypes: Pearson Correlation, Spearman Correlation</p></li>
@@ -396,7 +396,7 @@ Figure 7.11: Browse GSEA module in GenePattern
 <h4>
 <span class="header-section-number">7.3.2.1</span> Browse the GSEA results<a class="anchor" aria-label="anchor" href="#browse-the-gsea-results"><i class="fas fa-link"></i></a>
 </h4>
-<p>Once the job has been queued and successfully run, the output will be listd on the left panel under <code>Jobs</code> tab:</p>
+<p>Once the job has been queued and successfully run, the output will be listed on the left panel under <code>Jobs</code> tab:</p>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-28"></span>
 <img src="images/GenePattern-Jobs.png" alt="Job status in GenePattern"><p class="caption">
@@ -530,7 +530,7 @@ Figure 7.14: Analysis Tools in Reactome
 <ul>
 <li><p>Upload list of features on the box or choose a file, hit continue</p></li>
 <li>
-<p>Select prefered options:</p>
+<p>Select preferred options:</p>
 <p>- Project to Human: This option will convert identifiers from non-human species into human equivalents, allowing you to analyse data across species.</p>
 <p>- Include interactors: This option integrates interactors from IntAct, a protein interaction database. Including interactors broadens the background network, potentially offering deeper insights.</p>
 </li>
@@ -546,12 +546,12 @@ Figure 7.14: Analysis Tools in Reactome
 </ul>
 <div class="figure" style="text-align: center">
 <span style="display:block;" id="fig:unnamed-chunk-32"></span>
-<img src="images/reactome-gsea-methods.png" alt="Ractome GSA " width="100%"><p class="caption">
-Figure 7.15: Ractome GSA
+<img src="images/reactome-gsea-methods.png" alt="Reactome GSA " width="100%"><p class="caption">
+Figure 7.15: Reactome GSA
 </p>
 </div>
 <ul>
-<li><p>Lets try CAMERA as it represents the <code>camera()</code> function of <code>limma</code> package in <code>R</code> for a gene set analysis.</p></li>
+<li><p>Let’s try CAMERA as it represents the <code>camera()</code> function of <code>limma</code> package in <code>R</code> for a gene set analysis.</p></li>
 <li><p>Choose TMM normalisation to ensure consistency with the input data used in other tools within our workshop.</p></li>
 <li><p>Select data type and provide input data</p></li>
 </ul>
@@ -642,8 +642,8 @@ Figure 7.21: From RNA sequencing measurements to the final results: A practical 
 </ol>
 <p>- ORA methods are the least complex among the three approaches of FEA.</p>
 <p>- ORA methods requires a list of differentially expressed genes that are already analysed in differential expression analysis.</p>
-<p>- The background population, the universe, can be a more general set of gene like those in human genome or more specific from thos observed in an experiment.</p>
-<p>- A contingency table is created and the null distribution is modeled using the hypergeometric distribution.</p>
+<p>- The background population, the universe, can be a more general set of genes, like those in the human genome or more specific from those observed in an experiment.</p>
+<p>- A contingency table is created and the null distribution is modelled using the hypergeometric distribution.</p>
 <ol start="2" style="list-style-type: decimal">
 <li><strong>FCS</strong></li>
 </ol>
@@ -681,11 +681,11 @@ Figure 7.21: From RNA sequencing measurements to the final results: A practical 
 <li>
 <p>Set Technical Parameters:</p>
 <p>- Fix technical parameters like the random seed and number of permutations before running the analysis to ensure reproducibility.</p>
-<p>- Avoid adjusting these parameters to obtain favorable results.</p>
+<p>- Avoid adjusting these parameters to obtain favourable results.</p>
 </li>
 <li>
 <p>Avoid Cherry-picking:</p>
-<p>- Refrain from selectively reporting results based on favorable outcomes, as this can lead to over-optimistic and non-reproducible findings.</p>
+<p>- Refrain from selectively reporting results based on favourable outcomes, as this can lead to over-optimistic and non-reproducible findings.</p>
 <p>- Avoid excessive tweaking of the analysis strategy to fit the data post hoc.</p>
 </li>
 <li><p>Use different pipelines or parameter configurations as part of sensitivity analysis to check the consistency of results.</p></li>
@@ -695,7 +695,7 @@ Figure 7.21: From RNA sequencing measurements to the final results: A practical 
 </div>
 </div>
   <div class="chapter-nav">
-<div class="prev"><a href="defining-the-genelist.html"><span class="header-section-number">6</span> Defining the genelist</a></div>
+<div class="prev"><a href="defining-the-gene-list.html"><span class="header-section-number">6</span> Defining the Gene List</a></div>
 <div class="next"><a href="reporting-results.html"><span class="header-section-number">8</span> Reporting results</a></div>
 </div></main><div class="col-md-3 col-lg-2 d-none d-md-block sidebar sidebar-chapter">
     <nav id="toc" data-toggle="toc" aria-label="On this page"><h2>On this page</h2>
@@ -752,7 +752,7 @@ Figure 7.21: From RNA sequencing measurements to the final results: A practical 
 <footer class="bg-primary text-light mt-5"><div class="container"><div class="row">
 
   <div class="col-12 col-md-6 mt-3">
-    <p>"<strong>Functional Enrichment Workshop</strong>" was written by Australian Biocommons, Sydney Informatics Hub (USYD) and Monash Genomics and Bioinformatics Platform (MGBP). It was last built on <span>“November 06, 2025”</span> <br><img src="logos.png" width="300" alt="Logo"><br>.</p>
+    <p>"<strong>Functional Enrichment Workshop</strong>" was written by Monash Genomics and Bioinformatics Platform (MGBP). It was last built on <span>“November 07, 2025”</span> <br><img src="logos.png" width="300" alt="Logo"><br>.</p>
   </div>
 
   <div class="col-12 col-md-6 mt-3">

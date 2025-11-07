@@ -82,7 +82,7 @@ example-analysis
 sh-sy5y-differentiation
 the-question-what-pathways-are-involved-in-sh-sy5y-differentiation
 the-data-differentially-expressed-genes
-defining-the-genelist
+defining-the-gene-list
 activities
 common-gotcha
 example
