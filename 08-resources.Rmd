@@ -6,7 +6,7 @@
 
 <!-- ----- -->
 
-The following tools might be useful for downstream functional analysis; this includes some not covered in todays workshop. 
+The following tools might be useful for downstream functional analysis; this includes some not covered in today's workshop. 
 
 <!-- https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/shsy5ydiff.png) 
 http://localhost:1313/enrichment_analysis_workshop/img/david.png
@@ -18,7 +18,7 @@ Note that most of these tools do more than just enrichment tests, and some inclu
 
 https://biit.cs.ut.ee/gprofiler/gost
 
-The `g:GOSt` 'functional profiling' tool of `gProfiler`calculates functional enrichment for gene lists, identifying enriched terms across various ontologies and pathways. 
+The `g:GOSt` "functional profiling" tool of `gProfiler` calculates functional enrichment for gene lists, identifying enriched terms across various ontologies and pathways. 
 It features a clean, modern interface and provides a handy summary highlighting which genes contribute to the enrichment.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/gprofiler.png) -->
@@ -31,7 +31,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 http://www.pantherdb.org/
 
-PANTHER performs overrepresentation tests across multiple databases; Gene ontology, reactome, PANTHER pathways and protein classes. Allows more control over the statistical test used and clearly summarises what was actually done.
+PANTHER performs over-representation tests across multiple databases; Gene ontology, Reactome, PANTHER pathways and protein classes. It allows greater control over the statistical test used and clearly summarises what was performed.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/panther.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="PANTHER"} 
@@ -43,7 +43,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 https://david.ncifcrf.gov/
 
-Via its 'functional annotation' tool, DAVID allows you to calculate functional enrichment across a number of databases ; Gene Ontology, KEGG, reactome and others. Reliable, with a slightly clunky interface.
+Via its 'functional annotation' tool, DAVID allows you to calculate functional enrichment across a number of databases, including Gene Ontology, KEGG, Reactome, and others. Reliable, with a slightly clunky interface.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/david.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="DAVID"} 
@@ -55,7 +55,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 https://amp.pharm.mssm.edu/Enrichr/
 
-Enrichr easily calculates enrichment across a wide range of databases. Currently does allow for a background set. 
+Enrichr easily calculates enrichment across a wide range of databases. It currently allows for a background set. 
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/enrichr.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="Enrichr"} 
@@ -68,7 +68,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 https://reactome.org/
 
-The core of reactome is the reactome pathways and browser. ALthough other tools use the reactome database, the reactome website provides a means to browse enrichment within the pathway browser view.
+The core of Reactome is the Reactome Pathway Browser. Although other tools use the Reactome database, the Reactome website provides a means to browse enrichment within the pathway browser view.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/reactome.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="Reactome"} 
@@ -76,11 +76,11 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 ```
 
 
-## Biocyc
+## BioCyc
 
 https://biocyc.org/
 
-Biocyc is another suite of tools for enrichment and pathway browsing, which is particularly useful for prokaryotic work. It is licensed, but Monash does have a license.
+BioCyc is another suite of tools for enrichment and pathway browsing, particularly useful for prokaryotic studies. It is a licensed resource, but Monash holds an institutional licence.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/biocyc.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="Biocyc"} 
@@ -103,7 +103,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 http://geneontology.org/
 
-Gene Ontology (GO) terms are the most widely use set of functional annotations, used by many enrichment tools. The gene ontology resource website itself provides several tools for browsing the GO term hierarchy.
+Gene Ontology (GO) terms are the most widely used set of functional annotations, used by many enrichment tools. The Gene Ontology resource website itself provides several tools for browsing the GO term hierarchy.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/go.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="Gene Ontology"} 
@@ -114,7 +114,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 https://www.genome.jp/kegg/
 
-A well known curated pathway database. It is used by many other tools but with a caveat - KEGG moved to a subscription model in 2011, and so enrichment tools need to use the last open release from 2011. However up to date KEGG pathways are browsable directly through their website. 
+A well-known curated pathway database. It is used by many other tools but with a caveat - KEGG moved to a subscription model in 2011, and so enrichment tools need to use the last open release from 2011. However, up-to-date KEGG pathways are browsable directly through their website. 
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/kegg.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="KEGG"} 
@@ -126,7 +126,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 http://software.broadinstitute.org/gsea/index.jsp
 
-The GSEA Desktop is (one of many) gene set enrichment approaches. It uses of gene rankings across all genes rather than hypogeometric or fishers-exact tests of gene list enrichment.  MSigDB (Molecular signatures database) is a suite of annotation databases suitable for GSEA analysis.
+The GSEA Desktop is (one of many) gene set enrichment approaches. It uses gene rankings across all genes rather than hypergeometric or Fisher's exact tests of gene list enrichment. MSigDB (Molecular signatures Database) is a suite of annotation databases suitable for GSEA analysis.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/gsea.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="MSigDB"} 
@@ -135,7 +135,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 
 ## MetaboAnalyst
-MetaboAnalyst is popular among the metabolomics community for statistical, functional and integrative analysis of metabolomics data. It has a feature called **Functional enrichment analysis**, which performs metabolite set enrichment analysis, metabolic pathway analysis, and pathway activity prediction from MS peaks.
+MetaboAnalyst is popular among the metabolomics community for statistical, functional, and integrative analyses of metabolomics data. It has features such as **Enrichment Analysis**, **Pathway Analysis**, and **Network Analysis**, which perform metabolite set enrichment, metabolic pathway analysis, and pathway activity prediction from MS peaks.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/metaboanalyst.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="MetaboAnalyst"} 
@@ -146,7 +146,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 https://cytoscape.org/
 
-Cytoscape is a desktop-based biological network analysis / visualisation tool, rather than a functional enrichment tool (although plugins can change that). It is mentioned here because it is often useful as a next step when you need to create custom figures showing the interactions of an interesting biological pathway. 
+Cytoscape is a desktop-based biological network analysis and visualisation tool, rather than a functional enrichment tool (although plugins can extend its functionality). It is mentioned here because it is often useful as a next step when you need to create custom figures showing the interactions of an interesting biological pathway. 
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/cytoscape.png) -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "centre", fig.cap="Cytoscape"} 

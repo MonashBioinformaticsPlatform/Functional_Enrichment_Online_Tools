@@ -1,10 +1,10 @@
 # Overview
 
-## Functional analysis of -Omics data
+## Functional Analysis of -Omics Data
 
-### General information
+### General Information
 
-The workshop covers the bioinformatics concepts and tools available for interpreting a gene list using gene ontology and pathway information. The workshop focuses on the principles and concepts required for analysing and conducting functional and pathway analysis on a gene list from any organism, although the focus will be on human and model eukaryotic organisms.
+The workshop covers the bioinformatics concepts and tools for interpreting a gene list using Gene Ontology and pathway information. The workshop focuses on the principles and concepts required for analysing and conducting functional and pathway analyses on a gene list from any organism, although the focus will be on human and model eukaryotic organisms.
 
 ### Course Objectives
 
@@ -12,21 +12,21 @@ Participants will gain practical experience and skills to be able to:
 
 -   Understand basic concepts of functional enrichment analysis;
 -   Interpret enrichment analysis results;
--   Get systems perspective of gene functions;
--   Get more information about a gene list;
--   Discover what pathways are enriched in a gene list (and use it for hypothesis generation);
+-   Gain systems perspective of gene functions;
+-   Obtain more information about a gene list;
+-   Discover which pathways are enriched in a gene list (and use this information for hypothesis generation);
 -   Predict gene function and extend a gene list;
--   Follow workflow after the workshop to conduct their own analysis.
+-   Follow the workflow after the workshop to conduct their own analyses.
 
 ### Target Audience
 
-This workshop is intended for biologists working with ‘-Omics data’ (e.g. RNA-Seq, protein expression), who are interested in interpreting large gene/protein lists resulting from their experiments.
+This workshop is intended for biologists working with ‘-Omics data’ (e.g., RNA-seq, protein expression), who are interested in interpreting large gene/protein lists resulting from their experiments.
 
 ### Setup Requirements
 
 This workshop will be delivered in-person. It is recommended to install the [GSEA](https://www.gsea-msigdb.org/) and [Cytoscape](https://cytoscape.org/) software.
 
-Links and material are provided on `resources` page.
+Links and materials are provided on the `Resources` page.
 
 BYO coffee :)
 
@@ -104,7 +104,7 @@ kable(schedule, "html", escape = FALSE) %>%
 
 ### Abbreviations
 
--   **LP**: Laura Perlaza-Jimenez
+-   **LP**: Laura Perlaza-Jiménez
 -   **HK**: Hossein Valipour Kahrood
 -   **GI**: Giulia Iacono
 -   **SA**: Stuart Archer

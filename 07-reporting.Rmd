@@ -1,24 +1,24 @@
 # Reporting results
 
 
-Once we have done an enrichment analysis - how to communicate the results? Like everything - it depends what you need to say. Some examples are below.
+Once we have performed an enrichment analysis, how should we communicate the results? As with everything, it depends on what you need to convey. Some examples are below.
 
 ## In text
 
 If you just need to emphasise that the differential expression relates to a condition of interest, you don't need much:
 
-> Genes differentially expressed after SH-SY5Y cell differentiation were enriched for GO term "regulation of neurogenesis", adjusted pval < 0.01).
+> Genes differentially expressed after SH-SY5Y cell differentiation were enriched for the GO term “regulation of neurogenesis” (adjusted p-value < 0.01).
 
-And in the methods:
+In the methods section:
 
-> Enrichment calculated for differentially expressed genes with the g:GOSt enrichment tool [(Raudvere et al, 2019)](https://academic.oup.com/nar/article/47/W1/W191/5486750) using a background of tested genes.
+> Enrichment was calculated for differentially expressed genes using the g:GOSt enrichment tool [(Raudvere et al, 2019)](https://academic.oup.com/nar/article/47/W1/W191/5486750) using a background of tested genes.
 
 
 ## As a table
 
-For a more complete view, a table of the significant or top _n_ terms can be useful. E.g In a supplementary figure 
+For a more complete view, a table of the significant or top _n_ terms can be useful. e.g., in a supplementary figure. 
 
-The top 10 enriched GO terms for the differentially expressed genes;
+The top 10 enriched GO terms for the differentially expressed genes are shown below:
 
 | GO:BP Term                               | Term ID    | Adjusted p-value | Term Size | Num DE Genes      |
 |------------------------------------------|------------|-----------------:|----------:|------------------:|
@@ -37,10 +37,10 @@ The top 10 enriched GO terms for the differentially expressed genes;
 
 ## As a figure
 
-Plots of -log p-value are a popular option for a figure. By taking the exponent of the p-value bigger bars indicate more significance.
+Plots of –log(p-value) are a popular option for figures. By taking the negative logarithm of the p-value, larger bars indicate greater significance.
 
-For instance, this figure is taken from the [(Pezzini et al. 2017)](https://link.springer.com/article/10.1007%2Fs10571-016-0403-y) paper. 
-Note that in this figure shows 2 specifics categories from the IPA (ingenuity) database using the IPA tool (not covered here), so the terms themselves differ. 
+For instance, the following figure is taken from the [(Pezzini et al. 2017)](https://link.springer.com/article/10.1007%2Fs10571-016-0403-y) paper. 
+Note that this figure shows two specific categories from the IPA (Ingenuity Pathway Analysis) database using the IPA tool (not covered here), so the terms differ.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/NegLogPvalPlot_Pezzini2017.png) -->
 ```{r, out.width="90%", fig.align='center'}
@@ -48,8 +48,8 @@ Note that in this figure shows 2 specifics categories from the IPA (ingenuity) d
 knitr::include_graphics("images/NegLogPvalPlot_Pezzini2017.png")
 ```
 
-You can also build on such a plot with number of genes and the like. For an example, see the 'bubble' chart produced by a package called pathfindR here: https://www.biostars.org/p/322415/
+You can also enhance such plots by including the number of genes and other attributes. For an example, see the "bubble" chart produced by the R package `pathfindR`: https://www.biostars.org/p/322415/
 
 ----
 
-There are also tools like cluego (a cytoscape plugin) that build enriched terms into a network : http://apps.cytoscape.org/apps/cluego
+There are also tools like ClueGO (a Cytoscape plugin) that build enriched terms into a network : http://apps.cytoscape.org/apps/cluego

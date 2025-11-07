@@ -2,7 +2,7 @@
 
 
 
-Enrichment statistics are based on a contingency table like so:
+Enrichment statistics are based on a contingency table, as shown below:
 
 <!-- | Gene | ..in term | ..not in term | Total | -->
 <!-- |:------------------:|----------:|--------------:|------:| -->
@@ -49,10 +49,10 @@ For example, there might have been an additional 5,000 genes (some of which coul
 
 ## <span style="color:orange;">Fisher's Exact Test</span>
 
-Fisher's Exact Test is a statistical test used to determine if there are nonrandom associations between the proportions of two categorical variables. It calculates the exact probability of observing the given distribution of counts in a 2x2 contingency table, under the null hypothesis of no association between the variables.
+Fisher’s Exact Test is a statistical test used to determine whether there are non-random associations between the proportions of two categorical variables. It calculates the exact probability of observing the given distribution of counts in a 2x2 contingency table, under the null hypothesis of no association between the variables.
 
 
-> _Note:_ This is just a toy calculator for this training, it is quite limited. You can also use some online tools like [Social Science Statistics](https://www.socscistatistics.com/tests/fisher/default2.aspx) to play with.
+> _Note:_ This is just a toy calculator for this training and is quite limited. You can also use some online tools like [Social Science Statistics](https://www.socscistatistics.com/tests/fisher/default2.aspx) to play with.
 
 *Formula*:
 $$P = \frac{(a + b)!(c + d)!(a + c)!(b + d)!}{a!b!c!d!N!}$$
@@ -92,10 +92,10 @@ fisher.test(data, alternative = "g") # greater or "less"
 ## <span style="color:orange;">Hypergeometric Test</span>
 
 
-Hypergeometric test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance. It models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).
+The hypergeometric test calculates the probability of observing the given number of genes from a specific category (e.g., a pathway) in the gene list (differentially expressed genes) by chance; it models the situation where you draw a sample (the gene list) from a finite population (the background of all genes), and success is defined as a gene being in the category (e.g., belonging to the pathway).
 
 
-> _Note:_ Here is a tool by [Stat Trek](https://stattrek.com/online-calculator/hypergeometric) to play around with the hypergeometric test.
+> _Note:_ Here is a tool by [Stat Trek](https://stattrek.com/online-calculator/hypergeometric) to experiment with the hypergeometric test.
 
 *Formula:*
 $$P(X = k) = \frac{\binom{K}{k} \binom{N - K}{n - k}}{\binom{N}{n}}$$
@@ -115,8 +115,8 @@ k=30; n=300; K=500; N=16000;
 
 Where:
 
-k−1 is the number of observed successes minus 1 (for the "at least" scenario).
-lower.tail = FALSE gives the probability of getting at least k successes (right-tail).
+`k−1` is the number of observed successes minus 1 (for the "at least" scenario).
+Setting `lower.tail = FALSE` gives the probability of obtaining at least 𝑘 successes (right-tail).
 
 
 <details>
@@ -144,7 +144,7 @@ phyper(k - 1, K, N - K, n, lower.tail = FALSE)
 
 [*Link to open toy enrichment calculator*](https://bioinformatics3.erc.monash.edu/rsconnect/content/241/). 
 
-This calculates enrichment for a single hypothetical genelist (e.g. your RNAseq differentially expressed genelist) against a single hypothetical 'term' (some set of interesting genes, e.g. synaptic signaling genes). It makes a Venn diagram and a wordy description of what is being tested.
+This calculates enrichment for a single hypothetical gene list (e.g. your RNA-seq differentially expressed gene-list) against a single hypothetical 'term' (a set of interesting genes, e.g., synaptic signalling genes). It makes a Venn diagram and a wordy description of what is being tested.
 
 You can adjust various factors and see their effect on the enrichment p-values. 
 
@@ -211,7 +211,7 @@ $$
 \mathrm{ES}(S) = \max_i \big[ P_{\text{hit}}(i) - P_{\text{miss}}(i) \big]
 $$
 
-Explanation of the Terms:
+Explanation of the terms:
 
 | Symbol                               | Meaning                                                   |
 |:-------------------------------------|:----------------------------------------------------------|
@@ -222,7 +222,7 @@ Explanation of the Terms:
 | \( p \)                              | The weighting parameter (usually \( p = 1 \) in standard GSEA). Higher \( p \) values emphasize genes with stronger correlations. |
 | \( N_H = |S| \)                      | The number of genes in the gene set \( S \). |
 | \( N \)                              | The total number of genes in the ranked list. |
-| \( N_R = \sum_{g_j \in S} |r_j|^p \) | The normalization constant for the “hits” in the gene set. |
+| \( N_R = \sum_{g_j \in S} |r_j|^p \) | The normalisation constant for the “hits” in the gene set. |
 | \( P_{\text{hit}}(i) \)              | The cumulative fraction of genes in \( S \) found up to position \( i \). |
 | \( P_{\text{miss}}(i) \)             | The cumulative fraction of genes not in \( S \) found up to position \( i \). |
 | \( \mathrm{ES}(S) \)                 | The enrichment score, i.e., the maximum deviation between \( P_{\text{hit}}(i) \) and \( P_{\text{miss}}(i) \). A positive ES indicates enrichment at the top of the ranked list; a negative ES indicates enrichment at the bottom. |

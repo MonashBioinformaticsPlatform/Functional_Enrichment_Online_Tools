@@ -8,7 +8,7 @@ In this workshop, we will explore several popular tools for functional enrichmen
 <!-- ## FEA in [g:Profiler](https://biit.cs.ut.ee/gprofiler/gost) -->
 ## <a href="https://biit.cs.ut.ee/gprofiler/gost" target="_blank"><img src="images/gp2-logo-new.png" alt="g:Profiler Logo" style="height:35px; vertical-align:middle;"></a>
 
-[gProfiler](https://biit.cs.ut.ee/gprofiler/gost) is known for its integration of numerous species and databases. It supports both ORA and GSEA, enabling users to assess Gene Ontology (GO), biological pathways, regulatory motifs and protein databases. With gProfile one can 
+[gProfiler](https://biit.cs.ut.ee/gprofiler/gost) is known for its integration of numerous species and databases. It supports both ORA and GSEA, enabling users to assess Gene Ontology (GO), biological pathways, regulatory motifs and protein databases. With gProfiler one can 
 
 ### Steps to perform ORA in g:Profiler:
 
@@ -18,7 +18,7 @@ In this workshop, we will explore several popular tools for functional enrichmen
 
 <span style="color:orange;">- Select Organism:</span> Choose the appropriate organism from the `Organism` dropdown menu (e.g., *Homo sapiens* for human data).
 
-<span style="color:orange;">- Choose Statistical Domain Scope:</span> Under `Advanced options`, select your preferred statistical background from the `Statistical domain scope` menu.If you choose "Custom" background, provide your custom background list by pasting or uploading the relevant file.
+<span style="color:orange;">- Choose Statistical Domain Scope:</span> Under `Advanced options`, select your preferred statistical background from the `Statistical domain scope` menu. If you choose "Custom" background, provide your custom background list by pasting or uploading the relevant file.
 
 <span style="color:orange;">- Set Significance Threshold:</span> Select the desired significance threshold method, such as *g:SCS*, *Bonferroni*, or *Benjamini-Hochberg*.
    - Specify the threshold value (e.g., 0.05, 0.1, etc.).
@@ -108,7 +108,7 @@ How can one use multi-GMT as custom background?
 
 <span style="color:orange;">- Modify Settings:</span> Under `Advanced Settings`, you can modify `Required score` from low (0.15) to highest (0.9) confidence. Similarly `FDR stringency` and `Network type` can be selected. 
 
-NOTE: In cases where long list of features is provided, STRING may chnage some of its settings so that:
+NOTE: In cases where long list of features is provided, STRING may change some of its settings so that:
 
  - the nodes will have a simplified (not 3D) design
  - previews of protein structures are not shown
@@ -138,7 +138,7 @@ knitr::include_graphics("images/string-legend.png")
 
 #### Settings
 
-In the `Settings` tab of the STRING results, users have the flexibility to adjust existing settings and apply new filters to customise their data view and analysis. This tab you to switch between network types, strengths, data sources, intertaction scores and more.
+In the `Settings` tab of the STRING results, users have the flexibility to adjust existing settings and apply new filters to customise their data view and analysis. This tab you to switch between network types, strengths, data sources, interaction scores and more.
 
 #### Analysis
 
@@ -154,7 +154,7 @@ The first number indicates how many proteins in your network are annotated with 
 Log10(observed / expected). This measure describes how large the enrichment effect is. It’s the ratio between i) the number of proteins in your network that are annotated with a term and ii) the number of proteins that we expect to be annotated with this term in a random network of the same size.
 
 <span style="color:orange;">- Signal:</span>
-The signal is defined as a weighted harmonic mean between the observed/expected ratio and -log(FDR). FDR tends to emphasise larger terms due to their potential for achieving lower p-values, while the observed/expected ratio highlights smaller terms, which have a high foreground to background ratio but cannot achieve low FDR values due to their size. The signal measure seeks to balance both metrics for a more intuittive ordering of enriched terms.
+The signal is defined as a weighted harmonic mean between the observed/expected ratio and -log(FDR). FDR tends to emphasise larger terms due to their potential for achieving lower p-values, while the observed/expected ratio highlights smaller terms, which have a high foreground to background ratio but cannot achieve low FDR values due to their size. The signal measure seeks to balance both metrics for a more intuitive ordering of enriched terms.
 
 <span style="color:orange;">- False Discovery Rate:</span>
 This measure describes how significant the enrichment is. Shown are p-values corrected for multiple testing within each category using the Benjamini–Hochberg procedure.
@@ -166,7 +166,7 @@ STRING visualises terms within each category using a bubble plot, effectively sh
 knitr::include_graphics("images/string-enrichment_KEGG_sim0.7_graph_plus.png")
 ```
 
-Towards the the bottom of the `Analysis` page, one can change the background including adding one of their own.
+Towards the bottom of the `Analysis` page, one can change the background including adding one of their own.
 <!-- ![Statistical background](images/string-statistical-background.png){ width=100% } -->
 ```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Statistical background"} 
 knitr::include_graphics("images/string-statistical-background.png")
@@ -182,9 +182,9 @@ The network data can be exported with the `Exports` tab. Also Network data can b
 
 The `Clusters` tab essentially provides three different types of clustering algorithms:
 
- - k-means clustering: Initialise *k* centroids randomly, assigns each data point to the nearest centroid, recompute the centroids as the mean of all points in a cluster until until centroids do not change significantly.
+ - k-means clustering: Initialises *k* centroids randomly, assigns each data point to the nearest centroid, recomputes the centroids as the mean of all points in a cluster until centroids do not change significantly.
  
- - MCL clustering (Markov clustering): is a graph-based algorithm that uses flow simulation to detect clusters in a network by modeling random walks.
+ - MCL clustering (Markov clustering): is a graph-based algorithm that uses flow simulation to detect clusters in a network by modelling random walks.
  
  - DBSCAN clustering: is a density-based algorithm that groups points closely packed together while marking points in low-density regions as outliers or noise
 
@@ -200,7 +200,7 @@ What was the overlap in enrichment terms between gProfiler and STRING at FDR ≤
 
 ### Steps to Perform GSEA in STRING:
 
-<span style="color:orange;">- Selcet Proteins with Values/Ranks.</span>
+<span style="color:orange;">- Select Proteins with Values/Ranks.</span>
 
 <span style="color:orange;">- Input Gene List:</span> Paste your gene list with a meaningful value for ranking (fold-change, log-pvalue, abundance, ...) directly into the input box on the STRING web page or upload a file containing your list of features and their corresponding values.
 
@@ -281,7 +281,7 @@ knitr::include_graphics("images/Browse_Modules_gsea.png")
 
 \- Set permutation under `number of permutations` tab
 
-\- Type of the permuattaion to be set under `permutation type` tab
+\- Type of the permutation to be set under `permutation type` tab
 
 \- Select an appropriate DNA Chip annotation file from `chip platform file` tab
 
@@ -295,7 +295,7 @@ knitr::include_graphics("images/Browse_Modules_gsea.png")
  
   - WEighted: the score increment for each gene in *S* is weighted by its correlation with the phenotype, typically the absolute value of the correlation or ranking metric.
 
-\- Metric for ranking genes: Ranking metric of interest can be chosen from drop down menu. A detailed description od the metrics is given on [GSEA-MSigDB Documentation](https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/#metrics-for-ranking-genes).
+\- Metric for ranking genes: Ranking metric of interest can be chosen from drop down menu. A detailed description of the metrics is given on [GSEA-MSigDB Documentation](https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/#metrics-for-ranking-genes).
 
   - Categorical Phenotypes: Signal-to-Noise Ratio, t-Test, Ratio of Classes, Log2 Ratio of Classes
   
@@ -306,7 +306,7 @@ knitr::include_graphics("images/Browse_Modules_gsea.png")
 
 #### Browse the GSEA results
 
-Once the job has been queued and successfully run, the output will be listd on the left panel under `Jobs` tab:
+Once the job has been queued and successfully run, the output will be listed on the left panel under `Jobs` tab:
 
 ```{r, echo=FALSE, fig.align = "center", fig.cap="Job status in GenePattern"} 
 knitr::include_graphics("images/GenePattern-Jobs.png")
@@ -411,7 +411,7 @@ knitr::include_graphics("images/reactome-analysis-tools.png")
 
 - Upload list of features on the box or choose a file, hit continue
 
-- Select prefered options:
+- Select preferred options:
 
   \- Project to Human: This option will convert identifiers from non-human species into human equivalents, allowing you to analyse data across species.
   
@@ -425,11 +425,11 @@ knitr::include_graphics("images/reactome-analysis-tools.png")
 - If `Analyse gene expression` was chosen instead, Reactome offers the following gene set analysis:
 
 
-```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Ractome GSA "} 
+```{r, echo=FALSE, out.width="100%", fig.align = "center", fig.cap="Reactome GSA "} 
 knitr::include_graphics("images/reactome-gsea-methods.png")
 ```
 
-- Lets try CAMERA as it represents the `camera()` function of `limma` package in `R` for a gene set analysis.
+- Let's try CAMERA as it represents the `camera()` function of `limma` package in `R` for a gene set analysis.
 
 - Choose TMM normalisation to ensure consistency with the input data used in other tools within our workshop.
 
@@ -510,9 +510,9 @@ Functional enrichment analysis (FEA) typically involves one of over representati
 
   \- ORA methods requires a list of differentially expressed genes that are already analysed in differential expression analysis.
 
-  \- The background population, the universe, can be a more general set of gene like those in human genome or more specific from thos observed in an experiment.
+  \- The background population, the universe, can be a more general set of genes, like those in the human genome or more specific from those observed in an experiment.
 
-  \- A contingency table is created and the null distribution is modeled using the hypergeometric distribution.
+  \- A contingency table is created and the null distribution is modelled using the hypergeometric distribution.
 
 2. **FCS**
 
@@ -556,11 +556,11 @@ Functional enrichment analysis (FEA) typically involves one of over representati
 
     \- Fix technical parameters like the random seed and number of permutations before running the analysis to ensure reproducibility.
   
-    \- Avoid adjusting these parameters to obtain favorable results.
+    \- Avoid adjusting these parameters to obtain favourable results.
 
 - Avoid Cherry-picking:
 
-    \- Refrain from selectively reporting results based on favorable outcomes, as this can lead to over-optimistic and non-reproducible findings.
+    \- Refrain from selectively reporting results based on favourable outcomes, as this can lead to over-optimistic and non-reproducible findings.
 
     \- Avoid excessive tweaking of the analysis strategy to fit the data post hoc.
 
