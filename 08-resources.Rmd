@@ -6,6 +6,49 @@
 
 <!-- ----- -->
 
+Links to data sets used in this workshop:
+
+
+**1. gProfiler**
+
+ - [Bg_14420set_Enemble_IDs.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/Bg_14420set_Enemble_IDs.txt)
+ - [Bg_14420set_Gene_Symbols.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/Bg_14420set_Gene_Symbols.txt)
+ - [DE_198set_Enemble_IDs.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/DE_198set_Enemble_IDs.txt)
+ - [DE_198set_Gene_Symbols.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/DE_198set_Gene_Symbols.txt)
+ - [DE_378set_Enemble_IDs.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/DE_378set_Enemble_IDs.txt)
+ - [DE_378set_Gene_Symbols.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/DE_378set_Gene_Symbols.txt)
+
+**2. STRING**
+
+ - [DE_198set_Enemble_IDs.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/DE_198set_Enemble_IDs.txt)
+ - [DE_198set_Gene_Symbols.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/DE_198set_Gene_Symbols.txt)
+ - [Pre_Ranked_List_logFC_ENSEMBL](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/Pre_Ranked_List_logFC_ENSEMBL)
+ - [Pre_Ranked_List_logFC_SYMBOL](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/Pre_Ranked_List_logFC_SYMBOL)
+ - [Pre_Ranked_List_t_stat_ENSEMBL](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/Pre_Ranked_List_t_stat_ENSEMBL)
+ - [Pre_Ranked_List_t_stat_SYMBOL](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/Pre_Ranked_List_t_stat_SYMBOL)
+
+**3.GSEA**
+
+ - [Expression_Data.gct](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/GSEA/Expression_Data.gct)
+ - [Phenotype_Labels.cls](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/GSEA/Phenotype_Labels.cls)
+ 
+**4. Reactome**
+
+ - [DE_378set_Enemble_IDs.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/Reactome/DE_378set_Enemble_IDs.txt)
+ - [DE_378set_Gene_Symbols.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/Reactome/DE_378set_Gene_Symbols.txt)
+ - [TMM_normalized_data_Reactome.csv](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/Reactome/TMM_normalized_data_Reactome.csv)
+
+---
+
+Here is the [R scripts](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/datasets.R) used to create the data sets.
+
+Required input files for the datasets.R file:
+
+ - [Pezzini2016_SHSY5Ycelldiff_DE_table_filtering.xlsx](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/Pezzini2016_SHSY5Ycelldiff_DE_table_filtering.xlsx)
+ - [SHSY5Ycelldiff_Pezzini2016.tsv](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/SHSY5Ycelldiff_Pezzini2016.tsv)
+
+---
+
 The following tools might be useful for downstream functional analysis; this includes some not covered in today's workshop. 
 
 <!-- https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/shsy5ydiff.png) 

@@ -293,7 +293,7 @@ knitr::include_graphics("images/Browse_Modules_gsea.png")
 
   - K-S: The score increment is the same for all genes in *S* regardless of their ranking or correlation strength.
  
-  - WEighted: the score increment for each gene in *S* is weighted by its correlation with the phenotype, typically the absolute value of the correlation or ranking metric.
+  - Weighted: the score increment for each gene in *S* is weighted by its correlation with the phenotype, typically the absolute value of the correlation or ranking metric.
 
 \- Metric for ranking genes: Ranking metric of interest can be chosen from drop down menu. A detailed description of the metrics is given on [GSEA-MSigDB Documentation](https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/#metrics-for-ranking-genes).
 

@@ -3,23 +3,20 @@
 library(readxl)
 library(dplyr)
 
-setwd("Pezzini")
-list.files()
+# setwd("Pezzini")
+# list.files()
 
-
+# Create dirs
 dirs <- c("gProfiler", "STRING", "GSEA", "Reactome")
-# Create any directories that do not already exist
 lapply(dirs, function(d) {
     if (!dir.exists(d)) dir.create(d)
 })
-
 
 # Read Pezzini data
 dat <- readxl::read_xlsx("Pezzini2016_SHSY5Ycelldiff_DE_table_filtering.xlsx", sheet = "Full_DEResults_Table")
 names(dat)[1:4] <- c("Ensemble_ID", "Gene_Symbol", "Undifferentiated", "logFC")
 
-
-# Ensemble IDs
+# Data sets with Ensemble IDs
 ens1 <- dat %>%
     filter(abs(logFC) > log2(2) & FDR < 0.0001) %>%
     arrange(FDR) %>%
@@ -37,7 +34,7 @@ ens3 <- dat %>%
     pull(Ensemble_ID)
 write.table(ens3, file = "gProfiler/Bg_14420set_Enemble_IDs.txt", sep = "\t", row.names = FALSE, col.names = FALSE, quote = FALSE)
 
-# Gene symbols
+# Data sets with Gene symbols
 sym1 <- dat %>%
     filter(abs(logFC) > log2(2) & FDR < 0.0001) %>%
     arrange(FDR) %>%
@@ -57,7 +54,7 @@ write.table(sym3, file = "gProfiler/Bg_14420set_Gene_Symbols.txt", sep = "\t", r
 
 
 # -------------------------------------------------------------------------------------------------------
-
+# Generate TMM normalised data for Reactome analysis
 library(limma)
 library(edgeR)
 library(jsonlite)
@@ -161,6 +158,8 @@ normalized <- normalized %>% rownames_to_column(var = "Ensemble_IDs")
 write.table(normalized, file = "Reactome/TMM_normalized_data_Reactome.csv", row.names = FALSE, sep = ",", na = "", quote = FALSE)
 # ----------------------------------------------------------------------------------------------------------------------
 
+
+# Generate input data fro GSEA analysis
 # Get the ranks --------------------------------------------------------------------------------------------------------
 rnk1 <- out %>%
     arrange(-t) %>%
@@ -211,7 +210,7 @@ close(conn)
 new_rows <- c("#1.2", paste(nrow(normalized), ncol(normalized), sep = "\t"))
 
 GCT_FILE <- c(new_rows, expressed_data)
-writeLines(GCT_FILE, "GSEA/Expression_Data_.gct")
+writeLines(GCT_FILE, "GSEA/Expression_Data.gct")
 
 
 # Create .cls file

@@ -24,9 +24,10 @@ This workshop is intended for biologists working with ‘-Omics data’ (e.g., R
 
 ### Setup Requirements
 
-This workshop will be delivered in-person. It is recommended to install the [GSEA](https://www.gsea-msigdb.org/) and [Cytoscape](https://cytoscape.org/) software.
+The workshop will be held **in person**. Participants are encouraged to bring a **laptop**; however, **no software installation is necessary**.  
 
-Links and materials are provided on the `Resources` page.
+Workshop materials and relevant links can be found on the [**Resources**](https://monashbioinformaticsplatform.github.io/Functional_Enrichment_Online_Tools/resources.html) page.
+
 
 BYO coffee :)
 
