@@ -6,10 +6,10 @@
 
 <!-- ----- -->
 
-Links to data sets used in this workshop:
+## Links to data sets used in this workshop:
 
 
-**1. gProfiler**
+### **gProfiler**
 
  - [Bg_14420set_Enemble_IDs.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/Bg_14420set_Enemble_IDs.txt)
  - [Bg_14420set_Gene_Symbols.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/Bg_14420set_Gene_Symbols.txt)
@@ -18,7 +18,7 @@ Links to data sets used in this workshop:
  - [DE_378set_Enemble_IDs.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/DE_378set_Enemble_IDs.txt)
  - [DE_378set_Gene_Symbols.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/gProfiler/DE_378set_Gene_Symbols.txt)
 
-**2. STRING**
+### **STRING**
 
  - [DE_198set_Enemble_IDs.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/DE_198set_Enemble_IDs.txt)
  - [DE_198set_Gene_Symbols.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/DE_198set_Gene_Symbols.txt)
@@ -27,12 +27,12 @@ Links to data sets used in this workshop:
  - [Pre_Ranked_List_t_stat_ENSEMBL](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/Pre_Ranked_List_t_stat_ENSEMBL)
  - [Pre_Ranked_List_t_stat_SYMBOL](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/STRING/Pre_Ranked_List_t_stat_SYMBOL)
 
-**3.GSEA**
+### **GSEA**
 
  - [Expression_Data.gct](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/GSEA/Expression_Data.gct)
  - [Phenotype_Labels.cls](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/GSEA/Phenotype_Labels.cls)
  
-**4. Reactome**
+### **Reactome**
 
  - [DE_378set_Enemble_IDs.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/Reactome/DE_378set_Enemble_IDs.txt)
  - [DE_378set_Gene_Symbols.txt](https://github.com/MonashBioinformaticsPlatform/Functional_Enrichment_Online_Tools/blob/main/data/Reactome/DE_378set_Gene_Symbols.txt)
@@ -49,6 +49,8 @@ Required input files for the datasets.R file:
 
 ---
 
+## Web-based Tools
+
 The following tools might be useful for downstream functional analysis; this includes some not covered in today's workshop. 
 
 <!-- https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/shsy5ydiff.png) 
@@ -57,7 +59,7 @@ http://localhost:1313/enrichment_analysis_workshop/img/david.png
 
 Note that most of these tools do more than just enrichment tests, and some include their own databases. 
 
-## g:Profiler / g:GOSt
+### g:Profiler / g:GOSt
 
 https://biit.cs.ut.ee/gprofiler/gost
 
@@ -70,7 +72,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 ```
 
 
-## PANTHER 
+### PANTHER 
 
 http://www.pantherdb.org/
 
@@ -82,7 +84,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 ```
 
 
-## DAVID 
+### DAVID 
 
 https://david.ncifcrf.gov/
 
@@ -94,7 +96,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 ```
 
 
-## Enrichr
+### Enrichr
 
 https://amp.pharm.mssm.edu/Enrichr/
 
@@ -107,7 +109,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 
 
 
-## Reactome
+### Reactome
 
 https://reactome.org/
 
@@ -119,7 +121,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 ```
 
 
-## BioCyc
+### BioCyc
 
 https://biocyc.org/
 
@@ -131,7 +133,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 ```
 
 
-## STRING
+### STRING
 
 https://string-db.org/
 
@@ -142,7 +144,7 @@ STRING was originally designed as a convenient tool to explore interactions with
 knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/string.png")
 ```
 
-## Gene Ontology
+### Gene Ontology
 
 http://geneontology.org/
 
@@ -153,7 +155,7 @@ Gene Ontology (GO) terms are the most widely used set of functional annotations,
 knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/go.png")
 ```
 
-## KEGG
+### KEGG
 
 https://www.genome.jp/kegg/
 
@@ -165,7 +167,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 ```
 
 
-## GSEA and MSigDB
+### GSEA and MSigDB
 
 http://software.broadinstitute.org/gsea/index.jsp
 
@@ -177,7 +179,7 @@ knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichme
 ```
 
 
-## MetaboAnalyst
+### MetaboAnalyst
 MetaboAnalyst is popular among the metabolomics community for statistical, functional, and integrative analyses of metabolomics data. It has features such as **Enrichment Analysis**, **Pathway Analysis**, and **Network Analysis**, which perform metabolite set enrichment, metabolic pathway analysis, and pathway activity prediction from MS peaks.
 
 <!-- ![](https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/metaboanalyst.png) -->
@@ -185,7 +187,7 @@ MetaboAnalyst is popular among the metabolomics community for statistical, funct
 knitr::include_graphics("https://monashbioinformaticsplatform.github.io/enrichment_analysis_workshop/img/metaboanalyst.png")
 ```
 
-## Cytoscape
+### Cytoscape
 
 https://cytoscape.org/
 
