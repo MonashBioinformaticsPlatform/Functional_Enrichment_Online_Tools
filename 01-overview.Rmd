@@ -76,7 +76,7 @@ schedule <- tibble::tibble(
   ),
   `Time (mins)` = c(
     10,     # LP
-    30,15,15,  # HK before break
+    35,10,15,  # HK before break
     10,     # Morning break (new)
     40,     # HK: gProfiler (resumes at 11:20)
     40,     # GI - 1: STRING
